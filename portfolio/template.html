@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<!-- Declares this file uses HTML5 so browsers render in standards mode -->
+<html lang="sv">
+<!-- Sets the document language to Swedish; adjust if you prefer another primary language -->
+<head>
+    <!-- Head holds metadata that is not shown on the page -->
+    <meta charset="UTF-8">
+    <!-- Ensures characters (letters, symbols) display correctly -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Makes the layout adapt to mobile screen sizes -->
+    <title>PROJEKTTITEL HÄR | YourBrand Portfolio</title>
+    <!-- The text that appears in the browser tab and search results; keep Swedish first, adjust to your project -->
+    <link rel="stylesheet" href="portfolio.css">
+    <!-- Pulls in the shared styling used by the other portfolio pages -->
+</head>
+<!-- You can set page colors here by changing the two CSS variables below -->
+<body style="--accent-start:#4f46e5; --accent-end:#7c3aed;">
+    <div class="page">
+        <!-- HERO / HEADER -->
+        <header class="hero">
+            <div class="container">
+                <!-- Back link to return to the main site -->
+                <div class="topbar">
+                    <a class="back-link" href="../index.html#portfolio">&#8592; Tillbaka till portfolio</a>
+                    <p class="en-subtitle">Back to portfolio</p>
+                    <span class="badge">PROJEKTTYP</span>
+                    <p class="en-subtitle">Use a short label like "E-Commerce" or "Restaurant"</p>
+                </div>
+                <h1>Projektnamn skrivs här</h1>
+                <p class="en-subtitle">Project name goes here</p>
+                <!-- The main headline for this project -->
+                <p class="tagline">En mening som sammanfattar vad projektet levererar</p>
+                <p class="en-subtitle">One-line summary of what this project achieves</p>
+                <!-- Brief supporting sentence -->
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="../index.html#contact">Primär CTA</a>
+                    <p class="en-subtitle">Primary CTA (e.g., Start a Similar Project)</p>
+                    <a class="btn btn-outline" href="../index.html">Sekundär CTA</a>
+                    <p class="en-subtitle">Secondary CTA (e.g., Return Home)</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main class="main">
+            <div class="container">
+                <!-- Three-column grid that stacks on small screens -->
+                <div class="grid">
+                    <div class="card">
+                        <h3>Projektöversikt</h3>
+                        <p class="en-subtitle">Project overview</p>
+                        <!-- Explain the business goal and what you delivered -->
+                        <p>Kort stycke som beskriver resultatet och målgruppen.</p>
+                        <p class="en-subtitle">Short paragraph describing the project outcome and audience.</p>
+                        <ul class="list">
+                            <li><strong>Roll:</strong> Dina ansvarsområden (design, utveckling osv.) <span class="en-subtitle">Role: your responsibilities (design, dev, etc.)</span></li>
+                            <li><strong>Tidsplan:</strong> Hur lång tid det tog <span class="en-subtitle">Timeline: how long it took</span></li>
+                            <li><strong>Mål:</strong> Det viktigaste du löste <span class="en-subtitle">Goal: the main objective you solved</span></li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Viktiga funktioner</h3>
+                        <p class="en-subtitle">Key features</p>
+                        <!-- Bullet the most important things the site/app can do -->
+                        <ul class="list">
+                            <li>Funktion ett som betyder något för användarna <span class="en-subtitle">Feature one that matters to users</span></li>
+                            <li>Funktion två som visar värde <span class="en-subtitle">Feature two that shows value</span></li>
+                            <li>Funktion tre med en kort förklaring <span class="en-subtitle">Feature three with a short detail</span></li>
+                            <li>Funktion fyra (valfritt) <span class="en-subtitle">Feature four (optional)</span></li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Teknikstack</h3>
+                        <p class="en-subtitle">Tech stack</p>
+                        <!-- Pills below show which tools/tech you used -->
+                        <div class="meta">
+                            <span class="pill">HTML</span>
+                            <span class="pill">CSS</span>
+                            <span class="pill">JavaScript</span>
+                            <!-- Add or remove pills to match the project -->
+                        </div>
+                        <p>En mening om varför stacken valdes eller hur den presterar.</p>
+                        <p class="en-subtitle">One sentence on why this stack was chosen or how it performs.</p>
+                    </div>
+                </div>
+
+                <!-- Results or outcomes from the project -->
+                <div class="card">
+                    <h3>Resultat</h3>
+                    <p class="en-subtitle">Results</p>
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="value">+00%</div>
+                            <div class="label">Resultatetikett</div>
+                            <p class="en-subtitle">Result label</p>
+                        </div>
+                        <div class="metric">
+                            <div class="value">+00%</div>
+                            <div class="label">Ett annat resultat</div>
+                            <p class="en-subtitle">Another result</p>
+                        </div>
+                        <div class="metric">
+                            <div class="value">0.0s</div>
+                            <div class="label">Prestandasiffra</div>
+                            <p class="en-subtitle">Performance stat</p>
+                        </div>
+                        <!-- Change numbers and labels to your real outcomes -->
+                    </div>
+                </div>
+
+                <!-- Visual placeholder for screenshots or mockups -->
+                <div class="card">
+                    <h3>Sidförhandsvisning</h3>
+                    <p class="en-subtitle">Page preview</p>
+                    <div class="visual">Byt ut mot en skärmdump eller mockup</div>
+                    <p class="en-subtitle">Replace with a screenshot or mockup</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p>Vill du ha detta gjort? <a href="../index.html#contact">Hör av dig</a>.</p>
+            <p class="en-subtitle">Want this done for you? <a href="../index.html#contact">Get in touch</a>.</p>
+            <!-- Simple closing CTA that points back to your contact form -->
+        </footer>
+    </div>
+</body>
+</html>

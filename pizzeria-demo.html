@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klågerup Pizza & Grill – Demo | XyWebFix</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Små justeringar för denna sida utan att röra styles.css */
+        .hero.hero-pizzeria {
+            background: radial-gradient(circle at top left, #b91c1c, #111827);
+        }
+        .badge-demo {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.7rem;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.25);
+            color: #fecaca;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+        }
+        .menu-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        }
+        .menu-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 1.4rem 1.5rem 1.5rem;
+            box-shadow: 0 18px 35px rgba(15, 23, 42, 0.14);
+            border: 1px solid #e5e7eb;
+        }
+        .menu-card h3 {
+            margin: 0 0 0.35rem;
+            font-size: 1.1rem;
+        }
+        .menu-card ul {
+            margin: 0.4rem 0 0;
+            padding-left: 1.1rem;
+            font-size: 0.94rem;
+        }
+        .menu-card li + li {
+            margin-top: 0.15rem;
+        }
+        .info-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        }
+        .info-box {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 1.4rem 1.5rem 1.5rem;
+            box-shadow: 0 18px 35px rgba(15, 23, 42, 0.12);
+            border: 1px solid #e5e7eb;
+        }
+        .info-box h3 {
+            margin-top: 0;
+            margin-bottom: 0.4rem;
+        }
+        .opening-hours dt {
+            font-weight: 600;
+        }
+        .opening-hours dd {
+            margin: 0 0 0.25rem;
+            color: #6b7280;
+        }
+        .map-embed {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px dashed #d1d5db;
+            background: #f3f4f6;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+            color: #6b7280;
+            text-align: center;
+        }
+        .highlight-offer {
+            background: #fef3c7;
+            border-radius: 12px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.95rem;
+            border: 1px solid #facc15;
+            margin-top: 0.4rem;
+        }
+        .demo-note {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <!-- Enkel navbar som matchar din stil -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">XyWebFix Demo</div>
+            <button class="nav-toggle" id="navToggle">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#hero" class="nav-link">Hem</a></li>
+                <li><a href="#menu" class="nav-link">Meny</a></li>
+                <li><a href="#offers" class="nav-link">Erbjudanden</a></li>
+                <li><a href="#info" class="nav-link">Info & kontakt</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero" class="hero hero-pizzeria">
+        <div class="hero-content">
+            <span class="badge-demo">Demo · Pizzeria</span>
+            <h1 class="hero-title">Klågerup Pizza &amp; Grill (demo)</h1>
+            <p class="hero-subtitle">Pizza · grill · kebab · sallader</p>
+            <p class="en-subtitle">A modern pizza restaurant landing page built to make it easy to see the menu and call to order.</p>
+
+            <div style="margin-top: 1.6rem; display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center;">
+                <!-- Riktigt nummer i demo – du kan byta till annat om du vill -->
+                <a href="tel:040440347" class="btn btn-primary">📞 Ring och beställ</a>
+                <a href="#menu" class="btn" style="background:#f9fafb; border:1px solid #e5e7eb;">🍕 Visa meny</a>
+            </div>
+
+            <p class="demo-note">Detta är en demosida skapad av XyWebFix. Alla texter och priser är exempel.</p>
+        </div>
+    </section>
+
+    <!-- MENY -->
+    <section id="menu" class="services">
+        <div class="container">
+            <h2 class="section-title">Menyöversikt</h2>
+            <p class="section-subtitle">
+                Snabb överblick över de viktigaste kategorierna – detaljerad meny kan visas på egen sida eller som PDF-länk.
+            </p>
+            <p class="en-subtitle" style="text-align:center; margin-bottom:2rem;">
+                Quick overview of the main categories – a full detailed menu can be shown on a separate page or as a downloadable PDF.
+            </p>
+
+            <div class="menu-grid">
+                <div class="menu-card">
+                    <h3>Populära pizzor</h3>
+                    <p class="en-subtitle">Popular pizzas</p>
+                    <ul>
+                        <li>Margherita · ost & tomatsås</li>
+                        <li>Vesuvio · skinka & ost</li>
+                        <li>Capricciosa · skinka & champinjoner</li>
+                        <li>Husets special · blandade favoriter</li>
+                    </ul>
+                </div>
+
+                <div class="menu-card">
+                    <h3>Kebab & grill</h3>
+                    <p class="en-subtitle">Kebab & grilled dishes</p>
+                    <ul>
+                        <li>Kebabtallrik med pommes och sås</li>
+                        <li>Kebabrulle med sallad</li>
+                        <li>Kycklingfilé med ris & sallad</li>
+                        <li>Burgare med bröd, ost & pommes</li>
+                    </ul>
+                </div>
+
+                <div class="menu-card">
+                    <h3>Sallader & rullar</h3>
+                    <p class="en-subtitle">Salads & wraps</p>
+                    <ul>
+                        <li>Grekisk sallad med fetaost & oliver</li>
+                        <li>Kycklingsallad med krutonger</li>
+                        <li>Falafelrulle med fräsch sallad</li>
+                        <li>Vegosallad med säsongens grönsaker</li>
+                    </ul>
+                </div>
+
+                <div class="menu-card">
+                    <h3>Familjepizzor & erbjudanden</h3>
+                    <p class="en-subtitle">Family pizzas & combos</p>
+                    <ul>
+                        <li>Familjepizza – valfri fyllning</li>
+                        <li>2 valfria pizzor + läsk</li>
+                        <li>Student-/veckodeal</li>
+                        <li>Helgkampanj med extra topping</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ERBJUDANDEN -->
+    <section id="offers" class="portfolio">
+        <div class="container">
+            <h2 class="section-title">Kampanjer & erbjudanden</h2>
+            <p class="section-subtitle">
+                Tydliga kampanjytor gör att gäster snabbt ser dagens/de veckans erbjudanden.
+            </p>
+            <p class="en-subtitle" style="text-align:center; margin-bottom:2rem;">
+                Clear campaign sections highlight current offers and specials to increase average order value.
+            </p>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <h3>Veckans deal</h3>
+                    <p class="en-subtitle">Weekly deal</p>
+                    <p>2 valfria standardpizzor + 1,5L läsk för 199 kr.</p>
+                    <div class="highlight-offer">
+                        💡 På hemsidan kan detta uppdateras enkelt varje vecka utan att röra designen.
+                    </div>
+                </div>
+                <div class="info-box">
+                    <h3>Luncherbjudande</h3>
+                    <p class="en-subtitle">Lunch offer</p>
+                    <p>Vardagar 11:00–14:00 – utvalda pizzor, kebab- eller salladsrätter inkl. sallad & dryck.</p>
+                    <p class="en-subtitle">Weekday lunch menu with selected dishes at a fixed price, including salad and drink.</p>
+                </div>
+                <div class="info-box">
+                    <h3>Nyhet / special</h3>
+                    <p class="en-subtitle">New item / special</p>
+                    <p>Plats för att lyfta nya pizzor, säsongsmeny eller exempelvis “Klågerup Special”.</p>
+                    <p class="en-subtitle">A spot dedicated to promoting new pizzas, seasonal items or a house special.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INFO & KONTAKT -->
+    <section id="info" class="contact">
+        <div class="container">
+            <h2 class="section-title">Öppettider, läge & kontakt</h2>
+            <p class="section-subtitle">
+                All viktig information samlad på ett ställe – lätt att hitta och lätt att ringa.
+            </p>
+            <p class="en-subtitle" style="text-align:center; margin-bottom:2rem;">
+                All essential information in one place – easy to find and easy to call.
+            </p>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <h3>Öppettider</h3>
+                    <p class="en-subtitle">Opening hours</p>
+                    <dl class="opening-hours">
+                        <dt>Måndag–Torsdag</dt>
+                        <dd>14:00 – 21:00</dd>
+                        <dt>Fredag–Söndag</dt>
+                        <dd>12:00 – 21:00</dd>
+                    </dl>
+                    <p>Öppettider kan uppdateras enkelt vid helgdagar och sommarperioder.</p>
+                    <p class="en-subtitle">Opening hours can be updated quickly for holidays and seasonal changes.</p>
+                </div>
+
+                <div class="info-box">
+                    <h3>Kontakt</h3>
+                    <p class="en-subtitle">Contact</p>
+                    <p><strong>Telefon:</strong> <a href="tel:040440347">040-44 03 47</a></p>
+                    <p><strong>Adress:</strong> Industrivägen, Klågerup</p>
+                    <p><strong>E-post:</strong> <a href="mailto:info@klageruppizza.se">info@klageruppizza.se</a> (demoadress)</p>
+                    <p class="en-subtitle">Phone, address and email clearly visible with click-to-call on mobile.</p>
+                </div>
+
+                <div class="info-box">
+                    <h3>Hitta hit</h3>
+                    <p class="en-subtitle">Find us</p>
+                    <div class="map-embed">
+                        Här kan en inbäddad Google Maps-karta ligga så att gäster enkelt hittar vägen.
+                        <br>
+                        <span class="en-subtitle">Embedded Google Maps can be added here for easy navigation.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>XyWebFix</h3>
+                    <p>Denna sida är en demo byggd för att visa hur en modern pizzeriasajt kan se ut.</p>
+                    <p class="en-subtitle">This page is a demo created to show what a modern pizza restaurant website could look like.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Snabblänkar</h4>
+                    <ul>
+                        <li><a href="#hero">Hem</a></li>
+                        <li><a href="#menu">Menyöversikt</a></li>
+                        <li><a href="#offers">Kampanjer</a></li>
+                        <li><a href="#info">Info & kontakt</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Kontakt XyWebFix</h4>
+                    <p>E-post: <a href="mailto:Xytherisprints@gmail.com">Xytherisprints@gmail.com</a></p>
+                    <p>Telefon: <a href="tel:+46761900853">+46 76 190 08 53</a></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 XyWebFix. Demo site – not an official website for Klågerup Pizzeria.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
