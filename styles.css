@@ -476,6 +476,21 @@ section {
     box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
 }
 
+.form-status {
+    margin-top: 0.4rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    min-height: 1.2em;
+}
+
+.form-status.success {
+    color: #34d399;
+}
+
+.form-status.error {
+    color: #f87171;
+}
+
 /* ================
    Footer
    ================ */

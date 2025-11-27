@@ -7,6 +7,8 @@ window.addEventListener('DOMContentLoaded', () => {
     const contactForm = document.getElementById('contactForm');
     const languageSelect = document.getElementById('languageSelect');
     const LANG_KEY = 'xywebfix-lang';
+    const formStatus = document.getElementById('formStatus');
+    const submitButton = contactForm?.querySelector('button[type="submit"]');
 
     const placeholderMap = {
         name: { sv: 'Ditt namn', en: 'Your name' },
@@ -78,16 +80,57 @@ window.addEventListener('DOMContentLoaded', () => {
         navbar.style.boxShadow = shadow;
     });
 
-    // Basic contact form handler (placeholder alert + reset)
-    contactForm?.addEventListener('submit', e => {
-        e.preventDefault();
+    function setStatus(message, type = '') {
+        if (!formStatus) return;
+        formStatus.textContent = message;
+        formStatus.classList.remove('success', 'error');
+        if (type) formStatus.classList.add(type);
+    }
 
+    function enableSubmit(enable) {
+        if (!submitButton) return;
+        submitButton.disabled = !enable;
+        submitButton.style.opacity = enable ? '1' : '0.7';
+    }
+
+    // Basic contact form handler: send to configured endpoint or fall back to mailto
+    contactForm?.addEventListener('submit', async e => {
+        e.preventDefault();
+        const endpoint = contactForm.dataset.endpoint?.trim();
         const name = document.getElementById('name')?.value || '';
         const email = document.getElementById('email')?.value || '';
+        const subject = document.getElementById('subject')?.value || '';
+        const message = document.getElementById('message')?.value || '';
 
-        alert(`Thank you for your message, ${name}! We'll get back to you soon at ${email}.`);
-        contactForm.reset();
-        setPlaceholders(localStorage.getItem(LANG_KEY) || 'en');
+        setStatus('Sending...', '');
+        enableSubmit(false);
+
+        if (!endpoint) {
+            // Fallback: open mail client
+            const mailto = `mailto:info@xytheriswebstudio.com?subject=${encodeURIComponent(subject || 'New inquiry')}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`)}`;
+            window.location.href = mailto;
+            setStatus('Opening your email client...', 'success');
+            enableSubmit(true);
+            return;
+        }
+
+        try {
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, subject, message })
+            });
+
+            if (!res.ok) throw new Error(`Status ${res.status}`);
+
+            setStatus('Message sent! We will get back to you shortly.', 'success');
+            contactForm.reset();
+            setPlaceholders(localStorage.getItem(LANG_KEY) || 'en');
+        } catch (error) {
+            setStatus('Could not send right now. Please email info@xytheriswebstudio.com directly.', 'error');
+        } finally {
+            enableSubmit(true);
+        }
     });
 
     // Intersection Observer options for fade-in animations

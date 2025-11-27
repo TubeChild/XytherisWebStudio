@@ -348,23 +348,24 @@
                         </div>
                     </div>
                 </div>
-                <form class="contact-form" id="contactForm">
+                <form class="contact-form" id="contactForm" data-endpoint="">
                     <div class="form-group">
-                        <input type="text" id="name" name="name" data-placeholder-sv="Ditt namn" data-placeholder-en="Your name" aria-label="Your Name" required>
+                        <input type="text" id="name" name="name" autocomplete="name" data-placeholder-sv="Ditt namn" data-placeholder-en="Your name" aria-label="Your Name" required>
                     </div>
                     <div class="form-group">
-                        <input type="email" id="email" name="email" data-placeholder-sv="Din e-post" data-placeholder-en="Your email" aria-label="Your Email" required>
+                        <input type="email" id="email" name="email" autocomplete="email" data-placeholder-sv="Din e-post" data-placeholder-en="Your email" aria-label="Your Email" required>
                     </div>
                     <div class="form-group">
-                        <input type="text" id="subject" name="subject" data-placeholder-sv="Ämne" data-placeholder-en="Subject" aria-label="Subject" required>
+                        <input type="text" id="subject" name="subject" autocomplete="subject" data-placeholder-sv="Ämne" data-placeholder-en="Subject" aria-label="Subject" required>
                     </div>
                     <div class="form-group">
-                        <textarea id="message" name="message" rows="5" data-placeholder-sv="Ditt meddelande" data-placeholder-en="Your message" aria-label="Your Message" required></textarea>
+                        <textarea id="message" name="message" rows="5" autocomplete="off" data-placeholder-sv="Ditt meddelande" data-placeholder-en="Your message" aria-label="Your Message" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary" title="Send message">
                         <span data-lang="sv">Skicka meddelande</span>
                         <span data-lang="en">Send message</span>
                     </button>
+                    <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
                 </form>
             </div>
         </div>
