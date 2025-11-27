@@ -1,4 +1,4 @@
-// Run interactions after the DOM is ready
+﻿// Run interactions after the DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
     const navToggle = document.getElementById('navToggle');
     const navMenu = document.getElementById('navMenu');
@@ -11,7 +11,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const placeholderMap = {
         name: { sv: 'Ditt namn', en: 'Your name' },
         email: { sv: 'Din e-post', en: 'Your email' },
-        subject: { sv: '�mne', en: 'Subject' },
+        subject: { sv: 'Ämne', en: 'Subject' },
         message: { sv: 'Ditt meddelande', en: 'Your message' }
     };
 
@@ -25,7 +25,9 @@ window.addEventListener('DOMContentLoaded', () => {
     function applyLanguage(lang) {
         const selected = lang === 'sv' ? 'sv' : 'en';
         document.documentElement.setAttribute('lang', selected);
-        document.body.setAttribute('data-lang', selected);
+        // Track current language without colliding with data-lang selectors used for copy
+        document.body.removeAttribute('data-lang');
+        document.body.setAttribute('data-current-lang', selected);
 
         document.querySelectorAll('[data-lang]').forEach(el => {
             el.style.display = el.dataset.lang === selected ? '' : 'none';
