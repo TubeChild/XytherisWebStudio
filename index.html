@@ -1,82 +1,136 @@
-<!DOCTYPE html>
-<html lang="sv">
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XyWebFix - Webbutveckling för småföretag</title>
+    <title>XytherisWebStudio - Web Development for Small Businesses</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar">
         <div class="container">
-            <div class="nav-brand">XyWebFix</div>
-            <button class="nav-toggle" id="navToggle">
+            <div class="nav-brand">XytherisWebStudio</div>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
-            <ul class="nav-menu" id="navMenu">
-                <li><a href="#hero" class="nav-link" title="Home">Hem</a></li>
-                <li><a href="#services" class="nav-link" title="Services">Tjänster</a></li>
-                <li><a href="#portfolio" class="nav-link" title="Portfolio">Portfolio</a></li>
-                <li><a href="#contact" class="nav-link" title="Contact">Kontakt</a></li>
-            </ul>
+            <div class="nav-actions">
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#hero" class="nav-link" title="Home"><span data-lang="sv">Hem</span><span data-lang="en">Home</span></a></li>
+                    <li><a href="#services" class="nav-link" title="Services"><span data-lang="sv">Tjänster</span><span data-lang="en">Services</span></a></li>
+                    <li><a href="#portfolio" class="nav-link" title="Portfolio"><span data-lang="sv">Portfolio</span><span data-lang="en">Portfolio</span></a></li>
+                    <li><a href="#contact" class="nav-link" title="Contact"><span data-lang="sv">Kontakt</span><span data-lang="en">Contact</span></a></li>
+                </ul>
+                <div class="language-switcher">
+                    <label class="sr-only" for="languageSelect">Language</label>
+                    <select id="languageSelect" aria-label="Language selector">
+                        <option value="en">🇬🇧 EN</option>
+                        <option value="sv">🇸🇪 SV</option>
+                    </select>
+                </div>
+            </div>
         </div>
     </nav>
 
     <!-- Hero -->
     <section id="hero" class="hero">
         <div class="hero-content">
-            <h1 class="hero-title">Vi bygger digitala upplevelser för småföretag</h1>
-            <p class="hero-subtitle">Professionella webbtjänster anpassade för att få ditt företag att växa online</p>
-            <p class="en-subtitle">Building digital experiences for small businesses through professional and modern web development.</p>
-            <a href="#contact" class="btn btn-primary" title="Get started">Kom igång</a>
+            <h1 class="hero-title">
+                <span data-lang="sv">Vi bygger digitala upplevelser för småföretag</span>
+                <span data-lang="en">Building digital experiences for small businesses</span>
+            </h1>
+            <p class="hero-subtitle">
+                <span data-lang="sv">Professionella webbtjänster anpassade för att få ditt företag att växa online.</span>
+                <span data-lang="en">Professional web services tailored to help your business grow online.</span>
+            </p>
+            <div class="hero-cta">
+                <a href="#contact" class="btn btn-primary" title="Get started">
+                    <span data-lang="sv">Kom igång</span>
+                    <span data-lang="en">Get started</span>
+                </a>
+            </div>
         </div>
     </section>
 
     <!-- Services -->
     <section id="services" class="services">
         <div class="container">
-            <h2 class="section-title">Våra tjänster</h2>
-            <p class="section-subtitle">Kompletta webblösningar som lyfter ditt företag</p>
-            <p class="en-subtitle">Comprehensive web solutions to elevate your business</p>
+            <h2 class="section-title">
+                <span data-lang="sv">Våra tjänster</span>
+                <span data-lang="en">Our services</span>
+            </h2>
+            <p class="section-subtitle">
+                <span data-lang="sv">Kompletta webblösningar som lyfter ditt företag</span>
+                <span data-lang="en">Comprehensive web solutions to elevate your business</span>
+            </p>
             <div class="services-grid">
                 <div class="service-card">
                     <div class="service-icon">WD</div>
-                    <h3>Webbdesign</h3>
-                    <p>Snygga, moderna designer som fångar ditt varumärke och engagerar dina besökare</p>
-                    <p class="en-subtitle">Beautiful, modern designs that capture your brand essence and engage your audience</p>
+                    <h3>
+                        <span data-lang="sv">Webbdesign</span>
+                        <span data-lang="en">Web design</span>
+                    </h3>
+                    <p>
+                        <span data-lang="sv">Snygga, moderna designer som fångar ditt varumärke och engagerar dina besökare.</span>
+                        <span data-lang="en">Beautiful, modern designs that capture your brand essence and engage your audience.</span>
+                    </p>
                 </div>
                 <div class="service-card">
                     <div class="service-icon">DEV</div>
-                    <h3>Webbutveckling</h3>
-                    <p>Skräddarsydda webbplatser med ren kod, snabb prestanda och responsiva layouter</p>
-                    <p class="en-subtitle">Custom-built websites with clean code, fast performance, and responsive layouts</p>
+                    <h3>
+                        <span data-lang="sv">Webbutveckling</span>
+                        <span data-lang="en">Web development</span>
+                    </h3>
+                    <p>
+                        <span data-lang="sv">Skräddarsydda webbplatser med ren kod, snabb prestanda och responsiva layouter.</span>
+                        <span data-lang="en">Custom-built websites with clean code, fast performance, and responsive layouts.</span>
+                    </p>
                 </div>
                 <div class="service-card">
                     <div class="service-icon">OPT</div>
-                    <h3>Webboptimering</h3>
-                    <p>Hastighetsoptimering och SEO som hjälper ditt företag att ranka högre och ladda snabbare</p>
-                    <p class="en-subtitle">Speed optimization and SEO to help your business rank higher and load faster</p>
+                    <h3>
+                        <span data-lang="sv">Webboptimering</span>
+                        <span data-lang="en">Web optimization</span>
+                    </h3>
+                    <p>
+                        <span data-lang="sv">Hastighetsoptimering och SEO som hjälper ditt företag att ranka högre och ladda snabbare.</span>
+                        <span data-lang="en">Speed optimization and SEO to help your business rank higher and load faster.</span>
+                    </p>
                 </div>
                 <div class="service-card">
                     <div class="service-icon">RSP</div>
-                    <h3>Responsiv design</h3>
-                    <p>Mobilvänliga webbplatser som ser bra ut på alla enheter och skärmstorlekar</p>
-                    <p class="en-subtitle">Mobile-friendly websites that look great on all devices and screen sizes</p>
+                    <h3>
+                        <span data-lang="sv">Responsiv design</span>
+                        <span data-lang="en">Responsive design</span>
+                    </h3>
+                    <p>
+                        <span data-lang="sv">Mobilvänliga webbplatser som ser bra ut på alla enheter och skärmstorlekar.</span>
+                        <span data-lang="en">Mobile-friendly websites that look great on all devices and screen sizes.</span>
+                    </p>
                 </div>
                 <div class="service-card">
                     <div class="service-icon">SUP</div>
-                    <h3>Underhåll &amp; support</h3>
-                    <p>Löpande stöd och uppdateringar som håller din webbplats igång utan avbrott</p>
-                    <p class="en-subtitle">Ongoing support and updates to keep your website running smoothly</p>
+                    <h3>
+                        <span data-lang="sv">Underhåll &amp; support</span>
+                        <span data-lang="en">Maintenance &amp; support</span>
+                    </h3>
+                    <p>
+                        <span data-lang="sv">Löpande stöd och uppdateringar som håller din webbplats igång utan avbrott.</span>
+                        <span data-lang="en">Ongoing support and updates to keep your website running smoothly.</span>
+                    </p>
                 </div>
                 <div class="service-card">
                     <div class="service-icon">ECO</div>
-                    <h3>E-handelslösningar</h3>
-                    <p>Komplett webbutik redo för säkra betalningar och försäljning online</p>
-                    <p class="en-subtitle">Complete online store setup to start selling your products online</p>
+                    <h3>
+                        <span data-lang="sv">E-handelslösningar</span>
+                        <span data-lang="en">E-commerce solutions</span>
+                    </h3>
+                    <p>
+                        <span data-lang="sv">Komplett webbutik redo för säkra betalningar och försäljning online.</span>
+                        <span data-lang="en">Complete online store setup to start selling your products online.</span>
+                    </p>
                 </div>
             </div>
         </div>
@@ -85,27 +139,36 @@
     <!-- Portfolio -->
     <section id="portfolio" class="portfolio">
         <div class="container">
-            <h2 class="section-title">Vår portfolio</h2>
-            <p class="section-subtitle">Några aktuella projekt vi är stolta över</p>
-            <p class="en-subtitle">Recent projects we&apos;re proud of</p>
+            <h2 class="section-title">
+                <span data-lang="sv">Vår portfolio</span>
+                <span data-lang="en">Our portfolio</span>
+            </h2>
+            <p class="section-subtitle">
+                <span data-lang="sv">Några aktuella projekt vi är stolta över</span>
+                <span data-lang="en">Recent projects we&apos;re proud of</span>
+            </p>
             <div class="portfolio-grid">
                 <a class="portfolio-card" href="portfolio/restaurant.html">
                     <div class="portfolio-image">
                         <div class="portfolio-placeholder" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                             <div class="project-type">
-                                Restaurangwebb
-                                <span class="en-subtitle">Restaurant website</span>
+                                <span data-lang="sv">Restaurangwebb</span>
+                                <span data-lang="en">Restaurant website</span>
                             </div>
                         </div>
                     </div>
                     <div class="portfolio-content">
-                        <h3>Omprofilering för lokal restaurang</h3>
-                        <p class="en-subtitle">Local restaurant redesign</p>
-                        <p>En modern, aptitlig webbplats med digital meny och bordsbokning</p>
-                        <p class="en-subtitle">A modern, appetizing website with an online menu and reservations</p>
+                        <h3>
+                            <span data-lang="sv">Omprofilering för lokal restaurang</span>
+                            <span data-lang="en">Local restaurant redesign</span>
+                        </h3>
+                        <p>
+                            <span data-lang="sv">En modern, aptitlig webbplats med digital meny och bordsbokning.</span>
+                            <span data-lang="en">A modern, appetizing website with an online menu and reservations.</span>
+                        </p>
                         <div class="portfolio-tags">
-                            <span class="tag" title="Design">Design</span>
-                            <span class="tag" title="Development">Utveckling</span>
+                            <span class="tag" title="Design"><span data-lang="sv">Design</span><span data-lang="en">Design</span></span>
+                            <span class="tag" title="Development"><span data-lang="sv">Utveckling</span><span data-lang="en">Development</span></span>
                         </div>
                     </div>
                 </a>
@@ -114,19 +177,23 @@
                     <div class="portfolio-image">
                         <div class="portfolio-placeholder" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
                             <div class="project-type">
-                                E-handelsbutik
-                                <span class="en-subtitle">E-commerce store</span>
+                                <span data-lang="sv">E-handelsbutik</span>
+                                <span data-lang="en">E-commerce store</span>
                             </div>
                         </div>
                     </div>
                     <div class="portfolio-content">
-                        <h3>Boutiquebutik online</h3>
-                        <p class="en-subtitle">Boutique online store</p>
-                        <p>Komplett e-handelslösning för en modebutik med säker checkout</p>
-                        <p class="en-subtitle">Complete e-commerce solution for a fashion boutique with secure checkout</p>
+                        <h3>
+                            <span data-lang="sv">Boutiquebutik online</span>
+                            <span data-lang="en">Boutique online store</span>
+                        </h3>
+                        <p>
+                            <span data-lang="sv">Komplett e-handelslösning för en modebutik med säker checkout.</span>
+                            <span data-lang="en">Complete e-commerce solution for a fashion boutique with secure checkout.</span>
+                        </p>
                         <div class="portfolio-tags">
-                            <span class="tag" title="E-Commerce">E-handel</span>
-                            <span class="tag" title="Payment Integration">Betalning</span>
+                            <span class="tag" title="E-Commerce"><span data-lang="sv">E-handel</span><span data-lang="en">E-commerce</span></span>
+                            <span class="tag" title="Payment Integration"><span data-lang="sv">Betalning</span><span data-lang="en">Payments</span></span>
                         </div>
                     </div>
                 </a>
@@ -135,19 +202,23 @@
                     <div class="portfolio-image">
                         <div class="portfolio-placeholder" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
                             <div class="project-type">
-                                Tjänsteföretag
-                                <span class="en-subtitle">Service business</span>
+                                <span data-lang="sv">Tjänsteföretag</span>
+                                <span data-lang="en">Service business</span>
                             </div>
                         </div>
                     </div>
                     <div class="portfolio-content">
-                        <h3>Webbplats för konsultbolag</h3>
-                        <p class="en-subtitle">Professional services site</p>
-                        <p>Ren och förtroendeingivande sida med kundcase och omdömen</p>
-                        <p class="en-subtitle">Clean, professional website for a consulting firm with client testimonials</p>
+                        <h3>
+                            <span data-lang="sv">Webbplats för konsultbolag</span>
+                            <span data-lang="en">Professional services site</span>
+                        </h3>
+                        <p>
+                            <span data-lang="sv">Ren och förtroendeingivande sida med kundcase och omdömen.</span>
+                            <span data-lang="en">Clean, professional website for a consulting firm with client testimonials.</span>
+                        </p>
                         <div class="portfolio-tags">
-                            <span class="tag" title="Corporate">Företag</span>
-                            <span class="tag" title="SEO">SEO</span>
+                            <span class="tag" title="Corporate"><span data-lang="sv">Företag</span><span data-lang="en">Corporate</span></span>
+                            <span class="tag" title="SEO"><span data-lang="sv">SEO</span><span data-lang="en">SEO</span></span>
                         </div>
                     </div>
                 </a>
@@ -156,19 +227,23 @@
                     <div class="portfolio-image">
                         <div class="portfolio-placeholder" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
                             <div class="project-type">
-                                Fastighet
-                                <span class="en-subtitle">Real estate</span>
+                                <span data-lang="sv">Fastighet</span>
+                                <span data-lang="en">Real estate</span>
                             </div>
                         </div>
                     </div>
                     <div class="portfolio-content">
-                        <h3>Portfölj för bostäder</h3>
-                        <p class="en-subtitle">Real estate portfolio</p>
-                        <p>Objektsida med avancerad sök, filter och virtuella visningar</p>
-                        <p class="en-subtitle">Property listing website with advanced search and virtual tours</p>
+                        <h3>
+                            <span data-lang="sv">Portfölj för bostäder</span>
+                            <span data-lang="en">Real estate portfolio</span>
+                        </h3>
+                        <p>
+                            <span data-lang="sv">Objektsida med avancerad sök, filter och virtuella visningar.</span>
+                            <span data-lang="en">Property listing website with advanced search and virtual tours.</span>
+                        </p>
                         <div class="portfolio-tags">
-                            <span class="tag" title="Custom Features">Anpassade funktioner</span>
-                            <span class="tag" title="Database">Databas</span>
+                            <span class="tag" title="Custom Features"><span data-lang="sv">Anpassade funktioner</span><span data-lang="en">Custom features</span></span>
+                            <span class="tag" title="Database"><span data-lang="sv">Databas</span><span data-lang="en">Database</span></span>
                         </div>
                     </div>
                 </a>
@@ -177,19 +252,23 @@
                     <div class="portfolio-image">
                         <div class="portfolio-placeholder" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
                             <div class="project-type">
-                                Träningsstudio
-                                <span class="en-subtitle">Fitness studio</span>
+                                <span data-lang="sv">Träningsstudio</span>
+                                <span data-lang="en">Fitness studio</span>
                             </div>
                         </div>
                     </div>
                     <div class="portfolio-content">
-                        <h3>Webbplats för träningsstudio</h3>
-                        <p class="en-subtitle">Fitness studio website</p>
-                        <p>Dynamisk sida med scheman, tränare och enkel onlinebokning</p>
-                        <p class="en-subtitle">Dynamic website with class schedules and online booking system</p>
+                        <h3>
+                            <span data-lang="sv">Webbplats för träningsstudio</span>
+                            <span data-lang="en">Fitness studio website</span>
+                        </h3>
+                        <p>
+                            <span data-lang="sv">Dynamisk sida med scheman, tränare och enkel onlinebokning.</span>
+                            <span data-lang="en">Dynamic website with class schedules and online booking system.</span>
+                        </p>
                         <div class="portfolio-tags">
-                            <span class="tag" title="Booking System">Bokningssystem</span>
-                            <span class="tag" title="Mobile First">Mobil först</span>
+                            <span class="tag" title="Booking System"><span data-lang="sv">Bokningssystem</span><span data-lang="en">Booking</span></span>
+                            <span class="tag" title="Mobile First"><span data-lang="sv">Mobil först</span><span data-lang="en">Mobile first</span></span>
                         </div>
                     </div>
                 </a>
@@ -198,19 +277,23 @@
                     <div class="portfolio-image">
                         <div class="portfolio-placeholder" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
                             <div class="project-type">
-                                Tech-startup
-                                <span class="en-subtitle">Tech startup</span>
+                                <span data-lang="sv">Tech-startup</span>
+                                <span data-lang="en">Tech startup</span>
                             </div>
                         </div>
                     </div>
                     <div class="portfolio-content">
-                        <h3>Landningssida för tech-startup</h3>
-                        <p class="en-subtitle">Tech startup landing page</p>
-                        <p>Modern landningssida med animationer och formulär för leads</p>
-                        <p class="en-subtitle">Modern landing page with animations and lead generation forms</p>
+                        <h3>
+                            <span data-lang="sv">Landningssida för tech-startup</span>
+                            <span data-lang="en">Tech startup landing page</span>
+                        </h3>
+                        <p>
+                            <span data-lang="sv">Modern landningssida med animationer och formulär för leads.</span>
+                            <span data-lang="en">Modern landing page with animations and lead generation forms.</span>
+                        </p>
                         <div class="portfolio-tags">
-                            <span class="tag" title="Landing Page">Landningssida</span>
-                            <span class="tag" title="Animations">Animationer</span>
+                            <span class="tag" title="Landing Page"><span data-lang="sv">Landningssida</span><span data-lang="en">Landing page</span></span>
+                            <span class="tag" title="Animations"><span data-lang="sv">Animationer</span><span data-lang="en">Animations</span></span>
                         </div>
                     </div>
                 </a>
@@ -221,51 +304,67 @@
     <!-- Contact -->
     <section id="contact" class="contact">
         <div class="container">
-            <h2 class="section-title">Hör av dig</h2>
-            <p class="section-subtitle">Låt oss prata om ditt nästa projekt</p>
-            <p class="en-subtitle">Let's discuss your next project</p>
+            <h2 class="section-title">
+                <span data-lang="sv">Hör av dig</span>
+                <span data-lang="en">Get in touch</span>
+            </h2>
+            <p class="section-subtitle">
+                <span data-lang="sv">Låt oss prata om ditt nästa projekt</span>
+                <span data-lang="en">Let&apos;s discuss your next project</span>
+            </p>
             <div class="contact-wrapper">
                 <div class="contact-info">
                     <div class="info-item">
-                        <div class="info-icon">✉</div>
+                        <div class="info-icon">@</div>
                         <div>
-                            <h4>E-post</h4>
-                            <p class="en-subtitle">Email</p>
+                            <h4>
+                                <span data-lang="sv">E-post</span>
+                                <span data-lang="en">Email</span>
+                            </h4>
                             <p>Xytherisprints@gmail.com</p>
                         </div>
                     </div>
                     <div class="info-item">
                         <div class="info-icon">☎</div>
                         <div>
-                            <h4>Telefon</h4>
-                            <p class="en-subtitle">Phone</p>
+                            <h4>
+                                <span data-lang="sv">Telefon</span>
+                                <span data-lang="en">Phone</span>
+                            </h4>
                             <p>+46 761 90 08 53</p>
                         </div>
                     </div>
                     <div class="info-item">
                         <div class="info-icon">⌂</div>
                         <div>
-                            <h4>Plats</h4>
-                            <p class="en-subtitle">Location</p>
-                            <p>Malmö, Skåne</p>
-                            <p class="en-subtitle">Malmö, Skåne County</p>
+                            <h4>
+                                <span data-lang="sv">Plats</span>
+                                <span data-lang="en">Location</span>
+                            </h4>
+                            <p>
+                                <span data-lang="sv">Malmö, Skåne</span>
+                                <span data-lang="en">Malmö, Skåne County</span>
+                            </p>
                         </div>
                     </div>
                 </div>
                 <form class="contact-form" id="contactForm">
                     <div class="form-group">
-                        <input type="text" id="name" name="name" placeholder="Ditt namn" aria-label="Your Name" required>
+                        <input type="text" id="name" name="name" data-placeholder-sv="Ditt namn" data-placeholder-en="Your name" aria-label="Your Name" required>
                     </div>
                     <div class="form-group">
-                        <input type="email" id="email" name="email" placeholder="Din e-post" aria-label="Your Email" required>
+                        <input type="email" id="email" name="email" data-placeholder-sv="Din e-post" data-placeholder-en="Your email" aria-label="Your Email" required>
                     </div>
                     <div class="form-group">
-                        <input type="text" id="subject" name="subject" placeholder="Ämne" aria-label="Subject" required>
+                        <input type="text" id="subject" name="subject" data-placeholder-sv="Ämne" data-placeholder-en="Subject" aria-label="Subject" required>
                     </div>
                     <div class="form-group">
-                        <textarea id="message" name="message" rows="5" placeholder="Ditt meddelande" aria-label="Your Message" required></textarea>
+                        <textarea id="message" name="message" rows="5" data-placeholder-sv="Ditt meddelande" data-placeholder-en="Your message" aria-label="Your Message" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary" title="Send message">Skicka meddelande</button>
+                    <button type="submit" class="btn btn-primary" title="Send message">
+                        <span data-lang="sv">Skicka meddelande</span>
+                        <span data-lang="en">Send message</span>
+                    </button>
                 </form>
             </div>
         </div>
@@ -276,23 +375,29 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3>XyWebFix</h3>
-                    <p>Vi skapar starka webbupplevelser för småföretag sedan 2025.</p>
-                    <p class="en-subtitle">Creating exceptional web experiences for small businesses since 2025.</p>
+                    <h3>XytherisWebStudio</h3>
+                    <p>
+                        <span data-lang="sv">Vi skapar starka webbupplevelser för småföretag sedan 2025.</span>
+                        <span data-lang="en">Creating exceptional web experiences for small businesses since 2025.</span>
+                    </p>
                 </div>
                 <div class="footer-section">
-                    <h4>Snabblänkar</h4>
-                    <p class="en-subtitle">Quick links</p>
+                    <h4>
+                        <span data-lang="sv">Snabblänkar</span>
+                        <span data-lang="en">Quick links</span>
+                    </h4>
                     <ul>
-                        <li><a href="#hero" title="Home">Hem</a></li>
-                        <li><a href="#services" title="Services">Tjänster</a></li>
-                        <li><a href="#portfolio" title="Portfolio">Portfolio</a></li>
-                        <li><a href="#contact" title="Contact">Kontakt</a></li>
+                        <li><a href="#hero" title="Home"><span data-lang="sv">Hem</span><span data-lang="en">Home</span></a></li>
+                        <li><a href="#services" title="Services"><span data-lang="sv">Tjänster</span><span data-lang="en">Services</span></a></li>
+                        <li><a href="#portfolio" title="Portfolio"><span data-lang="sv">Portfolio</span><span data-lang="en">Portfolio</span></a></li>
+                        <li><a href="#contact" title="Contact"><span data-lang="sv">Kontakt</span><span data-lang="en">Contact</span></a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>Kontakt</h4>
-                    <p class="en-subtitle">Connect</p>
+                    <h4>
+                        <span data-lang="sv">Kontakt</span>
+                        <span data-lang="en">Connect</span>
+                    </h4>
                     <div class="social-links">
                         <a href="#" class="social-link">LinkedIn</a>
                         <a href="#" class="social-link">Twitter</a>
@@ -302,8 +407,10 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 XyWebFix. Alla rättigheter förbehålls.</p>
-                <p class="en-subtitle">&copy; 2025 XyWebFix. All rights reserved.</p>
+                <p>
+                    <span data-lang="sv">&copy; 2025 XytherisWebStudio. Alla rättigheter förbehålls.</span>
+                    <span data-lang="en">&copy; 2025 XytherisWebStudio. All rights reserved.</span>
+                </p>
             </div>
         </div>
     </footer>
