@@ -54,8 +54,13 @@ img {
     border: 0;
 }
 
-[data-lang="sv"] {
+[data-lang] {
     display: none;
+}
+
+body[data-current-lang="en"] [data-lang="en"],
+body[data-current-lang="sv"] [data-lang="sv"] {
+    display: inline;
 }
 
 /* ================

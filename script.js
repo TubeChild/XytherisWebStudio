@@ -25,13 +25,7 @@ window.addEventListener('DOMContentLoaded', () => {
     function applyLanguage(lang) {
         const selected = lang === 'sv' ? 'sv' : 'en';
         document.documentElement.setAttribute('lang', selected);
-        // Track current language without colliding with data-lang selectors used for copy
-        document.body.removeAttribute('data-lang');
         document.body.setAttribute('data-current-lang', selected);
-
-        document.querySelectorAll('[data-lang]').forEach(el => {
-            el.style.display = el.dataset.lang === selected ? '' : 'none';
-        });
 
         setPlaceholders(selected);
         if (languageSelect && languageSelect.value !== selected) {
