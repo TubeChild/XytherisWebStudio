@@ -52,21 +52,27 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Smooth-scroll to anchor targets accounting for navbar height
     navLinks.forEach(link => {
-        link.addEventListener('click', function () {
+        link.addEventListener('click', function (event) {
             navMenu?.classList.remove('active');
 
-            const targetId = this.getAttribute('href');
-            if (targetId && targetId.startsWith('#')) {
-                const targetSection = document.querySelector(targetId);
-                if (targetSection) {
-                    const navHeight = navbar?.offsetHeight || 0;
-                    const targetPosition = targetSection.offsetTop - navHeight;
+            const href = this.getAttribute('href') || '';
+            if (!href.includes('#')) return;
 
-                    window.scrollTo({
-                        top: targetPosition,
-                        behavior: 'smooth'
-                    });
-                }
+            const linkUrl = new URL(href, window.location.href);
+            const samePage = linkUrl.pathname === window.location.pathname;
+
+            if (!samePage) return;
+
+            const targetSection = document.querySelector(linkUrl.hash);
+            if (targetSection) {
+                event.preventDefault();
+                const navHeight = navbar?.offsetHeight || 0;
+                const targetPosition = targetSection.offsetTop - navHeight;
+
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
             }
         });
     });

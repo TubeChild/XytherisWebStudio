@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products | XytherisWebStudio</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body data-current-lang="en">
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">XytherisWebStudio</div>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="nav-actions">
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="../index.html#hero" class="nav-link" title="Home"><span data-lang="sv">Hem</span><span data-lang="en">Home</span></a></li>
+                    <li><a href="../index.html#services" class="nav-link" title="Services"><span data-lang="sv">Tjänster</span><span data-lang="en">Services</span></a></li>
+                    <li><a href="../products/" class="nav-link" title="Products"><span data-lang="sv">Produkter</span><span data-lang="en">Products</span></a></li>
+                    <li><a href="../previous-work/" class="nav-link" title="Previous Work"><span data-lang="sv">Tidigare arbeten</span><span data-lang="en">Previous Work</span></a></li>
+                    <li><a href="../index.html#portfolio" class="nav-link" title="Portfolio"><span data-lang="sv">Portfolio</span><span data-lang="en">Portfolio</span></a></li>
+                    <li><a href="../index.html#contact" class="nav-link" title="Contact"><span data-lang="sv">Kontakt</span><span data-lang="en">Contact</span></a></li>
+                    <li><a href="https://www.youtube.com/@XytherisGaming" class="nav-link external-link" title="XytherisGaming on YouTube" target="_blank" rel="noreferrer">XytherisGaming</a></li>
+                </ul>
+                <div class="language-switcher">
+                    <label class="sr-only" for="languageSelect">Language</label>
+                    <select id="languageSelect" aria-label="Language selector">
+                        <option value="en">🇺🇸 EN</option>
+                        <option value="sv">🇸🇪 SV</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="page-hero products-hero">
+            <div class="container">
+                <p class="eyebrow">Products</p>
+                <h1 class="hero-title">Modular tools that help you launch faster</h1>
+                <p class="hero-subtitle">Curated builds for web, automation, and content teams. Each product ships with a playbook, support options, and a way to customize for your stack.</p>
+                <div class="hero-cta">
+                    <a href="../index.html#contact" class="btn btn-primary" title="Book a walkthrough">Book a walkthrough</a>
+                    <a href="../previous-work/" class="btn btn-ghost" title="See previous work">See previous work</a>
+                </div>
+                <div class="status-legend">
+                    <span class="status-badge status-live">Live</span>
+                    <span class="status-badge status-dev">In development</span>
+                    <span class="status-badge status-prototype">Prototype</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-section">
+            <div class="container">
+                <div class="section-header">
+                    <div>
+                        <p class="eyebrow">Product lineup</p>
+                        <h2 class="section-title left">Built to cover the busywork so you can focus on the launch</h2>
+                        <p class="section-subtitle left">Each card expands with a quick snapshot. Tap “Learn more” to see what’s included today.</p>
+                    </div>
+                    <div class="section-meta">
+                        <div class="meta-pill">Ready for pilots</div>
+                        <div class="meta-pill">Fast onboarding</div>
+                    </div>
+                </div>
+
+                <div id="productsGrid" class="card-grid product-grid" aria-live="polite"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>XytherisWebStudio</h3>
+                    <p>
+                        <span data-lang="sv">Vi skapar starka webbupplevelser för småföretag sedan 2025.</span>
+                        <span data-lang="en">Creating exceptional web experiences for small businesses since 2025.</span>
+                    </p>
+                </div>
+                <div class="footer-section">
+                    <h4>
+                        <span data-lang="sv">Snabblänkar</span>
+                        <span data-lang="en">Quick links</span>
+                    </h4>
+                    <ul>
+                        <li><a href="../index.html#hero" title="Home"><span data-lang="sv">Hem</span><span data-lang="en">Home</span></a></li>
+                        <li><a href="../index.html#services" title="Services"><span data-lang="sv">Tjänster</span><span data-lang="en">Services</span></a></li>
+                        <li><a href="../products/" title="Products"><span data-lang="sv">Produkter</span><span data-lang="en">Products</span></a></li>
+                        <li><a href="../previous-work/" title="Previous Work"><span data-lang="sv">Tidigare arbeten</span><span data-lang="en">Previous Work</span></a></li>
+                        <li><a href="../index.html#portfolio" title="Portfolio"><span data-lang="sv">Portfolio</span><span data-lang="en">Portfolio</span></a></li>
+                        <li><a href="../index.html#contact" title="Contact"><span data-lang="sv">Kontakt</span><span data-lang="en">Contact</span></a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>
+                        <span data-lang="sv">Kontakt</span>
+                        <span data-lang="en">Connect</span>
+                    </h4>
+                    <div class="social-links">
+                        <a href="#" class="social-link">LinkedIn</a>
+                        <a href="#" class="social-link">Twitter</a>
+                        <a href="#" class="social-link">Instagram</a>
+                        <a href="#" class="social-link">GitHub</a>
+                        <a href="https://www.youtube.com/@XytherisGaming" class="social-link external-link" target="_blank" rel="noreferrer">XytherisGaming</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>
+                    <span data-lang="sv">&copy; 2025 XytherisWebStudio. Alla rättigheter förbehålls.</span>
+                    <span data-lang="en">&copy; 2025 XytherisWebStudio. All rights reserved.</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+    <script type="module" src="../products.js"></script>
+</body>
+</html>
