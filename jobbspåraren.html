@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jobbspåraren</title>
+  <title>W-Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
@@ -19,861 +19,771 @@
       --r:          8px;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 16px; }
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
+      background: var(--bg); color: var(--text);
+      font-family: 'SF Pro Display','Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+      min-height: 100vh; -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Auth screen ── */
-    .auth-screen {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    .auth-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 40px 36px;
-      width: 100%;
-      max-width: 380px;
-    }
+    /* ── Auth ── */
+    .auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .auth-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px 36px; width: 100%; max-width: 380px; }
     .auth-brand { margin-bottom: 36px; }
-    .auth-brand .sub {
-      font-size: .68rem; color: var(--muted); text-transform: uppercase;
-      letter-spacing: .12em; margin-bottom: 6px;
-    }
+    .auth-brand .sub { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 6px; }
     .auth-brand h1 { font-size: 1.3rem; font-weight: 500; letter-spacing: -.025em; }
-    .auth-heading {
-      font-size: .82rem; color: var(--muted); margin-bottom: 24px; font-weight: 400;
-    }
+    .auth-heading { font-size: .82rem; color: var(--muted); margin-bottom: 24px; }
     .auth-fields { display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px; }
     .auth-field { display: flex; flex-direction: column; gap: 6px; }
-    .auth-field label {
-      font-size: .67rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em;
-    }
-    .auth-field input {
-      background: var(--surface-2); border: 1px solid var(--border);
-      color: var(--text); padding: 10px 13px; border-radius: var(--r);
-      font-size: .9rem; outline: none; transition: border-color .15s;
-      font-family: inherit; width: 100%;
-    }
+    .auth-field label { font-size: .67rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+    .auth-field input { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 10px 13px; border-radius: var(--r); font-size: .9rem; outline: none; transition: border-color .15s; font-family: inherit; width: 100%; }
     .auth-field input:focus { border-color: var(--accent); }
-    .auth-error {
-      font-size: .76rem; color: #f87171; min-height: 20px;
-      margin-bottom: 4px; line-height: 1.4;
-    }
-    .auth-btn {
-      width: 100%; background: var(--accent); color: #fff; border: none;
-      padding: 11px; border-radius: var(--r); font-size: .88rem; font-weight: 500;
-      cursor: pointer; transition: opacity .15s; font-family: inherit;
-      margin-top: 12px;
-    }
-    .auth-btn:hover { opacity: .85; }
-    .auth-btn:disabled { opacity: .4; cursor: not-allowed; }
-    .auth-toggle {
-      font-size: .78rem; color: var(--muted); text-align: center; margin-top: 20px;
-    }
+    .auth-error { font-size: .76rem; color: #f87171; min-height: 20px; margin-bottom: 4px; line-height: 1.4; }
+    .auth-btn { width: 100%; background: var(--accent); color: #fff; border: none; padding: 11px; border-radius: var(--r); font-size: .88rem; font-weight: 500; cursor: pointer; transition: opacity .15s; font-family: inherit; margin-top: 12px; }
+    .auth-btn:hover { opacity: .85; } .auth-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .auth-toggle { font-size: .78rem; color: var(--muted); text-align: center; margin-top: 20px; }
     .auth-toggle span { color: var(--accent); cursor: pointer; }
-    .auth-toggle span:hover { opacity: .8; }
 
-    /* ── App screen ── */
-    .app-screen { padding: 56px 24px 100px; }
-    .container { max-width: 880px; margin: 0 auto; }
+    /* ── App shell ── */
+    .app-screen { padding: 48px 24px 100px; }
+    .container { max-width: 900px; margin: 0 auto; }
 
     /* ── Header ── */
-    header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 48px; padding-bottom: 22px; border-bottom: 1px solid var(--border);
-    }
-    header h1 { font-size: 1.25rem; font-weight: 500; letter-spacing: -.025em; }
-    header .sub { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
-    .header-right { display: flex; align-items: center; gap: 12px; }
-    .user-email { font-size: .74rem; color: var(--muted); }
+    header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+    header h1 { font-size: 1.2rem; font-weight: 500; letter-spacing: -.025em; }
+    header .sub { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .user-email { font-size: .72rem; color: var(--muted); }
+
+    /* ── Tab nav ── */
+    .tab-nav { display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; margin-bottom: 36px; width: fit-content; }
+    .tab-btn { background: transparent; border: none; color: var(--muted); padding: 7px 18px; border-radius: 7px; font-size: .82rem; cursor: pointer; transition: all .15s; font-family: inherit; letter-spacing: .01em; }
+    .tab-btn.active { background: var(--accent); color: #fff; }
+    .tab-btn:hover:not(.active) { color: var(--text); }
 
     /* ── Buttons ── */
-    .btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: var(--accent); color: #fff; border: none;
-      padding: 9px 18px; border-radius: var(--r);
-      font-size: .82rem; font-weight: 500; cursor: pointer;
-      transition: opacity .15s; letter-spacing: .01em; font-family: inherit;
-    }
-    .btn:hover { opacity: .82; }
-    .btn:active { opacity: .65; }
-    .btn:disabled { opacity: .4; cursor: not-allowed; }
+    .btn { display: inline-flex; align-items: center; gap: 7px; background: var(--accent); color: #fff; border: none; padding: 9px 18px; border-radius: var(--r); font-size: .82rem; font-weight: 500; cursor: pointer; transition: opacity .15s; font-family: inherit; }
+    .btn:hover { opacity: .82; } .btn:active { opacity: .65; } .btn:disabled { opacity: .4; cursor: not-allowed; }
     .btn-sm { padding: 6px 13px; font-size: .76rem; }
     .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
     .btn-ghost:hover { color: var(--text); border-color: var(--border-h); opacity: 1; }
+    .btn-xs { padding: 4px 10px; font-size: .72rem; }
 
     /* ── Readonly banner ── */
-    .ro-banner {
-      background: var(--accent-dim); border: 1px solid rgba(124,111,255,.25);
-      border-radius: var(--r); padding: 10px 18px; margin-bottom: 32px;
-      font-size: .8rem; color: #a89fff; text-align: center; letter-spacing: .01em;
-    }
+    .ro-banner { background: var(--accent-dim); border: 1px solid rgba(124,111,255,.25); border-radius: var(--r); padding: 10px 18px; margin-bottom: 32px; font-size: .8rem; color: #a89fff; text-align: center; }
 
     /* ── Stats ── */
     .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 32px; }
     .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 18px; }
     .stat-val { font-size: 1.9rem; font-weight: 600; letter-spacing: -.04em; line-height: 1; margin-bottom: 5px; }
     .stat-label { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .09em; }
-    .stat-val.c-applied   { color: #60a5fa; }
-    .stat-val.c-interview { color: #fbbf24; }
-    .stat-val.c-offer     { color: #34d399; }
+    .stat-val.c-a { color: #60a5fa; } .stat-val.c-i { color: #fbbf24; } .stat-val.c-o { color: #34d399; }
 
     /* ── Form card ── */
-    .form-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 26px 28px; margin-bottom: 36px;
-    }
-    .form-card-header {
-      display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
-    }
-    .form-card-header h2 {
-      font-size: .68rem; font-weight: 500; color: var(--muted);
-      text-transform: uppercase; letter-spacing: .1em;
-    }
-
-    /* ── API key section ── */
-    .apikey-row { display: flex; align-items: center; gap: 8px; }
-    .apikey-label { font-size: .68rem; color: var(--muted); white-space: nowrap; }
-    .apikey-input {
-      background: var(--surface-2); border: 1px solid var(--border);
-      color: var(--text); padding: 5px 10px; border-radius: 6px;
-      font-size: .76rem; outline: none; font-family: monospace;
-      width: 220px; transition: border-color .15s;
-    }
-    .apikey-input:focus { border-color: var(--accent); }
-    .apikey-saved { font-size: .68rem; color: #34d399; }
-    .apikey-change { font-size: .68rem; color: var(--muted); cursor: pointer; text-decoration: underline; }
-    .apikey-change:hover { color: var(--text); }
+    .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 26px; margin-bottom: 32px; }
+    .form-card-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .form-card-hd h2 { font-size: .68rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
 
     /* ── URL fetcher ── */
-    .url-fetcher {
-      background: var(--surface-2); border: 1px solid var(--border);
-      border-radius: var(--r); padding: 14px 16px; margin-bottom: 20px;
-    }
-    .url-fetcher-label {
-      font-size: .65rem; color: var(--muted); text-transform: uppercase;
-      letter-spacing: .1em; margin-bottom: 10px;
-    }
-    .url-fetcher-row { display: flex; gap: 8px; align-items: stretch; }
-    .url-input {
-      flex: 1; background: var(--bg); border: 1px solid var(--border);
-      color: var(--text); padding: 9px 13px; border-radius: var(--r);
-      font-size: .84rem; outline: none; font-family: inherit; transition: border-color .15s;
-    }
+    .url-fetcher { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r); padding: 13px 15px; margin-bottom: 18px; }
+    .url-fetcher-label { font-size: .64rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 9px; }
+    .url-row { display: flex; gap: 8px; }
+    .url-input { flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: var(--r); font-size: .84rem; outline: none; font-family: inherit; transition: border-color .15s; }
     .url-input:focus { border-color: var(--accent); }
     .url-input::placeholder { color: var(--muted); }
-    .fetch-status {
-      margin-top: 10px; font-size: .76rem; color: var(--muted);
-      min-height: 18px; display: flex; align-items: center; gap: 6px;
-    }
-    .fetch-status.error { color: #f87171; }
-    .fetch-status.success { color: #34d399; }
-
-    /* ── Manual fallback ── */
-    .manual-fallback { margin-top: 12px; display: none; }
-    .fallback-msg { font-size: .78rem; color: #fbbf24; margin-bottom: 10px; line-height: 1.5; }
-    .manual-textarea {
-      width: 100%; background: var(--bg); border: 1px solid var(--border);
-      color: var(--text); padding: 10px 13px; border-radius: var(--r);
-      font-size: .82rem; font-family: inherit; outline: none; resize: vertical;
-      min-height: 120px; transition: border-color .15s; display: block;
-    }
+    .fetch-status { margin-top: 9px; font-size: .75rem; color: var(--muted); min-height: 16px; display: flex; align-items: center; gap: 6px; }
+    .fetch-status.error { color: #f87171; } .fetch-status.success { color: #34d399; }
+    .manual-fallback { margin-top: 10px; display: none; }
+    .fallback-msg { font-size: .76rem; color: #fbbf24; margin-bottom: 9px; line-height: 1.5; }
+    .manual-textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 9px 12px; border-radius: var(--r); font-size: .82rem; font-family: inherit; outline: none; resize: vertical; min-height: 110px; transition: border-color .15s; display: block; }
     .manual-textarea:focus { border-color: var(--accent); }
-    .manual-textarea::placeholder { color: var(--muted); }
-    .fallback-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
-
-    .spinner {
-      width: 12px; height: 12px; border: 2px solid var(--border-h);
-      border-top-color: var(--accent); border-radius: 50%;
-      animation: spin .7s linear infinite; display: inline-block; flex-shrink: 0;
-    }
+    .fallback-actions { display: flex; justify-content: flex-end; margin-top: 7px; }
+    .spinner { width: 11px; height: 11px; border: 2px solid var(--border-h); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; display: inline-block; flex-shrink: 0; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ── Form fields ── */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
-    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 18px; }
-    .form-divider {
-      font-size: .65rem; color: var(--muted); text-transform: uppercase;
-      letter-spacing: .1em; margin: 18px 0 14px; display: flex; align-items: center; gap: 10px;
-    }
-    .form-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-    .fg { display: flex; flex-direction: column; gap: 6px; }
-    .fg label { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
-    .fg input, .fg select {
-      background: var(--surface-2); border: 1px solid var(--border);
-      color: var(--text); padding: 9px 13px; border-radius: var(--r);
-      font-size: .88rem; outline: none; transition: border-color .15s;
-      font-family: inherit; width: 100%;
-    }
-    .fg input:focus, .fg select:focus { border-color: var(--accent); }
+    .fg { display: flex; flex-direction: column; gap: 5px; }
+    .fg label { font-size: .67rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+    .fg input, .fg select, .fg textarea { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 9px 12px; border-radius: var(--r); font-size: .87rem; outline: none; transition: border-color .15s; font-family: inherit; width: 100%; }
+    .fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--accent); }
     .fg select option { background: #1a1a1e; }
+    .fg textarea { resize: vertical; min-height: 72px; }
     .fg input.autofilled { border-color: rgba(124,111,255,.5); background: rgba(124,111,255,.05); }
-    .form-actions { display: flex; justify-content: flex-end; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-bottom: 16px; }
+    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 13px; margin-bottom: 16px; }
+    .form-divider { font-size: .64rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin: 16px 0 13px; display: flex; align-items: center; gap: 10px; }
+    .form-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .form-actions { display: flex; justify-content: flex-end; margin-top: 4px; }
 
-    /* ── Section header ── */
-    .sh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .sh h2 { font-size: .68rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
-    .sh .count { font-size: .72rem; color: var(--muted); }
-
-    /* ── Filter bar ── */
-    .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-    .filter-chip {
-      background: transparent; border: 1px solid var(--border); color: var(--muted);
-      padding: 5px 13px; border-radius: 20px; font-size: .74rem; cursor: pointer;
-      transition: all .15s; font-family: inherit; letter-spacing: .02em;
-    }
+    /* ── Filter ── */
+    .filter-bar { display: flex; gap: 7px; margin-bottom: 18px; flex-wrap: wrap; }
+    .filter-chip { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 5px 13px; border-radius: 20px; font-size: .73rem; cursor: pointer; transition: all .15s; font-family: inherit; }
     .filter-chip:hover { border-color: var(--border-h); color: var(--text); }
     .filter-chip.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 
-    /* ── Application rows ── */
-    .applications { display: flex; flex-direction: column; gap: 7px; }
-    .app-row {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--r); padding: 15px 20px;
-      display: flex; align-items: center; gap: 18px; transition: border-color .15s;
-    }
+    /* ── App rows ── */
+    .sh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; }
+    .sh h2 { font-size: .67rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+    .sh .count { font-size: .71rem; color: var(--muted); }
+    .applications { display: flex; flex-direction: column; gap: 6px; }
+    .app-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 18px; transition: border-color .15s; }
     .app-row:hover { border-color: var(--border-h); }
+    .app-row-top { display: flex; align-items: center; gap: 16px; }
     .app-main { flex: 1; min-width: 0; }
-    .app-company { font-size: .92rem; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .app-role { font-size: .78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
-    .app-contact { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 5px; }
-    .app-contact-item { font-size: .71rem; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+    .app-company { font-size: .9rem; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .app-role { font-size: .77rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .app-contact { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+    .app-contact-item { font-size: .7rem; color: var(--muted); display: flex; align-items: center; gap: 4px; }
     .app-contact-item a { color: var(--muted); text-decoration: none; }
     .app-contact-item a:hover { color: var(--text); }
-    .contact-icon { font-size: .75rem; opacity: .6; }
-    .app-date { font-size: .74rem; color: var(--muted); text-align: right; min-width: 84px; white-space: nowrap; }
-    .app-actions { display: flex; align-items: center; gap: 8px; }
-
-    .badge {
-      font-size: .66rem; padding: 4px 10px; border-radius: 20px;
-      font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
-      min-width: 78px; text-align: center; white-space: nowrap;
-    }
+    .app-date { font-size: .72rem; color: var(--muted); text-align: right; min-width: 82px; white-space: nowrap; }
+    .app-actions { display: flex; align-items: center; gap: 7px; }
+    .badge { font-size: .64rem; padding: 3px 9px; border-radius: 20px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; min-width: 76px; text-align: center; white-space: nowrap; }
     .b-Applied   { background: rgba(59,130,246,.14); color: #60a5fa; }
     .b-Interview { background: rgba(245,158,11,.14);  color: #fbbf24; }
     .b-Rejected  { background: rgba(239,68,68,.14);   color: #f87171; }
     .b-Offer     { background: rgba(16,185,129,.14);  color: #34d399; }
-
-    .status-select {
-      background: transparent; border: 1px solid var(--border); color: var(--muted);
-      padding: 5px 9px; border-radius: 6px; font-size: .76rem; cursor: pointer;
-      outline: none; font-family: inherit; transition: border-color .15s;
-    }
+    .status-select { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 5px 8px; border-radius: 6px; font-size: .74rem; cursor: pointer; outline: none; font-family: inherit; transition: border-color .15s; }
     .status-select:hover { border-color: var(--border-h); }
     .status-select option { background: #1a1a1e; }
-
-    .icon-btn {
-      background: transparent; border: none; color: var(--muted); cursor: pointer;
-      font-size: .9rem; padding: 4px 5px; border-radius: 5px;
-      transition: color .15s; line-height: 1;
-    }
+    .icon-btn { background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: .85rem; padding: 4px 5px; border-radius: 5px; transition: color .15s; line-height: 1; }
     .icon-btn:hover { color: var(--text); }
     .icon-btn.del:hover { color: #f87171; }
-
     .job-link { color: inherit; text-decoration: none; }
     .job-link:hover { opacity: .75; }
+    .expand-toggle { font-size: .7rem; color: var(--muted); background: none; border: none; cursor: pointer; font-family: inherit; padding: 0; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .expand-toggle:hover { color: var(--text); }
 
-    /* ── Empty ── */
-    .empty { text-align: center; padding: 64px 0; color: var(--muted); font-size: .88rem; line-height: 1.7; }
+    /* ── App expand panel ── */
+    .app-expand { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
+    .expand-section-label { font-size: .63rem; color: var(--muted); text-transform: uppercase; letter-spacing: .09em; margin-bottom: 6px; }
+    .notes-area { width: 100%; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 8px 11px; border-radius: var(--r); font-size: .82rem; font-family: inherit; resize: vertical; min-height: 60px; outline: none; transition: border-color .15s; }
+    .notes-area:focus { border-color: var(--accent); }
+    .file-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; }
+    .file-row { display: flex; align-items: center; gap: 8px; font-size: .73rem; color: var(--muted); }
+    .file-icon { flex-shrink: 0; }
+    .file-name { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-name a { color: var(--muted); text-decoration: none; }
+    .file-name a:hover { color: var(--text); }
+    .file-size { font-size: .65rem; white-space: nowrap; }
+    .file-del-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: .75rem; padding: 2px 4px; }
+    .file-del-btn:hover { color: #f87171; }
+    .file-uploading { font-size: .73rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+
+    /* ── Profile tab ── */
+    .p-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; margin-bottom: 20px; }
+    .p-section-hd { font-size: .67rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+    .p-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-bottom: 14px; }
+    .p-top { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start; margin-bottom: 16px; }
+    .avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+    .avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+    .avatar-ph { width: 80px; height: 80px; border-radius: 50%; background: var(--accent-dim); border: 2px dashed rgba(124,111,255,.3); display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer; color: var(--accent); transition: border-color .15s; }
+    .avatar-ph:hover { border-color: var(--accent); }
+    .avatar-lbl { font-size: .65rem; color: var(--muted); cursor: pointer; background: none; border: none; font-family: inherit; text-decoration: underline; }
+    .avatar-lbl:hover { color: var(--text); }
+    .list-item-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; margin-bottom: 9px; position: relative; }
+    .list-item-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; }
+    .list-item-num { font-size: .65rem; color: var(--muted); }
+    .list-item-rm { background: none; border: none; color: var(--muted); cursor: pointer; font-size: .76rem; padding: 3px 6px; border-radius: 4px; font-family: inherit; }
+    .list-item-rm:hover { color: #f87171; }
+    .list-grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .list-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .skill-tag { background: var(--accent-dim); border: 1px solid rgba(124,111,255,.25); color: #a89fff; padding: 3px 10px; border-radius: 20px; font-size: .73rem; display: flex; align-items: center; gap: 5px; }
+    .skill-tag button { background: none; border: none; color: inherit; cursor: pointer; font-size: .7rem; opacity: .6; padding: 0; line-height: 1; }
+    .skill-tag button:hover { opacity: 1; }
+    .skill-row { display: flex; gap: 8px; }
+    .skill-inp { flex: 1; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 7px 11px; border-radius: var(--r); font-size: .82rem; outline: none; font-family: inherit; transition: border-color .15s; }
+    .skill-inp:focus { border-color: var(--accent); }
+    .profile-save-row { display: flex; justify-content: flex-end; margin-top: 4px; }
+
+    /* ── Documents tab ── */
+    .doc-list { display: flex; flex-direction: column; gap: 9px; }
+    .doc-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 20px; }
+    .doc-row-hd { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .doc-co { font-size: .9rem; font-weight: 500; margin-bottom: 2px; }
+    .doc-role { font-size: .75rem; color: var(--muted); }
+    .doc-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .lang-tog { display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .lang-btn { background: transparent; border: none; color: var(--muted); padding: 5px 10px; font-size: .71rem; cursor: pointer; font-family: inherit; transition: all .15s; }
+    .lang-btn.active { background: var(--accent-dim); color: var(--accent); }
+    .gen-panel { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .gen-panel-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+    .gen-panel-lbl { font-size: .66rem; color: var(--muted); text-transform: uppercase; letter-spacing: .09em; }
+    .gen-content { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); padding: 18px 20px; font-size: .81rem; line-height: 1.85; white-space: pre-wrap; font-family: inherit; max-height: 500px; overflow-y: auto; color: var(--text); }
+    .gen-loading { text-align: center; padding: 30px; color: var(--muted); font-size: .82rem; display: flex; align-items: center; justify-content: center; gap: 9px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); }
+    .profile-warn { background: rgba(251,191,36,.07); border: 1px solid rgba(251,191,36,.2); border-radius: var(--r); padding: 11px 16px; font-size: .8rem; color: #fbbf24; margin-bottom: 20px; }
 
     /* ── Share section ── */
-    .share-section { margin-top: 52px; padding-top: 22px; border-top: 1px solid var(--border); }
-    .share-section h3 { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 12px; }
-    .share-row { display: flex; gap: 10px; align-items: center; }
-    .share-url-input {
-      flex: 1; background: var(--surface); border: 1px solid var(--border);
-      color: var(--muted); padding: 9px 13px; border-radius: var(--r);
-      font-size: .78rem; font-family: 'SF Mono','Fira Code',monospace; outline: none;
-    }
+    .share-section { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .share-section h3 { font-size: .67rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 11px; }
+    .share-row { display: flex; gap: 9px; align-items: center; }
+    .share-url-input { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: 8px 12px; border-radius: var(--r); font-size: .76rem; font-family: 'SF Mono','Fira Code',monospace; outline: none; }
 
     /* ── Toast ── */
-    #toast {
-      position: fixed; bottom: 28px; right: 28px;
-      background: var(--surface); border: 1px solid var(--border-h);
-      border-radius: var(--r); padding: 11px 18px; font-size: .82rem; color: var(--text);
-      opacity: 0; transform: translateY(6px); transition: opacity .2s, transform .2s;
-      pointer-events: none; z-index: 9999;
-    }
+    #toast { position: fixed; bottom: 26px; right: 26px; background: var(--surface); border: 1px solid var(--border-h); border-radius: var(--r); padding: 10px 17px; font-size: .81rem; color: var(--text); opacity: 0; transform: translateY(6px); transition: opacity .2s, transform .2s; pointer-events: none; z-index: 9999; }
     #toast.show { opacity: 1; transform: translateY(0); }
 
-    .loading { text-align: center; padding: 80px 0; color: var(--muted); font-size: .88rem; }
+    .empty { text-align: center; padding: 60px 0; color: var(--muted); font-size: .87rem; line-height: 1.7; }
+    .loading-msg { text-align: center; padding: 70px 0; color: var(--muted); font-size: .87rem; }
 
     @media (max-width: 680px) {
-      .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
+      .form-grid, .form-grid-3, .p-grid, .list-grid-4, .list-grid-2 { grid-template-columns: 1fr; }
       .stats { grid-template-columns: repeat(2,1fr); }
       .app-date { display: none; }
-      .apikey-input { width: 140px; }
       .user-email { display: none; }
-      .auth-card { padding: 32px 24px; }
+      .auth-card { padding: 30px 22px; }
+      .p-top { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-<div id="app"><div class="loading" style="padding:80px 0;text-align:center;color:var(--muted)">Loading…</div></div>
+<div id="app"><div class="loading-msg">Laddar…</div></div>
 <div id="toast"></div>
-
 <script>
-const SUPABASE_URL = 'https://jxophknjulubgnbbekgp.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4b3Boa25qdWx1YmduYmJla2dwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzI5NjQsImV4cCI6MjA5MjUwODk2NH0.pYp_8uKIjYiSf2TDA5Ty_Q7SUDoRKsaHkhqalVfMdHM';
-const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
+const SUPABASE_URL  = 'https://jxophknjulubgnbbekgp.supabase.co';
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4b3Boa25qdWx1YmduYmJla2dwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzI5NjQsImV4cCI6MjA5MjUwODk2NH0.pYp_8uKIjYiSf2TDA5Ty_Q7SUDoRKsaHkhqalVfMdHM';
+const CLAUDE_KEY    = 'ANTHROPIC_KEY_PLACEHOLDER';
+const CLAUDE_MODEL  = 'claude-sonnet-4-20250514';
+const BUCKET        = 'wtrackerfiles';
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const params      = new URLSearchParams(window.location.search);
-const isReadOnly  = params.has('view');
-const sharedUID   = params.get('user') || '';   // UID in the share URL
-const STATUSES    = ['Applied', 'Interview', 'Rejected', 'Offer'];
+const params     = new URLSearchParams(window.location.search);
+const isReadOnly = params.has('view');
+const sharedUID  = params.get('user') || '';
+const STATUSES   = ['Applied','Interview','Rejected','Offer'];
 
-let currentUser     = null;
-let applications    = [];
-let activeFilter    = 'All';
-let authMode        = 'login';   // 'login' | 'signup'
-let showApiKeyInput = false;
+let currentUser  = null;
+let applications = [];
+let appFiles     = {};          // { appId: [file,...] }
+let expandedApps = new Set();   // app IDs with expand panel open
+let profile      = defaultProfile();
+let activeFilter = 'All';
+let currentTab   = 'applications';
+let authMode     = 'login';
+let docLangs     = {};          // { appId: 'sv'|'en' }
+let generatedDocs= {};          // { `${appId}-${type}`: content|'loading' }
 
-// ── Helpers ────────────────────────────────────────────
-function esc(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function today() { return new Date().toISOString().split('T')[0]; }
-
-let toastTimer;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+function defaultProfile() {
+  return { full_name:'', phone:'', address:'', linkedin_url:'', photo_url:'', bio:'', work_experiences:[], education:[], skills:[] };
 }
 
-// ── API key (localStorage) ─────────────────────────────
-function getApiKey() { return localStorage.getItem('anthropic_api_key') || ''; }
-function saveApiKey(k) { localStorage.setItem('anthropic_api_key', k.trim()); }
+// ── Helpers ─────────────────────────────────────────────────────────
+function esc(s){ if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function today(){ return new Date().toISOString().split('T')[0]; }
+function formatDate(d){ return new Date(d+'T00:00:00').toLocaleDateString('sv-SE',{day:'numeric',month:'short',year:'numeric'}); }
+function formatSize(b){ if(!b)return''; if(b<1024)return b+'B'; if(b<1048576)return(b/1024).toFixed(0)+'KB'; return(b/1048576).toFixed(1)+'MB'; }
+function fileIcon(t){ if(!t)return'📄'; if(t.includes('pdf'))return'📕'; if(t.includes('word')||t.includes('docx'))return'📘'; if(t.includes('image'))return'🖼'; return'📄'; }
 
-// ── Auth ───────────────────────────────────────────────
-function initAuth() {
-  // Readonly share links skip authentication entirely
-  if (isReadOnly) {
-    load();
-    return;
-  }
+let _toastTimer;
+function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(_toastTimer); _toastTimer=setTimeout(()=>el.classList.remove('show'),2600); }
 
-  db.auth.onAuthStateChange((_event, session) => {
-    currentUser = session?.user || null;
-    if (currentUser) {
-      load();
-    } else {
-      renderAuth();
+// ── Auth ─────────────────────────────────────────────────────────────
+function initAuth(){
+  if(isReadOnly){ load().then(()=>render()); return; }
+  db.auth.onAuthStateChange(async(_,session)=>{
+    currentUser = session?.user||null;
+    if(currentUser){
+      await Promise.all([load(), loadProfile()]);
     }
+    render();
   });
 }
 
-async function doLogin(e) {
+async function doLogin(e){
   e.preventDefault();
-  const form  = e.target;
-  const email = form.email.value.trim();
-  const pw    = form.password.value;
-  const btn   = form.querySelector('.auth-btn');
-  const errEl = document.getElementById('auth-error');
-
-  btn.disabled = true;
-  btn.textContent = 'Loggar in…';
-  errEl.textContent = '';
-
-  const { error } = await db.auth.signInWithPassword({ email, password: pw });
-  btn.disabled = false;
-  btn.textContent = 'Logga in';
-
-  if (error) errEl.textContent = translateAuthError(error.message);
-  // on success, onAuthStateChange fires and calls load()
+  const f=e.target, btn=f.querySelector('.auth-btn'), err=document.getElementById('auth-error');
+  btn.disabled=true; btn.textContent='Loggar in…'; err.textContent='';
+  const {error}=await db.auth.signInWithPassword({email:f.email.value.trim(),password:f.password.value});
+  btn.disabled=false; btn.textContent='Logga in';
+  if(error) err.textContent=xlateErr(error.message);
 }
 
-async function doSignup(e) {
+async function doSignup(e){
   e.preventDefault();
-  const form  = e.target;
-  const email = form.email.value.trim();
-  const pw    = form.password.value;
-  const btn   = form.querySelector('.auth-btn');
-  const errEl = document.getElementById('auth-error');
+  const f=e.target, btn=f.querySelector('.auth-btn'), err=document.getElementById('auth-error');
+  btn.disabled=true; btn.textContent='Skapar konto…'; err.textContent='';
+  const {error}=await db.auth.signUp({email:f.email.value.trim(),password:f.password.value});
+  btn.disabled=false; btn.textContent='Skapa konto';
+  if(error){ err.textContent=xlateErr(error.message); }
+  else { err.style.color='#34d399'; err.textContent='Konto skapat! Kontrollera din e-post.'; }
+}
 
-  btn.disabled = true;
-  btn.textContent = 'Skapar konto…';
-  errEl.textContent = '';
+async function logout(){ await db.auth.signOut(); }
 
-  const { error } = await db.auth.signUp({ email, password: pw });
-  btn.disabled = false;
-  btn.textContent = 'Skapa konto';
+function xlateErr(m){
+  if(m.includes('Invalid login'))   return 'Fel e-post eller lösenord.';
+  if(m.includes('Email not confirmed')) return 'Bekräfta din e-post först.';
+  if(m.includes('already registered')) return 'Det finns redan ett konto med den e-postadressen.';
+  if(m.includes('Password should'))  return 'Lösenordet måste vara minst 6 tecken.';
+  return m;
+}
 
-  if (error) {
-    errEl.textContent = translateAuthError(error.message);
-  } else {
-    errEl.style.color = '#34d399';
-    errEl.textContent = 'Konto skapat! Kontrollera din e-post för bekräftelse.';
+function setAuthMode(m){ authMode=m; renderAuth(); }
+
+// ── Profile data ─────────────────────────────────────────────────────
+async function loadProfile(){
+  if(!currentUser) return;
+  const {data}=await db.from('profiles').select('*').eq('id',currentUser.id).single();
+  if(data){
+    profile = {
+      full_name: data.full_name||'',
+      phone: data.phone||'',
+      address: data.address||'',
+      linkedin_url: data.linkedin_url||'',
+      photo_url: data.photo_url||'',
+      bio: data.bio||'',
+      work_experiences: data.work_experiences||[],
+      education: data.education||[],
+      skills: data.skills||[],
+    };
   }
 }
 
-async function logout() {
-  await db.auth.signOut();
-  // onAuthStateChange fires and calls renderAuth()
+function collectProfileFormData(){
+  const f=document.getElementById('profile-form'); if(!f) return;
+  profile.full_name    = f.querySelector('[name="full_name"]')?.value    ?? profile.full_name;
+  profile.phone        = f.querySelector('[name="phone"]')?.value        ?? profile.phone;
+  profile.address      = f.querySelector('[name="address"]')?.value      ?? profile.address;
+  profile.linkedin_url = f.querySelector('[name="linkedin_url"]')?.value ?? profile.linkedin_url;
+  profile.bio          = f.querySelector('[name="bio"]')?.value          ?? profile.bio;
+  const weEls=f.querySelectorAll('.we-item');
+  if(weEls.length) profile.work_experiences=Array.from(weEls).map(el=>({
+    title:el.querySelector('.we-title')?.value||'', company:el.querySelector('.we-company')?.value||'',
+    start_date:el.querySelector('.we-start')?.value||'', end_date:el.querySelector('.we-end')?.value||'',
+    description:el.querySelector('.we-desc')?.value||'',
+  }));
+  const eduEls=f.querySelectorAll('.edu-item');
+  if(eduEls.length) profile.education=Array.from(eduEls).map(el=>({
+    degree:el.querySelector('.edu-degree')?.value||'', school:el.querySelector('.edu-school')?.value||'',
+    start_date:el.querySelector('.edu-start')?.value||'', end_date:el.querySelector('.edu-end')?.value||'',
+  }));
 }
 
-function translateAuthError(msg) {
-  if (msg.includes('Invalid login')) return 'Fel e-post eller lösenord.';
-  if (msg.includes('Email not confirmed')) return 'Bekräfta din e-post innan du loggar in.';
-  if (msg.includes('User already registered')) return 'Det finns redan ett konto med den e-postadressen.';
-  if (msg.includes('Password should be')) return 'Lösenordet måste vara minst 6 tecken.';
-  return msg;
+async function saveProfile(){
+  collectProfileFormData();
+  const {error}=await db.from('profiles').upsert({
+    id:currentUser.id, ...profile, updated_at:new Date().toISOString()
+  });
+  if(error){ toast('Fel vid sparning: '+error.message); return; }
+  toast('Profil sparad');
 }
 
-function setAuthMode(mode) {
-  authMode = mode;
-  renderAuth();
+function addWorkExp(){ collectProfileFormData(); profile.work_experiences.push({title:'',company:'',start_date:'',end_date:'',description:''}); renderTabContent(); }
+function removeWorkExp(i){ collectProfileFormData(); profile.work_experiences.splice(i,1); renderTabContent(); }
+function addEducation(){ collectProfileFormData(); profile.education.push({degree:'',school:'',start_date:'',end_date:''}); renderTabContent(); }
+function removeEducation(i){ collectProfileFormData(); profile.education.splice(i,1); renderTabContent(); }
+
+function addSkill(){
+  const inp=document.getElementById('skill-inp'); if(!inp) return;
+  const val=inp.value.trim(); if(!val) return;
+  if(!profile.skills.includes(val)){ profile.skills.push(val); }
+  inp.value=''; renderTabContent(); setTimeout(()=>document.getElementById('skill-inp')?.focus(),30);
+}
+function removeSkill(i){ profile.skills.splice(i,1); renderTabContent(); }
+
+function triggerPhotoUpload(){
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange=async e=>{ const f=e.target.files[0]; if(f) await uploadProfilePhoto(f); };
+  inp.click();
+}
+async function uploadProfilePhoto(file){
+  toast('Laddar upp foto…');
+  const ext=file.name.split('.').pop()||'jpg';
+  const path=`avatars/${currentUser.id}/avatar.${ext}`;
+  const {error}=await db.storage.from(BUCKET).upload(path,file,{upsert:true});
+  if(error){ toast('Fel: '+error.message); return; }
+  const {data}=db.storage.from(BUCKET).getPublicUrl(path);
+  profile.photo_url=data.publicUrl+'?t='+Date.now();
+  await saveProfile();
+  renderTabContent();
 }
 
-// ── Data ───────────────────────────────────────────────
-async function load() {
-  let query = db.from('job_applications').select('*').order('date_applied', { ascending: false });
-
-  if (isReadOnly) {
-    if (!sharedUID) { renderNoUser(); return; }
-    query = query.eq('user_id', sharedUID);
-  } else {
-    if (!currentUser) return;
-    query = query.eq('user_id', currentUser.id);
-  }
-
-  const { data, error } = await query;
-  if (error) { console.error(error); toast('Kunde inte ladda data'); return; }
-  applications = data || [];
-  render();
+// ── Applications data ────────────────────────────────────────────────
+async function load(){
+  let q=db.from('job_applications').select('*').order('date_applied',{ascending:false});
+  if(isReadOnly){ if(!sharedUID){ renderNoUser(); return; } q=q.eq('user_id',sharedUID); }
+  else { if(!currentUser) return; q=q.eq('user_id',currentUser.id); }
+  const {data,error}=await q;
+  if(error){ toast('Kunne inte ladda data'); return; }
+  applications=data||[];
+  await loadAllFiles();
 }
 
-async function addApplication(e) {
-  e.preventDefault();
-  const form = e.target;
-  const payload = {
-    user_id:       currentUser.id,
-    company:       form.company.value.trim(),
-    role:          form.role.value.trim(),
-    date_applied:  form.date_applied.value,
-    status:        form.status.value,
-    contact_name:  form.contact_name.value.trim() || null,
-    contact_email: form.contact_email.value.trim() || null,
-    contact_phone: form.contact_phone.value.trim() || null,
-    job_url:       form.job_url.value.trim() || null,
+async function addApplication(e){
+  e.preventDefault(); const f=e.target;
+  const payload={
+    user_id:currentUser.id,
+    company:f.company.value.trim(), role:f.role.value.trim(),
+    date_applied:f.date_applied.value, status:f.status.value,
+    contact_name:f.contact_name.value.trim()||null,
+    contact_email:f.contact_email.value.trim()||null,
+    contact_phone:f.contact_phone.value.trim()||null,
+    job_url:f.job_url.value.trim()||null,
+    notes:f.notes.value.trim()||null,
   };
-
-  if (!payload.company || !payload.role || !payload.date_applied) return;
-
-  const btn = form.querySelector('button[type="submit"]');
-  btn.disabled = true;
-  btn.textContent = 'Sparar…';
-
-  const { error } = await db.from('job_applications').insert(payload);
-  btn.disabled = false;
-  btn.textContent = 'Lägg till ansökan';
-
-  if (error) { toast('Fel vid sparning'); console.error(error); return; }
-  form.reset();
-  form.date_applied.value = today();
-  setFetchStatus('', '');
-  const ui = document.getElementById('url-input');
-  if (ui) ui.value = '';
-  toast('Ansökan sparad');
-  await load();
+  if(!payload.company||!payload.role||!payload.date_applied) return;
+  const btn=f.querySelector('button[type="submit"]'); btn.disabled=true; btn.textContent='Sparar…';
+  const {error}=await db.from('job_applications').insert(payload);
+  btn.disabled=false; btn.textContent='Lägg till ansökan';
+  if(error){ toast('Fel vid sparning'); return; }
+  f.reset(); f.date_applied.value=today(); setFetchStatus('','');
+  const ui=document.getElementById('url-input'); if(ui) ui.value='';
+  toast('Ansökan sparad'); await load(); renderTabContent();
 }
 
-async function updateStatus(id, status) {
-  const { error } = await db.from('job_applications').update({ status }).eq('id', id);
-  if (error) { toast('Uppdatering misslyckades'); return; }
-  applications = applications.map(a => a.id === id ? { ...a, status } : a);
-  render();
+async function updateStatus(id,status){
+  const {error}=await db.from('job_applications').update({status}).eq('id',id);
+  if(error){ toast('Uppdatering misslyckades'); return; }
+  applications=applications.map(a=>a.id===id?{...a,status}:a); renderTabContent();
 }
 
-async function deleteApp(id) {
-  const { error } = await db.from('job_applications').delete().eq('id', id);
-  if (error) { toast('Borttagning misslyckades'); return; }
-  applications = applications.filter(a => a.id !== id);
-  toast('Borttagen');
-  render();
+async function saveNotes(id,notes){
+  const {error}=await db.from('job_applications').update({notes}).eq('id',id);
+  if(!error){ applications=applications.map(a=>a.id===id?{...a,notes}:a); toast('Anteckningar sparade'); }
 }
 
-// ── Job URL extraction ─────────────────────────────────
-const PROXIES = [
-  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-  u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+async function deleteApp(id){
+  const {error}=await db.from('job_applications').delete().eq('id',id);
+  if(error){ toast('Borttagning misslyckades'); return; }
+  applications=applications.filter(a=>a.id!==id); expandedApps.delete(id); delete appFiles[id]; toast('Borttagen'); renderTabContent();
+}
+
+// ── Files ─────────────────────────────────────────────────────────────
+async function loadAllFiles(){
+  if(!applications.length) return;
+  const ids=applications.map(a=>a.id);
+  const {data}=await db.from('application_files').select('*').in('application_id',ids);
+  appFiles={};
+  (data||[]).forEach(f=>{ if(!appFiles[f.application_id]) appFiles[f.application_id]=[]; appFiles[f.application_id].push(f); });
+}
+
+async function toggleExpand(appId){
+  if(expandedApps.has(appId)){ expandedApps.delete(appId); }
+  else { expandedApps.add(appId); if(!appFiles[appId]) appFiles[appId]=[]; }
+  renderTabContent();
+}
+
+function triggerFileUpload(appId){
+  const inp=document.createElement('input'); inp.type='file';
+  inp.accept='.pdf,.docx,.doc,.png,.jpg,.jpeg,.gif,.webp,.txt';
+  inp.onchange=async e=>{ const f=e.target.files[0]; if(f) await uploadFile(appId,f); };
+  inp.click();
+}
+
+async function uploadFile(appId,file){
+  const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+  const path=`attachments/${currentUser.id}/${appId}/${Date.now()}-${safe}`;
+  toast('Laddar upp fil…');
+  const {error:ue}=await db.storage.from(BUCKET).upload(path,file);
+  if(ue){ toast('Uppladdning misslyckades: '+ue.message); return; }
+  const {data:pu}=db.storage.from(BUCKET).getPublicUrl(path);
+  const {data:row,error:de}=await db.from('application_files').insert({
+    user_id:currentUser.id, application_id:appId,
+    filename:file.name, storage_path:path, file_type:file.type, file_size:file.size,
+  }).select().single();
+  if(de){ toast('DB-fel'); return; }
+  if(!appFiles[appId]) appFiles[appId]=[];
+  appFiles[appId].push({...row, publicUrl:pu.publicUrl});
+  toast('Fil uppladdad'); renderTabContent();
+}
+
+async function deleteFile(fileId,path,appId){
+  if(!confirm('Ta bort filen?')) return;
+  await db.storage.from(BUCKET).remove([path]);
+  await db.from('application_files').delete().eq('id',fileId);
+  appFiles[appId]=(appFiles[appId]||[]).filter(f=>f.id!==fileId);
+  toast('Fil borttagen'); renderTabContent();
+}
+
+function getFileUrl(f){
+  if(f.publicUrl) return f.publicUrl;
+  const {data}=db.storage.from(BUCKET).getPublicUrl(f.storage_path);
+  return data.publicUrl;
+}
+
+// ── URL fetcher ──────────────────────────────────────────────────────
+const PROXIES=[
+  u=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u=>`https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u=>`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
 ];
 
-async function fetchViaProxies(url) {
-  for (let i = 0; i < PROXIES.length; i++) {
-    setFetchStatus('loading', `Försöker proxy ${i + 1}/${PROXIES.length}…`);
-    try {
-      const res = await fetch(PROXIES[i](url), { signal: AbortSignal.timeout(10000) });
-      if (!res.ok) continue;
-      const text = await res.text();
-      if (text && text.length > 100) return text;
-    } catch (_) { /* try next */ }
+async function fetchViaProxies(url){
+  for(let i=0;i<PROXIES.length;i++){
+    setFetchStatus('loading',`Försöker proxy ${i+1}/${PROXIES.length}…`);
+    try{
+      const res=await fetch(PROXIES[i](url),{signal:AbortSignal.timeout(10000)});
+      if(!res.ok) continue;
+      const t=await res.text(); if(t&&t.length>100) return t;
+    } catch(_){}
   }
   return null;
 }
 
-async function fetchJobInfo() {
-  const urlEl  = document.getElementById('url-input');
-  const url    = urlEl?.value.trim();
-  const apiKey = getApiKey();
-
-  if (!url)   { setFetchStatus('error', 'Klistra in en URL först.'); return; }
-  if (!apiKey){ setFetchStatus('error', 'Lägg till din Anthropic API-nyckel ovan först.'); return; }
-  if (!url.startsWith('http')) { setFetchStatus('error', 'URL:en måste börja med http/https.'); return; }
-
-  const fetchBtn = document.getElementById('fetch-btn');
-  fetchBtn.disabled = true;
-  hideFallback();
-
-  const html = await fetchViaProxies(url);
-
-  if (!html) {
-    fetchBtn.disabled = false;
-    setFetchStatus('error', 'Alla proxies misslyckades.');
-    showFallback();
-    return;
-  }
-
-  setFetchStatus('loading', 'Extraherar detaljer med Claude…');
-
+async function fetchJobInfo(){
+  const urlEl=document.getElementById('url-input');
+  const url=urlEl?.value.trim();
+  if(!url){ setFetchStatus('error','Klistra in en URL först.'); return; }
+  if(!url.startsWith('http')){ setFetchStatus('error','URL måste börja med http/https.'); return; }
+  const btn=document.getElementById('fetch-btn'); btn.disabled=true; hideFallback();
+  const html=await fetchViaProxies(url);
+  if(!html){ btn.disabled=false; setFetchStatus('error','Alla proxies misslyckades.'); showFallback(); return; }
+  setFetchStatus('loading','Extraherar detaljer med Claude…');
   let extracted;
-  try {
-    extracted = await callClaude(apiKey, extractText(html));
-  } catch (err) {
-    setFetchStatus('error', `Claude-fel: ${err.message}`);
-    fetchBtn.disabled = false;
-    return;
-  }
-
-  fetchBtn.disabled = false;
-  applyExtracted(extracted, url);
+  try{ extracted=await callClaudeExtract(extractText(html)); }
+  catch(err){ setFetchStatus('error','Claude-fel: '+err.message); btn.disabled=false; return; }
+  btn.disabled=false; applyExtracted(extracted,url);
 }
 
-async function extractFromManualText() {
-  const apiKey  = getApiKey();
-  const rawText = document.getElementById('manual-text')?.value.trim();
-  const url     = document.getElementById('url-input')?.value.trim() || '';
-
-  if (!rawText) { setFetchStatus('error', 'Klistra in annonstext först.'); return; }
-  if (!apiKey)  { setFetchStatus('error', 'Lägg till din Anthropic API-nyckel ovan först.'); return; }
-
-  const btn = document.getElementById('manual-extract-btn');
-  if (btn) btn.disabled = true;
-  setFetchStatus('loading', 'Extraherar detaljer med Claude…');
-
+async function extractFromManualText(){
+  const raw=document.getElementById('manual-text')?.value.trim();
+  const url=document.getElementById('url-input')?.value.trim()||'';
+  if(!raw){ setFetchStatus('error','Klistra in annonstext först.'); return; }
+  const btn=document.getElementById('manual-extract-btn'); if(btn) btn.disabled=true;
+  setFetchStatus('loading','Extraherar detaljer med Claude…');
   let extracted;
-  try {
-    extracted = await callClaude(apiKey, rawText.slice(0, 7000));
-  } catch (err) {
-    setFetchStatus('error', `Claude-fel: ${err.message}`);
-    if (btn) btn.disabled = false;
-    return;
-  }
-
-  if (btn) btn.disabled = false;
-  hideFallback();
-  applyExtracted(extracted, url);
+  try{ extracted=await callClaudeExtract(raw.slice(0,7000)); }
+  catch(err){ setFetchStatus('error','Claude-fel: '+err.message); if(btn) btn.disabled=false; return; }
+  if(btn) btn.disabled=false; hideFallback(); applyExtracted(extracted,url);
 }
 
-function applyExtracted(extracted, url) {
-  const form = document.getElementById('add-form');
-  const filled = [];
-
-  if (extracted.company)       { form.company.value = extracted.company; form.company.classList.add('autofilled'); filled.push('företag'); }
-  if (extracted.role)          { form.role.value = extracted.role; form.role.classList.add('autofilled'); filled.push('roll'); }
-  if (extracted.contact_name)  { form.contact_name.value  = extracted.contact_name; }
-  if (extracted.contact_email) { form.contact_email.value = extracted.contact_email; }
-  if (extracted.contact_phone) { form.contact_phone.value = extracted.contact_phone; }
-  if (url) { document.getElementById('form-job-url').value = url; }
-
-  if (filled.length === 0) {
-    setFetchStatus('error', 'Kunde inte extrahera detaljer — fyll i manuellt.');
-    showFallback();
-  } else {
-    setFetchStatus('success', `Ifyllt: ${filled.join(', ')}. Granska och spara.`);
-  }
+function applyExtracted(ex,url){
+  const f=document.getElementById('add-form'); const filled=[];
+  if(ex.company){ f.company.value=ex.company; f.company.classList.add('autofilled'); filled.push('företag'); }
+  if(ex.role){ f.role.value=ex.role; f.role.classList.add('autofilled'); filled.push('roll'); }
+  if(ex.contact_name)  f.contact_name.value=ex.contact_name;
+  if(ex.contact_email) f.contact_email.value=ex.contact_email;
+  if(ex.contact_phone) f.contact_phone.value=ex.contact_phone;
+  if(url){ const jf=document.getElementById('form-job-url'); if(jf) jf.value=url; }
+  if(!filled.length){ setFetchStatus('error','Kunde inte extrahera — fyll i manuellt.'); showFallback(); }
+  else setFetchStatus('success',`Ifyllt: ${filled.join(', ')}. Granska och spara.`);
 }
 
-function showFallback() {
-  let el = document.getElementById('manual-fallback');
-  if (!el) {
-    const anchor = document.getElementById('fetch-status');
-    if (!anchor) return;
-    el = document.createElement('div');
-    el.id = 'manual-fallback';
-    el.className = 'manual-fallback';
-    el.innerHTML = `
-      <div class="fallback-msg">Kunde inte hämta sidan automatiskt. Klistra in jobbannonsen som text istället.</div>
+function showFallback(){
+  let el=document.getElementById('manual-fallback');
+  if(!el){
+    const anchor=document.getElementById('fetch-status'); if(!anchor) return;
+    el=document.createElement('div'); el.id='manual-fallback'; el.className='manual-fallback';
+    el.innerHTML=`<div class="fallback-msg">Kunde inte hämta sidan automatiskt. Klistra in jobbannonsen som text istället.</div>
       <textarea id="manual-text" class="manual-textarea" placeholder="Klistra in hela jobbannonsen här…"></textarea>
-      <div class="fallback-actions">
-        <button id="manual-extract-btn" class="btn btn-sm" onclick="extractFromManualText()">Extrahera med Claude</button>
-      </div>`;
+      <div class="fallback-actions"><button id="manual-extract-btn" class="btn btn-sm" onclick="extractFromManualText()">Extrahera med Claude</button></div>`;
     anchor.after(el);
   }
-  el.style.display = 'block';
-  el.querySelector('textarea')?.focus();
+  el.style.display='block'; el.querySelector('textarea')?.focus();
+}
+function hideFallback(){ const el=document.getElementById('manual-fallback'); if(el) el.style.display='none'; }
+
+function extractText(html){
+  const doc=new DOMParser().parseFromString(html,'text/html');
+  ['script','style','nav','footer','header','noscript','iframe','svg'].forEach(t=>doc.querySelectorAll(t).forEach(e=>e.remove()));
+  return (doc.body?.innerText||doc.body?.textContent||'').replace(/\s+/g,' ').trim().slice(0,7000);
 }
 
-function hideFallback() {
-  const el = document.getElementById('manual-fallback');
-  if (el) el.style.display = 'none';
+function setFetchStatus(type,msg){
+  const el=document.getElementById('fetch-status'); if(!el) return;
+  el.className='fetch-status'+(type?' '+type:'');
+  el.innerHTML=type==='loading'?`<span class="spinner"></span> ${esc(msg)}`:esc(msg);
 }
 
-function extractText(html) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-  ['script','style','nav','footer','header','noscript','iframe','svg'].forEach(tag => {
-    doc.querySelectorAll(tag).forEach(el => el.remove());
+// ── Claude API ───────────────────────────────────────────────────────
+async function callClaude(messages, maxTokens=1200){
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':CLAUDE_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:CLAUDE_MODEL,max_tokens:maxTokens,messages}),
   });
-  return (doc.body?.innerText || doc.body?.textContent || '')
-    .replace(/\s+/g, ' ').trim().slice(0, 7000);
+  if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||`HTTP ${res.status}`); }
+  const d=await res.json(); return d.content?.[0]?.text||'';
 }
 
-async function callClaude(apiKey, text) {
-  const prompt = `Extract job listing details from the text below. Return ONLY valid JSON — no explanation, no markdown, just the JSON object.
+async function callClaudeExtract(text){
+  const raw=await callClaude([{role:'user',content:`Extract job listing details. Return ONLY valid JSON with keys: company, role, contact_name, contact_email, contact_phone (string or null).\n\n"""${text}"""`}],300);
+  const m=raw.match(/\{[\s\S]*\}/); if(!m) throw new Error('No JSON');
+  return JSON.parse(m[0]);
+}
 
-Fields:
-- company: the hiring company name (string or null)
-- role: the job title / position name (string or null)
-- contact_name: name of hiring manager or contact person (string or null)
-- contact_email: contact email address (string or null)
-- contact_phone: contact phone number (string or null)
+// ── Document generation ──────────────────────────────────────────────
+function getDocLang(appId){ return docLangs[appId]||'sv'; }
+function setDocLang(appId,lang){ docLangs[appId]=lang; renderTabContent(); }
 
-Job listing text:
-"""
-${text}
-"""`;
+async function generateDocument(appId, type){
+  const app=applications.find(a=>a.id===appId); if(!app) return;
+  const lang=getDocLang(appId);
+  const key=`${appId}-${type}`;
+  generatedDocs[key]='loading'; renderTabContent();
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({ model: CLAUDE_MODEL, max_tokens: 300, messages: [{ role: 'user', content: prompt }] }),
-  });
+  const we=profile.work_experiences.map(w=>`${w.title} — ${w.company} (${w.start_date||'?'} – ${w.end_date||'nu'})\n${w.description||''}`).join('\n\n');
+  const edu=profile.education.map(e=>`${e.degree} — ${e.school} (${e.start_date||'?'} – ${e.end_date||'?'})`).join('\n');
+  const skills=profile.skills.join(', ');
+  const langWord=lang==='sv'?'Swedish':'English';
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `HTTP ${res.status}`);
+  let prompt;
+  if(type==='cv'){
+    prompt=`Generate a professional, tailored CV in ${langWord} for the following candidate applying to the specified position. Format it as plain text with clear section headers (no markdown symbols). Make it ATS-friendly and tailored to the role.
+
+CANDIDATE:
+Name: ${profile.full_name||'[Name]'}
+Phone: ${profile.phone||''}
+Email: ${currentUser?.email||''}
+Address: ${profile.address||''}
+LinkedIn: ${profile.linkedin_url||''}
+
+SUMMARY:
+${profile.bio||''}
+
+WORK EXPERIENCE:
+${we||'(none provided)'}
+
+EDUCATION:
+${edu||'(none provided)'}
+
+SKILLS: ${skills||'(none provided)'}
+
+TARGET ROLE: ${app.role} at ${app.company}
+
+Write the complete CV now.`;
+  } else {
+    const contact=app.contact_name?`\nAttn: ${app.contact_name}`:'';
+    prompt=`Write a professional, tailored cover letter in ${langWord}. Keep it to one page (~300–380 words). Be specific to the role and company. Use a warm but professional tone.
+
+CANDIDATE:
+Name: ${profile.full_name||'[Name]'}
+Phone: ${profile.phone||''} | Email: ${currentUser?.email||''}
+LinkedIn: ${profile.linkedin_url||''}
+
+SUMMARY: ${profile.bio||''}
+EXPERIENCE: ${we||'(none provided)'}
+EDUCATION: ${edu||'(none provided)'}
+SKILLS: ${skills||'(none provided)'}
+
+TARGET:
+Company: ${app.company}${contact}
+Role: ${app.role}
+
+Write the complete cover letter now.`;
   }
-  const data = await res.json();
-  const raw = data.content?.[0]?.text || '';
-  const jsonMatch = raw.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('No JSON in Claude response');
-  return JSON.parse(jsonMatch[0]);
-}
 
-function setFetchStatus(type, msg) {
-  const el = document.getElementById('fetch-status');
-  if (!el) return;
-  el.className = 'fetch-status' + (type ? ' ' + type : '');
-  el.innerHTML = type === 'loading' ? `<span class="spinner"></span> ${esc(msg)}` : esc(msg);
-}
-
-// ── API key UI ─────────────────────────────────────────
-function handleApiKeySave() {
-  const val = document.getElementById('apikey-field')?.value.trim();
-  if (val) { saveApiKey(val); showApiKeyInput = false; render(); toast('API-nyckel sparad'); }
-}
-function toggleApiKey() {
-  showApiKeyInput = !showApiKeyInput;
-  render();
-  if (showApiKeyInput) setTimeout(() => document.getElementById('apikey-field')?.focus(), 50);
-}
-
-function renderApiKeySection() {
-  const key = getApiKey();
-  if (key && !showApiKeyInput) {
-    return `<div class="apikey-row">
-      <span class="apikey-label">Claude API-nyckel</span>
-      <span class="apikey-saved">✓ sparad</span>
-      <span class="apikey-change" onclick="toggleApiKey()">ändra</span>
-    </div>`;
+  try{
+    const content=await callClaude([{role:'user',content:prompt}],1500);
+    generatedDocs[key]=content;
+  } catch(err){
+    generatedDocs[key]='ERROR: '+err.message;
   }
-  return `<div class="apikey-row">
-    <span class="apikey-label">Claude API-nyckel</span>
-    <input id="apikey-field" class="apikey-input" type="password" placeholder="sk-ant-…" value="${esc(key)}"
-      onkeydown="if(event.key==='Enter')handleApiKeySave()">
-    <button class="btn btn-ghost btn-sm" onclick="handleApiKeySave()">Spara</button>
-    ${key ? `<span class="apikey-change" onclick="toggleApiKey()">avbryt</span>` : ''}
-  </div>`;
+  renderTabContent();
 }
 
-// ── Stats / filters ────────────────────────────────────
-function statsCount() {
-  return {
-    total:     applications.length,
-    applied:   applications.filter(a => a.status === 'Applied').length,
-    interview: applications.filter(a => a.status === 'Interview').length,
-    offer:     applications.filter(a => a.status === 'Offer').length,
-  };
-}
-function formatDate(d) {
-  return new Date(d + 'T00:00:00').toLocaleDateString('sv-SE', { day: 'numeric', month: 'short', year: 'numeric' });
-}
-function filteredApps() {
-  if (activeFilter === 'All') return applications;
-  return applications.filter(a => a.status === activeFilter);
-}
-function setFilter(f) { activeFilter = f; render(); }
-
-function renderContactMeta(a) {
-  const parts = [];
-  if (a.contact_name)  parts.push(`<span class="app-contact-item"><span class="contact-icon">👤</span>${esc(a.contact_name)}</span>`);
-  if (a.contact_email) parts.push(`<span class="app-contact-item"><span class="contact-icon">✉</span><a href="mailto:${esc(a.contact_email)}">${esc(a.contact_email)}</a></span>`);
-  if (a.contact_phone) parts.push(`<span class="app-contact-item"><span class="contact-icon">📞</span><a href="tel:${esc(a.contact_phone)}">${esc(a.contact_phone)}</a></span>`);
-  return parts.length ? `<div class="app-contact">${parts.join('')}</div>` : '';
+async function copyDoc(key){
+  const c=generatedDocs[key]; if(!c||c==='loading') return;
+  try{ await navigator.clipboard.writeText(c); toast('Kopierad till urklipp!'); }
+  catch(_){ toast('Kunde inte kopiera'); }
 }
 
-function copyShare() {
-  const base  = window.location.href.split('?')[0];
-  const uid   = currentUser?.id || sharedUID;
-  const url   = `${base}?view=readonly&user=${uid}`;
-  navigator.clipboard.writeText(url)
-    .then(() => toast('Länk kopierad!'))
-    .catch(() => {
-      const el = document.getElementById('share-url');
-      if (el) { el.select(); document.execCommand('copy'); toast('Länk kopierad!'); }
-    });
+// ── Share URL ────────────────────────────────────────────────────────
+function getShareUrl(){
+  const base=window.location.href.split('?')[0];
+  return `${base}?view=readonly&user=${currentUser?.id||sharedUID}`;
+}
+function copyShare(){
+  navigator.clipboard.writeText(getShareUrl()).then(()=>toast('Länk kopierad!')).catch(()=>toast('Kunde inte kopiera'));
 }
 
-function confirmDelete(id) {
-  if (confirm('Ta bort denna ansökan?')) deleteApp(id);
-}
+// ── Filter / stats ───────────────────────────────────────────────────
+function filteredApps(){ return activeFilter==='All'?applications:applications.filter(a=>a.status===activeFilter); }
+function statsCount(){ return { total:applications.length, applied:applications.filter(a=>a.status==='Applied').length, interview:applications.filter(a=>a.status==='Interview').length, offer:applications.filter(a=>a.status==='Offer').length }; }
+function setFilter(f){ activeFilter=f; renderTabContent(); }
+function switchTab(tab){ currentTab=tab; document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab)); renderTabContent(); }
+function confirmDelete(id){ if(confirm('Ta bort denna ansökan?')) deleteApp(id); }
 
-// ── Render: auth screen ────────────────────────────────
-function renderAuth() {
-  const root = document.getElementById('app');
-  const isLogin = authMode === 'login';
-  root.innerHTML = `
-    <div class="auth-screen">
-      <div class="auth-card">
-        <div class="auth-brand">
-          <div class="sub">Job Tracker</div>
-          <h1>Jobbspåraren</h1>
+// ── Render: auth ─────────────────────────────────────────────────────
+function renderAuth(){
+  const isLogin=authMode==='login';
+  document.getElementById('app').innerHTML=`
+    <div class="auth-screen"><div class="auth-card">
+      <div class="auth-brand"><div class="sub">Job Tracker</div><h1>W-Tracker</h1></div>
+      <div class="auth-heading">${isLogin?'Logga in på ditt konto':'Skapa ett nytt konto'}</div>
+      <form id="auth-form">
+        <div class="auth-fields">
+          <div class="auth-field"><label>E-post</label><input name="email" type="email" placeholder="du@exempel.se" required autocomplete="email"></div>
+          <div class="auth-field"><label>Lösenord</label><input name="password" type="password" placeholder="••••••••" required autocomplete="${isLogin?'current-password':'new-password'}"></div>
         </div>
-        <div class="auth-heading">${isLogin ? 'Logga in på ditt konto' : 'Skapa ett nytt konto'}</div>
-        <form id="auth-form">
-          <div class="auth-fields">
-            <div class="auth-field">
-              <label>E-post</label>
-              <input name="email" type="email" placeholder="du@exempel.se" required autocomplete="email">
-            </div>
-            <div class="auth-field">
-              <label>Lösenord</label>
-              <input name="password" type="password" placeholder="••••••••" required autocomplete="${isLogin ? 'current-password' : 'new-password'}">
-            </div>
-          </div>
-          <div id="auth-error" class="auth-error"></div>
-          <button class="auth-btn" type="submit">${isLogin ? 'Logga in' : 'Skapa konto'}</button>
-        </form>
-        <div class="auth-toggle">
-          ${isLogin
-            ? `Inget konto? <span onclick="setAuthMode('signup')">Skapa ett här</span>`
-            : `Har du redan ett konto? <span onclick="setAuthMode('login')">Logga in</span>`}
+        <div id="auth-error" class="auth-error"></div>
+        <button class="auth-btn" type="submit">${isLogin?'Logga in':'Skapa konto'}</button>
+      </form>
+      <div class="auth-toggle">${isLogin?`Inget konto? <span onclick="setAuthMode('signup')">Skapa ett här</span>`:`Har du ett konto? <span onclick="setAuthMode('login')">Logga in</span>`}</div>
+    </div></div>`;
+  const form=document.getElementById('auth-form');
+  form.addEventListener('submit',isLogin?doLogin:doSignup);
+  setTimeout(()=>form.querySelector('input')?.focus(),40);
+}
+
+function renderNoUser(){
+  document.getElementById('app').innerHTML=`<div class="auth-screen"><div style="text-align:center;color:var(--muted);font-size:.9rem;line-height:1.8">Ogiltig delningslänk — be ägaren dela på nytt.</div></div>`;
+}
+
+// ── Render: main shell ───────────────────────────────────────────────
+function render(){
+  if(!currentUser && !isReadOnly){ renderAuth(); return; }
+  if(isReadOnly){ renderReadOnly(); return; }
+
+  document.getElementById('app').innerHTML=`
+    <div class="app-screen"><div class="container">
+      <header>
+        <div><div class="sub">Job Tracker</div><h1>W-Tracker</h1></div>
+        <div class="header-right">
+          <span class="user-email">${esc(currentUser?.email||'')}</span>
+          <button class="btn btn-ghost btn-sm" onclick="copyShare()">Dela länk</button>
+          <button class="btn btn-ghost btn-sm" onclick="logout()">Logga ut</button>
         </div>
-      </div>
-    </div>`;
+      </header>
+      <nav class="tab-nav">
+        <button class="tab-btn${currentTab==='applications'?' active':''}" data-tab="applications" onclick="switchTab('applications')">Ansökningar</button>
+        <button class="tab-btn${currentTab==='profile'?' active':''}" data-tab="profile" onclick="switchTab('profile')">Profil</button>
+        <button class="tab-btn${currentTab==='documents'?' active':''}" data-tab="documents" onclick="switchTab('documents')">Dokument</button>
+      </nav>
+      <div id="tab-content"></div>
+    </div></div>`;
 
-  const form = document.getElementById('auth-form');
-  form.addEventListener('submit', isLogin ? doLogin : doSignup);
-  setTimeout(() => form.querySelector('input[name="email"]')?.focus(), 50);
+  renderTabContent();
 }
 
-// ── Render: no user param on share link ───────────────
-function renderNoUser() {
-  document.getElementById('app').innerHTML = `
-    <div class="auth-screen">
-      <div style="text-align:center;color:var(--muted);font-size:.9rem;line-height:1.8">
-        Den här delningslänken saknar ett användar-ID.<br>Be ägaren dela länken på nytt från appen.
-      </div>
-    </div>`;
+function renderTabContent(){
+  const el=document.getElementById('tab-content'); if(!el) return;
+  if(currentTab==='applications') el.innerHTML=renderApplicationsTab();
+  else if(currentTab==='profile')  el.innerHTML=renderProfileTab();
+  else if(currentTab==='documents') el.innerHTML=renderDocumentsTab();
+  attachTabListeners();
 }
 
-// ── Render: main app ───────────────────────────────────
-function render() {
-  const root     = document.getElementById('app');
-  const s        = statsCount();
-  const list     = filteredApps();
-  const base     = window.location.href.split('?')[0];
-  const shareUrl = currentUser ? `${base}?view=readonly&user=${currentUser.id}` : '';
-
-  root.innerHTML = `
-    <div class="app-screen">
-    <div class="container">
-
-    <header>
-      <div>
-        <div class="sub">Job Tracker</div>
-        <h1>Jobbspåraren</h1>
-      </div>
-      <div class="header-right">
-        ${isReadOnly
-          ? ''
-          : `<span class="user-email">${esc(currentUser?.email || '')}</span>
-             <button class="btn btn-ghost btn-sm" onclick="copyShare()">Dela länk</button>
-             <button class="btn btn-ghost btn-sm" onclick="logout()">Logga ut</button>`}
-      </div>
-    </header>
-
-    ${isReadOnly ? `<div class="ro-banner">Skrivskyddad vy — inga ändringar kan göras</div>` : ''}
-
+// ── Render: applications tab ─────────────────────────────────────────
+function renderApplicationsTab(){
+  const s=statsCount(); const list=filteredApps(); const shareUrl=getShareUrl();
+  return `
     <div class="stats">
       <div class="stat"><div class="stat-val">${s.total}</div><div class="stat-label">Totalt</div></div>
-      <div class="stat"><div class="stat-val c-applied">${s.applied}</div><div class="stat-label">Skickade</div></div>
-      <div class="stat"><div class="stat-val c-interview">${s.interview}</div><div class="stat-label">Intervjuer</div></div>
-      <div class="stat"><div class="stat-val c-offer">${s.offer}</div><div class="stat-label">Erbjudanden</div></div>
+      <div class="stat"><div class="stat-val c-a">${s.applied}</div><div class="stat-label">Skickade</div></div>
+      <div class="stat"><div class="stat-val c-i">${s.interview}</div><div class="stat-label">Intervjuer</div></div>
+      <div class="stat"><div class="stat-val c-o">${s.offer}</div><div class="stat-label">Erbjudanden</div></div>
     </div>
 
-    ${!isReadOnly ? `
     <div class="form-card">
-      <div class="form-card-header">
-        <h2>Ny ansökan</h2>
-        ${renderApiKeySection()}
-      </div>
-
+      <div class="form-card-hd"><h2>Ny ansökan</h2></div>
       <div class="url-fetcher">
         <div class="url-fetcher-label">Hämta info från jobbannons</div>
-        <div class="url-fetcher-row">
-          <input id="url-input" class="url-input" type="url" placeholder="Klistra in URL till jobbannonsen…"
-            onkeydown="if(event.key==='Enter'){event.preventDefault();fetchJobInfo()}">
+        <div class="url-row">
+          <input id="url-input" class="url-input" type="url" placeholder="Klistra in URL…" onkeydown="if(event.key==='Enter'){event.preventDefault();fetchJobInfo()}">
           <button id="fetch-btn" class="btn btn-sm" onclick="fetchJobInfo()">Hämta jobbinfo</button>
         </div>
         <div id="fetch-status" class="fetch-status"></div>
       </div>
-
       <form id="add-form">
         <input type="hidden" name="job_url" id="form-job-url">
         <div class="form-grid">
           <div class="fg"><label>Företag</label><input name="company" placeholder="Acme AB" required autocomplete="off"></div>
           <div class="fg"><label>Roll</label><input name="role" placeholder="Frontend-utvecklare" required autocomplete="off"></div>
           <div class="fg"><label>Datum ansökt</label><input name="date_applied" type="date" required value="${today()}"></div>
-          <div class="fg">
-            <label>Status</label>
-            <select name="status">
-              ${STATUSES.map(s => `<option value="${s}">${s}</option>`).join('')}
-            </select>
-          </div>
+          <div class="fg"><label>Status</label><select name="status">${STATUSES.map(s=>`<option>${s}</option>`).join('')}</select></div>
         </div>
         <div class="form-divider">Kontaktinfo</div>
         <div class="form-grid-3">
@@ -881,77 +791,225 @@ function render() {
           <div class="fg"><label>E-post</label><input name="contact_email" type="email" placeholder="anna@foretag.se" autocomplete="off"></div>
           <div class="fg"><label>Telefon</label><input name="contact_phone" type="tel" placeholder="+46 70 …" autocomplete="off"></div>
         </div>
-        <div class="form-actions">
-          <button class="btn" type="submit">Lägg till ansökan</button>
-        </div>
+        <div class="form-divider">Anteckningar</div>
+        <div class="fg" style="margin-bottom:16px"><textarea name="notes" placeholder="Egna anteckningar om denna ansökan…"></textarea></div>
+        <div class="form-actions"><button class="btn" type="submit">Lägg till ansökan</button></div>
       </form>
     </div>
-    ` : ''}
 
     <div class="filter-bar">
-      ${['All', ...STATUSES].map(f =>
-        `<button class="filter-chip ${activeFilter === f ? 'active' : ''}" onclick="setFilter('${f}')">${f === 'All' ? 'Alla' : f}</button>`
-      ).join('')}
+      ${['All',...STATUSES].map(f=>`<button class="filter-chip${activeFilter===f?' active':''}" onclick="setFilter('${f}')">${f==='All'?'Alla':f}</button>`).join('')}
     </div>
-
-    <div class="sh">
-      <h2>Ansökningar</h2>
-      <span class="count">${list.length} visas</span>
-    </div>
-
+    <div class="sh"><h2>Ansökningar</h2><span class="count">${list.length} visas</span></div>
     <div class="applications">
-      ${list.length === 0 ? `
-        <div class="empty">Inga ansökningar ännu.<br>Lägg till din första ovan.</div>
-      ` : list.map(a => `
-        <div class="app-row">
-          <div class="app-main">
-            <div class="app-company">
-              ${a.job_url
-                ? `<a class="job-link" href="${esc(a.job_url)}" target="_blank" rel="noopener">${esc(a.company)} ↗</a>`
-                : esc(a.company)}
-            </div>
-            <div class="app-role">${esc(a.role)}</div>
-            ${renderContactMeta(a)}
-          </div>
-          <div class="app-date">${formatDate(a.date_applied)}</div>
-          ${isReadOnly
-            ? `<span class="badge b-${a.status}">${a.status}</span>`
-            : `<div class="app-actions">
-                <select class="status-select" onchange="updateStatus('${a.id}', this.value)">
-                  ${STATUSES.map(s => `<option value="${s}" ${a.status === s ? 'selected' : ''}>${s}</option>`).join('')}
-                </select>
-                <button class="icon-btn del" onclick="confirmDelete('${a.id}')" title="Ta bort">✕</button>
-              </div>`
-          }
-        </div>
-      `).join('')}
+      ${list.length===0?`<div class="empty">Inga ansökningar ännu.<br>Lägg till din första ovan.</div>`:list.map(a=>renderAppRow(a)).join('')}
     </div>
 
-    ${!isReadOnly ? `
     <div class="share-section">
       <h3>Dela skrivskyddad länk</h3>
       <div class="share-row">
         <input class="share-url-input" id="share-url" readonly value="${esc(shareUrl)}">
         <button class="btn btn-ghost btn-sm" onclick="copyShare()">Kopiera</button>
       </div>
-    </div>
-    ` : ''}
-
-    </div>
     </div>`;
+}
 
-  if (!isReadOnly) {
-    const form = document.getElementById('add-form');
-    form.addEventListener('submit', addApplication);
-    const urlInput    = document.getElementById('url-input');
-    const jobUrlField = document.getElementById('form-job-url');
-    if (urlInput && jobUrlField) {
-      urlInput.addEventListener('input', () => { jobUrlField.value = urlInput.value.trim(); });
-    }
+function renderAppRow(a){
+  const files=appFiles[a.id]||[];
+  const expanded=expandedApps.has(a.id);
+  const contact=[];
+  if(a.contact_name)  contact.push(`<span class="app-contact-item">👤 ${esc(a.contact_name)}</span>`);
+  if(a.contact_email) contact.push(`<span class="app-contact-item">✉ <a href="mailto:${esc(a.contact_email)}">${esc(a.contact_email)}</a></span>`);
+  if(a.contact_phone) contact.push(`<span class="app-contact-item">📞 <a href="tel:${esc(a.contact_phone)}">${esc(a.contact_phone)}</a></span>`);
+
+  return `<div class="app-row">
+    <div class="app-row-top">
+      <div class="app-main">
+        <div class="app-company">${a.job_url?`<a class="job-link" href="${esc(a.job_url)}" target="_blank" rel="noopener">${esc(a.company)} ↗</a>`:esc(a.company)}</div>
+        <div class="app-role">${esc(a.role)}</div>
+        ${contact.length?`<div class="app-contact">${contact.join('')}</div>`:''}
+      </div>
+      <div class="app-date">${formatDate(a.date_applied)}</div>
+      <div class="app-actions">
+        <select class="status-select" onchange="updateStatus('${a.id}',this.value)">
+          ${STATUSES.map(s=>`<option${a.status===s?' selected':''}>${s}</option>`).join('')}
+        </select>
+        <button class="expand-toggle" onclick="toggleExpand('${a.id}')">📎 ${files.length}${a.notes?' 📝':''} ${expanded?'▲':'▼'}</button>
+        <button class="icon-btn del" onclick="confirmDelete('${a.id}')" title="Ta bort">✕</button>
+      </div>
+    </div>
+    ${expanded?`
+    <div class="app-expand">
+      <div>
+        <div class="expand-section-label">Anteckningar</div>
+        <textarea class="notes-area" placeholder="Inga anteckningar…" onblur="saveNotes('${a.id}',this.value)">${esc(a.notes||'')}</textarea>
+      </div>
+      <div>
+        <div class="expand-section-label">Bifogade filer</div>
+        <div class="file-list">
+          ${files.map(f=>`<div class="file-row">
+            <span class="file-icon">${fileIcon(f.file_type)}</span>
+            <span class="file-name"><a href="${esc(getFileUrl(f))}" target="_blank" rel="noopener">${esc(f.filename)}</a></span>
+            <span class="file-size">${formatSize(f.file_size)}</span>
+            <button class="file-del-btn" onclick="deleteFile('${f.id}','${esc(f.storage_path)}','${a.id}')">✕</button>
+          </div>`).join('')}
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="triggerFileUpload('${a.id}')">+ Bifoga fil</button>
+      </div>
+    </div>`:''}
+  </div>`;
+}
+
+// ── Render: profile tab ───────────────────────────────────────────────
+function renderProfileTab(){
+  const p=profile;
+  const initials=(p.full_name||currentUser?.email||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  return `
+    <form id="profile-form">
+    <div class="p-card">
+      <div class="p-section-hd">Grundinfo</div>
+      <div class="p-top">
+        <div class="avatar-wrap">
+          ${p.photo_url?`<img class="avatar" src="${esc(p.photo_url)}" alt="Foto" onclick="triggerPhotoUpload()">`:`<div class="avatar-ph" onclick="triggerPhotoUpload()" title="Ladda upp foto">📷</div>`}
+          <button type="button" class="avatar-lbl" onclick="triggerPhotoUpload()">Ändra foto</button>
+        </div>
+        <div class="p-grid">
+          <div class="fg"><label>Fullständigt namn</label><input name="full_name" placeholder="Anna Andersson" value="${esc(p.full_name)}"></div>
+          <div class="fg"><label>Telefon</label><input name="phone" placeholder="+46 70 123 45 67" value="${esc(p.phone)}"></div>
+          <div class="fg"><label>Adress</label><input name="address" placeholder="Storgatan 1, Stockholm" value="${esc(p.address)}"></div>
+          <div class="fg"><label>LinkedIn URL</label><input name="linkedin_url" type="url" placeholder="https://linkedin.com/in/…" value="${esc(p.linkedin_url)}"></div>
+        </div>
+      </div>
+      <div class="fg"><label>Personlig sammanfattning / bio</label><textarea name="bio" rows="4" placeholder="Beskriv dig själv, din bakgrund och vad du söker…">${esc(p.bio)}</textarea></div>
+    </div>
+
+    <div class="p-card">
+      <div class="p-section-hd">Arbetslivserfarenhet <button type="button" class="btn btn-ghost btn-sm" onclick="addWorkExp()">+ Lägg till</button></div>
+      ${p.work_experiences.length===0?`<div style="color:var(--muted);font-size:.82rem">Inga erfarenheter tillagda ännu.</div>`:''}
+      ${p.work_experiences.map((w,i)=>`
+        <div class="list-item-card we-item">
+          <div class="list-item-hd"><span class="list-item-num">Erfarenhet ${i+1}</span><button type="button" class="list-item-rm" onclick="removeWorkExp(${i})">Ta bort</button></div>
+          <div class="list-grid-4" style="grid-template-columns:1fr 1fr 1fr 1fr">
+            <div class="fg"><label>Titel / roll</label><input class="we-title" placeholder="Frontend-utvecklare" value="${esc(w.title)}"></div>
+            <div class="fg"><label>Företag</label><input class="we-company" placeholder="Acme AB" value="${esc(w.company)}"></div>
+            <div class="fg"><label>Startdatum</label><input class="we-start" type="month" value="${esc(w.start_date)}"></div>
+            <div class="fg"><label>Slutdatum</label><input class="we-end" type="month" placeholder="Pågående" value="${esc(w.end_date)}"></div>
+          </div>
+          <div class="fg"><label>Beskrivning</label><textarea class="we-desc" rows="3" placeholder="Beskriv dina ansvarsområden och prestationer…">${esc(w.description)}</textarea></div>
+        </div>`).join('')}
+    </div>
+
+    <div class="p-card">
+      <div class="p-section-hd">Utbildning <button type="button" class="btn btn-ghost btn-sm" onclick="addEducation()">+ Lägg till</button></div>
+      ${p.education.length===0?`<div style="color:var(--muted);font-size:.82rem">Ingen utbildning tillagd ännu.</div>`:''}
+      ${p.education.map((e,i)=>`
+        <div class="list-item-card edu-item">
+          <div class="list-item-hd"><span class="list-item-num">Utbildning ${i+1}</span><button type="button" class="list-item-rm" onclick="removeEducation(${i})">Ta bort</button></div>
+          <div class="list-grid-4" style="grid-template-columns:1fr 1fr 1fr 1fr">
+            <div class="fg"><label>Examen / program</label><input class="edu-degree" placeholder="Civilingenjör" value="${esc(e.degree)}"></div>
+            <div class="fg"><label>Skola / universitet</label><input class="edu-school" placeholder="KTH" value="${esc(e.school)}"></div>
+            <div class="fg"><label>Startdatum</label><input class="edu-start" type="month" value="${esc(e.start_date)}"></div>
+            <div class="fg"><label>Slutdatum</label><input class="edu-end" type="month" value="${esc(e.end_date)}"></div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <div class="p-card">
+      <div class="p-section-hd">Kompetenser</div>
+      <div class="skill-tags">
+        ${p.skills.map((s,i)=>`<span class="skill-tag">${esc(s)}<button type="button" onclick="removeSkill(${i})">✕</button></span>`).join('')}
+        ${p.skills.length===0?`<span style="font-size:.78rem;color:var(--muted)">Inga kompetenser tillagda ännu.</span>`:''}
+      </div>
+      <div class="skill-row">
+        <input id="skill-inp" class="skill-inp" placeholder="Lägg till kompetens…" onkeydown="if(event.key==='Enter'){event.preventDefault();addSkill()}">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="addSkill()">Lägg till</button>
+      </div>
+    </div>
+
+    <div class="profile-save-row">
+      <button type="button" class="btn" onclick="saveProfile()">Spara profil</button>
+    </div>
+    </form>`;
+}
+
+// ── Render: documents tab ─────────────────────────────────────────────
+function renderDocumentsTab(){
+  const profileEmpty=!profile.full_name&&!profile.bio&&!profile.work_experiences.length;
+  return `
+    ${profileEmpty?`<div class="profile-warn">⚠ Din profil är ofullständig. Fyll i <button class="btn btn-ghost btn-sm" style="display:inline-flex;padding:3px 10px;font-size:.72rem" onclick="switchTab('profile')">Profil</button> för bättre dokument.</div>`:''}
+    <div class="doc-list">
+      ${applications.length===0?`<div class="empty">Inga ansökningar ännu.</div>`:applications.map(a=>{
+        const lang=getDocLang(a.id);
+        const cvKey=`${a.id}-cv`, clKey=`${a.id}-cover`;
+        const cvDoc=generatedDocs[cvKey], clDoc=generatedDocs[clKey];
+        return `<div class="doc-row">
+          <div class="doc-row-hd">
+            <div><div class="doc-co">${esc(a.company)}</div><div class="doc-role">${esc(a.role)}</div></div>
+            <span class="badge b-${a.status}">${a.status}</span>
+          </div>
+          <div class="doc-controls">
+            <div class="lang-tog">
+              <button class="lang-btn${lang==='sv'?' active':''}" onclick="setDocLang('${a.id}','sv')">Svenska</button>
+              <button class="lang-btn${lang==='en'?' active':''}" onclick="setDocLang('${a.id}','en')">English</button>
+            </div>
+            <button class="btn btn-sm" onclick="generateDocument('${a.id}','cv')" ${cvDoc==='loading'?'disabled':''}>
+              ${cvDoc==='loading'?`<span class="spinner"></span> Genererar…`:'Generera CV'}
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick="generateDocument('${a.id}','cover')" ${clDoc==='loading'?'disabled':''}>
+              ${clDoc==='loading'?`<span class="spinner"></span> Genererar…`:'Generera personligt brev'}
+            </button>
+          </div>
+          ${cvDoc&&cvDoc!=='loading'?`<div class="gen-panel"><div class="gen-panel-hd"><span class="gen-panel-lbl">CV — ${lang==='sv'?'Svenska':'English'}</span><button class="btn btn-ghost btn-sm" onclick="copyDoc('${cvKey}')">Kopiera</button></div><div class="gen-content">${esc(cvDoc)}</div></div>`:''}
+          ${clDoc&&clDoc!=='loading'?`<div class="gen-panel"><div class="gen-panel-hd"><span class="gen-panel-lbl">Personligt brev — ${lang==='sv'?'Svenska':'English'}</span><button class="btn btn-ghost btn-sm" onclick="copyDoc('${clKey}')">Kopiera</button></div><div class="gen-content">${esc(clDoc)}</div></div>`:''}
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ── Render: read-only view ────────────────────────────────────────────
+function renderReadOnly(){
+  const s=statsCount();
+  document.getElementById('app').innerHTML=`
+    <div class="app-screen"><div class="container">
+      <header>
+        <div><div class="sub">Job Tracker</div><h1>W-Tracker</h1></div>
+      </header>
+      <div class="ro-banner">Skrivskyddad vy — visar endast offentlig information</div>
+      <div class="stats">
+        <div class="stat"><div class="stat-val">${s.total}</div><div class="stat-label">Totalt</div></div>
+        <div class="stat"><div class="stat-val c-a">${s.applied}</div><div class="stat-label">Skickade</div></div>
+        <div class="stat"><div class="stat-val c-i">${s.interview}</div><div class="stat-label">Intervjuer</div></div>
+        <div class="stat"><div class="stat-val c-o">${s.offer}</div><div class="stat-label">Erbjudanden</div></div>
+      </div>
+      <div class="sh"><h2>Ansökningar</h2><span class="count">${applications.length} totalt</span></div>
+      <div class="applications">
+        ${applications.length===0?`<div class="empty">Inga ansökningar.</div>`:applications.map(a=>`
+          <div class="app-row">
+            <div class="app-row-top">
+              <div class="app-main">
+                <div class="app-company">${esc(a.company)}</div>
+                <div class="app-role">${esc(a.role)}</div>
+              </div>
+              <div class="app-date">${formatDate(a.date_applied)}</div>
+              <span class="badge b-${a.status}">${a.status}</span>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div></div>`;
+}
+
+// ── Attach listeners ──────────────────────────────────────────────────
+function attachTabListeners(){
+  const form=document.getElementById('add-form');
+  if(form){
+    form.addEventListener('submit',addApplication);
+    const ui=document.getElementById('url-input');
+    const jf=document.getElementById('form-job-url');
+    if(ui&&jf) ui.addEventListener('input',()=>{ jf.value=ui.value.trim(); });
   }
 }
 
-// ── Init ───────────────────────────────────────────────
+// ── Init ──────────────────────────────────────────────────────────────
 initAuth();
 </script>
 </body>
