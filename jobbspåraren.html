@@ -1011,6 +1011,11 @@ function attachTabListeners(){
 
 // ── Init ──────────────────────────────────────────────────────────────
 initAuth();
+setTimeout(()=>{
+  if(!currentUser && !isReadOnly && document.getElementById('app')?.querySelector('.loading-msg')){
+    render();
+  }
+}, 2000);
 </script>
 </body>
 </html>
