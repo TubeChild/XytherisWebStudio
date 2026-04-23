@@ -282,6 +282,7 @@ function toast(msg){ const el=document.getElementById('toast'); el.textContent=m
 // ── Auth ─────────────────────────────────────────────────────────────
 function initAuth(){
   if(isReadOnly){ load().then(()=>render()); return; }
+  render(); // show login immediately — no waiting
   db.auth.onAuthStateChange(async(_,session)=>{
     currentUser = session?.user||null;
     if(currentUser){
@@ -1015,7 +1016,7 @@ setTimeout(()=>{
   if(!currentUser && !isReadOnly && document.getElementById('app')?.querySelector('.loading-msg')){
     render();
   }
-}, 2000);
+}, 500);
 </script>
 </body>
 </html>
