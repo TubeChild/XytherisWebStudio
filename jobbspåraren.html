@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jobbspåraren</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg:         #080809;
+      --surface:    #0f0f11;
+      --surface-2:  #141417;
+      --border:     #1c1c20;
+      --border-h:   #28282f;
+      --text:       #e8e8ec;
+      --muted:      #666675;
+      --accent:     #7c6fff;
+      --accent-dim: rgba(124,111,255,.12);
+      --r:          8px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      padding: 56px 24px 100px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 880px; margin: 0 auto; }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 48px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--border);
+    }
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 500;
+      letter-spacing: -.025em;
+    }
+    header .sub {
+      font-size: .7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 4px;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: var(--r);
+      font-size: .82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity .15s;
+      letter-spacing: .01em;
+      font-family: inherit;
+    }
+    .btn:hover { opacity: .82; }
+    .btn:active { opacity: .65; }
+    .btn-sm {
+      padding: 6px 13px;
+      font-size: .76rem;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: var(--border-h); opacity: 1; }
+    .btn-danger {
+      background: transparent;
+      color: #f87171;
+      border: 1px solid rgba(248,113,113,.25);
+    }
+    .btn-danger:hover { background: rgba(248,113,113,.08); opacity: 1; }
+
+    /* ── Readonly banner ── */
+    .ro-banner {
+      background: var(--accent-dim);
+      border: 1px solid rgba(124,111,255,.25);
+      border-radius: var(--r);
+      padding: 10px 18px;
+      margin-bottom: 32px;
+      font-size: .8rem;
+      color: #a89fff;
+      text-align: center;
+      letter-spacing: .01em;
+    }
+
+    /* ── Stats ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 16px 18px;
+    }
+    .stat-val {
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: -.04em;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+    .stat-label {
+      font-size: .68rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .09em;
+    }
+    .stat-val.c-applied   { color: #60a5fa; }
+    .stat-val.c-interview { color: #fbbf24; }
+    .stat-val.c-offer     { color: #34d399; }
+
+    /* ── Add form ── */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 26px 28px;
+      margin-bottom: 36px;
+    }
+    .form-card h2 {
+      font-size: .68rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 20px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .fg {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .fg label {
+      font-size: .68rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .fg input, .fg select, .fg textarea {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 9px 13px;
+      border-radius: var(--r);
+      font-size: .88rem;
+      outline: none;
+      transition: border-color .15s;
+      font-family: inherit;
+      width: 100%;
+    }
+    .fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--accent); }
+    .fg select option { background: #1a1a1e; }
+    .fg textarea { resize: vertical; min-height: 60px; }
+    .form-actions { display: flex; justify-content: flex-end; }
+
+    /* ── Section header ── */
+    .sh {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .sh h2 {
+      font-size: .68rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+    .sh .count {
+      font-size: .72rem;
+      color: var(--muted);
+    }
+
+    /* ── Filter bar ── */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-chip {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 5px 13px;
+      border-radius: 20px;
+      font-size: .74rem;
+      cursor: pointer;
+      transition: all .15s;
+      font-family: inherit;
+      letter-spacing: .02em;
+    }
+    .filter-chip:hover { border-color: var(--border-h); color: var(--text); }
+    .filter-chip.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+    /* ── Application rows ── */
+    .applications { display: flex; flex-direction: column; gap: 7px; }
+    .app-row {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      transition: border-color .15s;
+    }
+    .app-row:hover { border-color: var(--border-h); }
+    .app-main { flex: 1; min-width: 0; }
+    .app-company {
+      font-size: .92rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+    .app-role {
+      font-size: .78rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .app-date {
+      font-size: .74rem;
+      color: var(--muted);
+      text-align: right;
+      min-width: 84px;
+      white-space: nowrap;
+    }
+    .badge {
+      font-size: .66rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      min-width: 78px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .b-Applied   { background: rgba(59,130,246,.14); color: #60a5fa; }
+    .b-Interview { background: rgba(245,158,11,.14); color: #fbbf24; }
+    .b-Rejected  { background: rgba(239,68,68,.14);  color: #f87171; }
+    .b-Offer     { background: rgba(16,185,129,.14); color: #34d399; }
+
+    .status-select {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 5px 9px;
+      border-radius: 6px;
+      font-size: .76rem;
+      cursor: pointer;
+      outline: none;
+      font-family: inherit;
+      transition: border-color .15s;
+    }
+    .status-select:hover { border-color: var(--border-h); }
+    .status-select option { background: #1a1a1e; }
+
+    .delete-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 4px 6px;
+      border-radius: 5px;
+      transition: color .15s;
+      line-height: 1;
+    }
+    .delete-btn:hover { color: #f87171; }
+
+    /* ── Empty state ── */
+    .empty {
+      text-align: center;
+      padding: 64px 0;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.7;
+    }
+
+    /* ── Share section ── */
+    .share-section {
+      margin-top: 52px;
+      padding-top: 22px;
+      border-top: 1px solid var(--border);
+    }
+    .share-section h3 {
+      font-size: .68rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 12px;
+    }
+    .share-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .share-url-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 9px 13px;
+      border-radius: var(--r);
+      font-size: .78rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      outline: none;
+    }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--surface);
+      border: 1px solid var(--border-h);
+      border-radius: var(--r);
+      padding: 11px 18px;
+      font-size: .82rem;
+      color: var(--text);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .2s, transform .2s;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── Loading ── */
+    .loading {
+      text-align: center;
+      padding: 80px 0;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 620px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .app-date { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="container" id="app">
+  <div class="loading">Loading…</div>
+</div>
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://jxophknjulubgnbbekgp.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4b3Boa25qdWx1YmduYmJla2dwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzI5NjQsImV4cCI6MjA5MjUwODk2NH0.pYp_8uKIjYiSf2TDA5Ty_Q7SUDoRKsaHkhqalVfMdHM';
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const isReadOnly = new URLSearchParams(window.location.search).has('view');
+const STATUSES = ['Applied', 'Interview', 'Rejected', 'Offer'];
+
+let applications = [];
+let activeFilter = 'All';
+
+// ── Toast ──────────────────────────────────────────────
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// ── Data ───────────────────────────────────────────────
+async function load() {
+  const { data, error } = await db
+    .from('job_applications')
+    .select('*')
+    .order('date_applied', { ascending: false });
+  if (error) { console.error(error); toast('Failed to load data'); return; }
+  applications = data || [];
+  render();
+}
+
+async function addApplication(e) {
+  e.preventDefault();
+  const form = e.target;
+  const company    = form.company.value.trim();
+  const role       = form.role.value.trim();
+  const date_applied = form.date_applied.value;
+  const status     = form.status.value;
+
+  if (!company || !role || !date_applied) return;
+
+  const btn = form.querySelector('.btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  const { error } = await db.from('job_applications').insert({ company, role, date_applied, status });
+  btn.disabled = false;
+  btn.textContent = 'Add Application';
+
+  if (error) { toast('Error saving'); console.error(error); return; }
+  form.reset();
+  form.date_applied.value = new Date().toISOString().split('T')[0];
+  toast('Application added');
+  await load();
+}
+
+async function updateStatus(id, status) {
+  const { error } = await db.from('job_applications').update({ status }).eq('id', id);
+  if (error) { toast('Update failed'); return; }
+  applications = applications.map(a => a.id === id ? { ...a, status } : a);
+  render();
+}
+
+async function deleteApp(id) {
+  const { error } = await db.from('job_applications').delete().eq('id', id);
+  if (error) { toast('Delete failed'); return; }
+  applications = applications.filter(a => a.id !== id);
+  toast('Removed');
+  render();
+}
+
+// ── Render ─────────────────────────────────────────────
+function stats() {
+  const total     = applications.length;
+  const applied   = applications.filter(a => a.status === 'Applied').length;
+  const interview = applications.filter(a => a.status === 'Interview').length;
+  const offer     = applications.filter(a => a.status === 'Offer').length;
+  return { total, applied, interview, offer };
+}
+
+function formatDate(d) {
+  return new Date(d + 'T00:00:00').toLocaleDateString('sv-SE', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function filteredApps() {
+  if (activeFilter === 'All') return applications;
+  return applications.filter(a => a.status === activeFilter);
+}
+
+function render() {
+  const app = document.getElementById('app');
+  const s = stats();
+  const list = filteredApps();
+  const shareUrl = window.location.href.split('?')[0] + '?view=readonly';
+
+  app.innerHTML = `
+    <header>
+      <div>
+        <div class="sub">Job Tracker</div>
+        <h1>Jobbspåraren</h1>
+      </div>
+      ${isReadOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="copyShare()">Share read-only link</button>`}
+    </header>
+
+    ${isReadOnly ? `<div class="ro-banner">Read-only view — no changes can be made</div>` : ''}
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-val">${s.total}</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val c-applied">${s.applied}</div>
+        <div class="stat-label">Applied</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val c-interview">${s.interview}</div>
+        <div class="stat-label">Interviews</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val c-offer">${s.offer}</div>
+        <div class="stat-label">Offers</div>
+      </div>
+    </div>
+
+    ${!isReadOnly ? `
+    <div class="form-card">
+      <h2>New Application</h2>
+      <form id="add-form">
+        <div class="form-grid">
+          <div class="fg">
+            <label>Company</label>
+            <input name="company" placeholder="Acme Corp" required autocomplete="off">
+          </div>
+          <div class="fg">
+            <label>Role</label>
+            <input name="role" placeholder="Frontend Engineer" required autocomplete="off">
+          </div>
+          <div class="fg">
+            <label>Date Applied</label>
+            <input name="date_applied" type="date" required value="${new Date().toISOString().split('T')[0]}">
+          </div>
+          <div class="fg">
+            <label>Status</label>
+            <select name="status">
+              ${STATUSES.map(s => `<option value="${s}">${s}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn" type="submit">Add Application</button>
+        </div>
+      </form>
+    </div>
+    ` : ''}
+
+    <div class="filter-bar">
+      ${['All', ...STATUSES].map(f => `
+        <button class="filter-chip ${activeFilter === f ? 'active' : ''}" onclick="setFilter('${f}')">${f}</button>
+      `).join('')}
+    </div>
+
+    <div class="sh">
+      <h2>Applications</h2>
+      <span class="count">${list.length} shown</span>
+    </div>
+
+    <div class="applications">
+      ${list.length === 0 ? `
+        <div class="empty">
+          No applications yet.<br>Add your first one above.
+        </div>
+      ` : list.map(a => `
+        <div class="app-row">
+          <div class="app-main">
+            <div class="app-company">${esc(a.company)}</div>
+            <div class="app-role">${esc(a.role)}</div>
+          </div>
+          <div class="app-date">${formatDate(a.date_applied)}</div>
+          ${isReadOnly
+            ? `<span class="badge b-${a.status}">${a.status}</span>`
+            : `<select class="status-select" onchange="updateStatus('${a.id}', this.value)">
+                ${STATUSES.map(s => `<option value="${s}" ${a.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+              </select>
+              <button class="delete-btn" onclick="confirmDelete('${a.id}')" title="Remove">✕</button>`
+          }
+        </div>
+      `).join('')}
+    </div>
+
+    ${!isReadOnly ? `
+    <div class="share-section">
+      <h3>Shareable Read-Only Link</h3>
+      <div class="share-row">
+        <input class="share-url-input" id="share-url" readonly value="${shareUrl}">
+        <button class="btn btn-ghost btn-sm" onclick="copyShare()">Copy</button>
+      </div>
+    </div>
+    ` : ''}
+  `;
+
+  if (!isReadOnly) {
+    document.getElementById('add-form').addEventListener('submit', addApplication);
+  }
+}
+
+function esc(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  render();
+}
+
+function copyShare() {
+  const url = window.location.href.split('?')[0] + '?view=readonly';
+  navigator.clipboard.writeText(url).then(() => toast('Read-only link copied!')).catch(() => {
+    const el = document.getElementById('share-url');
+    if (el) { el.select(); document.execCommand('copy'); toast('Link copied!'); }
+  });
+}
+
+function confirmDelete(id) {
+  if (confirm('Remove this application?')) deleteApp(id);
+}
+
+// ── Init ───────────────────────────────────────────────
+load();
+</script>
+</body>
+</html>
