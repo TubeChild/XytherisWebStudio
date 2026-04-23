@@ -39,183 +39,150 @@
       padding-bottom: 22px;
       border-bottom: 1px solid var(--border);
     }
-    header h1 {
-      font-size: 1.25rem;
-      font-weight: 500;
-      letter-spacing: -.025em;
-    }
-    header .sub {
-      font-size: .7rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      margin-bottom: 4px;
-    }
+    header h1 { font-size: 1.25rem; font-weight: 500; letter-spacing: -.025em; }
+    header .sub { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
 
     /* ── Buttons ── */
     .btn {
       display: inline-flex; align-items: center; gap: 7px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 9px 18px;
-      border-radius: var(--r);
-      font-size: .82rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: opacity .15s;
-      letter-spacing: .01em;
-      font-family: inherit;
+      background: var(--accent); color: #fff; border: none;
+      padding: 9px 18px; border-radius: var(--r);
+      font-size: .82rem; font-weight: 500; cursor: pointer;
+      transition: opacity .15s; letter-spacing: .01em; font-family: inherit;
     }
     .btn:hover { opacity: .82; }
     .btn:active { opacity: .65; }
-    .btn-sm {
-      padding: 6px 13px;
-      font-size: .76rem;
-    }
-    .btn-ghost {
-      background: transparent;
-      color: var(--muted);
-      border: 1px solid var(--border);
-    }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-sm { padding: 6px 13px; font-size: .76rem; }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
     .btn-ghost:hover { color: var(--text); border-color: var(--border-h); opacity: 1; }
-    .btn-danger {
-      background: transparent;
-      color: #f87171;
-      border: 1px solid rgba(248,113,113,.25);
-    }
-    .btn-danger:hover { background: rgba(248,113,113,.08); opacity: 1; }
 
     /* ── Readonly banner ── */
     .ro-banner {
-      background: var(--accent-dim);
-      border: 1px solid rgba(124,111,255,.25);
-      border-radius: var(--r);
-      padding: 10px 18px;
-      margin-bottom: 32px;
-      font-size: .8rem;
-      color: #a89fff;
-      text-align: center;
-      letter-spacing: .01em;
+      background: var(--accent-dim); border: 1px solid rgba(124,111,255,.25);
+      border-radius: var(--r); padding: 10px 18px; margin-bottom: 32px;
+      font-size: .8rem; color: #a89fff; text-align: center; letter-spacing: .01em;
     }
 
     /* ── Stats ── */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-bottom: 32px;
-    }
-    .stat {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 16px 18px;
-    }
-    .stat-val {
-      font-size: 1.9rem;
-      font-weight: 600;
-      letter-spacing: -.04em;
-      line-height: 1;
-      margin-bottom: 5px;
-    }
-    .stat-label {
-      font-size: .68rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .09em;
-    }
+    .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 32px; }
+    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 18px; }
+    .stat-val { font-size: 1.9rem; font-weight: 600; letter-spacing: -.04em; line-height: 1; margin-bottom: 5px; }
+    .stat-label { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .09em; }
     .stat-val.c-applied   { color: #60a5fa; }
     .stat-val.c-interview { color: #fbbf24; }
     .stat-val.c-offer     { color: #34d399; }
 
-    /* ── Add form ── */
+    /* ── Form card ── */
     .form-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 26px 28px;
-      margin-bottom: 36px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 26px 28px; margin-bottom: 36px;
     }
-    .form-card h2 {
-      font-size: .68rem;
-      font-weight: 500;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      margin-bottom: 20px;
+    .form-card-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
     }
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 18px;
+    .form-card-header h2 {
+      font-size: .68rem; font-weight: 500; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .1em;
     }
-    .fg {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+
+    /* ── API key section ── */
+    .apikey-row {
+      display: flex; align-items: center; gap: 8px;
     }
-    .fg label {
-      font-size: .68rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .08em;
+    .apikey-label { font-size: .68rem; color: var(--muted); white-space: nowrap; }
+    .apikey-input {
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--text); padding: 5px 10px; border-radius: 6px;
+      font-size: .76rem; outline: none; font-family: monospace;
+      width: 220px; transition: border-color .15s;
     }
-    .fg input, .fg select, .fg textarea {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 9px 13px;
-      border-radius: var(--r);
-      font-size: .88rem;
-      outline: none;
+    .apikey-input:focus { border-color: var(--accent); }
+    .apikey-saved { font-size: .68rem; color: #34d399; }
+    .apikey-change { font-size: .68rem; color: var(--muted); cursor: pointer; text-decoration: underline; }
+    .apikey-change:hover { color: var(--text); }
+
+    /* ── URL fetcher ── */
+    .url-fetcher {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 14px 16px; margin-bottom: 20px;
+    }
+    .url-fetcher-label {
+      font-size: .65rem; color: var(--muted); text-transform: uppercase;
+      letter-spacing: .1em; margin-bottom: 10px;
+    }
+    .url-fetcher-row { display: flex; gap: 8px; align-items: stretch; }
+    .url-input {
+      flex: 1; background: var(--bg); border: 1px solid var(--border);
+      color: var(--text); padding: 9px 13px; border-radius: var(--r);
+      font-size: .84rem; outline: none; font-family: inherit;
       transition: border-color .15s;
-      font-family: inherit;
-      width: 100%;
     }
-    .fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--accent); }
+    .url-input:focus { border-color: var(--accent); }
+    .url-input::placeholder { color: var(--muted); }
+    .fetch-status {
+      margin-top: 10px; font-size: .76rem; color: var(--muted);
+      min-height: 18px; display: flex; align-items: center; gap: 6px;
+    }
+    .fetch-status.error { color: #f87171; }
+    .fetch-status.success { color: #34d399; }
+
+    /* ── Manual fallback ── */
+    .manual-fallback {
+      margin-top: 12px; display: none;
+    }
+    .manual-fallback.visible { display: block; }
+    .fallback-msg {
+      font-size: .78rem; color: #fbbf24; margin-bottom: 10px; line-height: 1.5;
+    }
+    .manual-textarea {
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      color: var(--text); padding: 10px 13px; border-radius: var(--r);
+      font-size: .82rem; font-family: inherit; outline: none; resize: vertical;
+      min-height: 120px; transition: border-color .15s; display: block;
+    }
+    .manual-textarea:focus { border-color: var(--accent); }
+    .manual-textarea::placeholder { color: var(--muted); }
+    .fallback-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
+    .spinner {
+      width: 12px; height: 12px; border: 2px solid var(--border-h);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin .7s linear infinite; display: inline-block; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Form fields ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+    .form-divider {
+      font-size: .65rem; color: var(--muted); text-transform: uppercase;
+      letter-spacing: .1em; margin: 18px 0 14px; display: flex; align-items: center; gap: 10px;
+    }
+    .form-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .fg { display: flex; flex-direction: column; gap: 6px; }
+    .fg label { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+    .fg input, .fg select {
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--text); padding: 9px 13px; border-radius: var(--r);
+      font-size: .88rem; outline: none; transition: border-color .15s;
+      font-family: inherit; width: 100%;
+    }
+    .fg input:focus, .fg select:focus { border-color: var(--accent); }
     .fg select option { background: #1a1a1e; }
-    .fg textarea { resize: vertical; min-height: 60px; }
+    .fg input.autofilled { border-color: rgba(124,111,255,.5); background: rgba(124,111,255,.05); }
     .form-actions { display: flex; justify-content: flex-end; }
 
     /* ── Section header ── */
-    .sh {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-    .sh h2 {
-      font-size: .68rem;
-      font-weight: 500;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .1em;
-    }
-    .sh .count {
-      font-size: .72rem;
-      color: var(--muted);
-    }
+    .sh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .sh h2 { font-size: .68rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+    .sh .count { font-size: .72rem; color: var(--muted); }
 
     /* ── Filter bar ── */
-    .filter-bar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
     .filter-chip {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 5px 13px;
-      border-radius: 20px;
-      font-size: .74rem;
-      cursor: pointer;
-      transition: all .15s;
-      font-family: inherit;
-      letter-spacing: .02em;
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      padding: 5px 13px; border-radius: 20px; font-size: .74rem; cursor: pointer;
+      transition: all .15s; font-family: inherit; letter-spacing: .02em;
     }
     .filter-chip:hover { border-color: var(--border-h); color: var(--text); }
     .filter-chip.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
@@ -223,154 +190,86 @@
     /* ── Application rows ── */
     .applications { display: flex; flex-direction: column; gap: 7px; }
     .app-row {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      gap: 18px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 15px 20px;
+      display: flex; align-items: center; gap: 18px;
       transition: border-color .15s;
     }
     .app-row:hover { border-color: var(--border-h); }
     .app-main { flex: 1; min-width: 0; }
-    .app-company {
-      font-size: .92rem;
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-bottom: 2px;
+    .app-company { font-size: .92rem; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .app-role { font-size: .78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .app-contact {
+      display: flex; gap: 14px; flex-wrap: wrap; margin-top: 5px;
     }
-    .app-role {
-      font-size: .78rem;
-      color: var(--muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .app-contact-item {
+      font-size: .71rem; color: var(--muted); display: flex; align-items: center; gap: 4px;
     }
-    .app-date {
-      font-size: .74rem;
-      color: var(--muted);
-      text-align: right;
-      min-width: 84px;
-      white-space: nowrap;
-    }
+    .app-contact-item a { color: var(--muted); text-decoration: none; }
+    .app-contact-item a:hover { color: var(--text); }
+    .contact-icon { font-size: .75rem; opacity: .6; }
+    .app-date { font-size: .74rem; color: var(--muted); text-align: right; min-width: 84px; white-space: nowrap; }
+    .app-actions { display: flex; align-items: center; gap: 8px; }
+
     .badge {
-      font-size: .66rem;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-weight: 600;
-      letter-spacing: .05em;
-      text-transform: uppercase;
-      min-width: 78px;
-      text-align: center;
-      white-space: nowrap;
+      font-size: .66rem; padding: 4px 10px; border-radius: 20px;
+      font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
+      min-width: 78px; text-align: center; white-space: nowrap;
     }
     .b-Applied   { background: rgba(59,130,246,.14); color: #60a5fa; }
-    .b-Interview { background: rgba(245,158,11,.14); color: #fbbf24; }
-    .b-Rejected  { background: rgba(239,68,68,.14);  color: #f87171; }
-    .b-Offer     { background: rgba(16,185,129,.14); color: #34d399; }
+    .b-Interview { background: rgba(245,158,11,.14);  color: #fbbf24; }
+    .b-Rejected  { background: rgba(239,68,68,.14);   color: #f87171; }
+    .b-Offer     { background: rgba(16,185,129,.14);  color: #34d399; }
 
     .status-select {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 5px 9px;
-      border-radius: 6px;
-      font-size: .76rem;
-      cursor: pointer;
-      outline: none;
-      font-family: inherit;
-      transition: border-color .15s;
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      padding: 5px 9px; border-radius: 6px; font-size: .76rem; cursor: pointer;
+      outline: none; font-family: inherit; transition: border-color .15s;
     }
     .status-select:hover { border-color: var(--border-h); }
     .status-select option { background: #1a1a1e; }
 
-    .delete-btn {
-      background: transparent;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 4px 6px;
-      border-radius: 5px;
-      transition: color .15s;
-      line-height: 1;
+    .icon-btn {
+      background: transparent; border: none; color: var(--muted); cursor: pointer;
+      font-size: .9rem; padding: 4px 5px; border-radius: 5px;
+      transition: color .15s; line-height: 1;
     }
-    .delete-btn:hover { color: #f87171; }
+    .icon-btn:hover { color: var(--text); }
+    .icon-btn.del:hover { color: #f87171; }
 
-    /* ── Empty state ── */
-    .empty {
-      text-align: center;
-      padding: 64px 0;
-      color: var(--muted);
-      font-size: .88rem;
-      line-height: 1.7;
-    }
+    .job-link { color: var(--muted); text-decoration: none; font-size: .82rem; }
+    .job-link:hover { color: var(--text); }
+
+    /* ── Empty ── */
+    .empty { text-align: center; padding: 64px 0; color: var(--muted); font-size: .88rem; line-height: 1.7; }
 
     /* ── Share section ── */
-    .share-section {
-      margin-top: 52px;
-      padding-top: 22px;
-      border-top: 1px solid var(--border);
-    }
-    .share-section h3 {
-      font-size: .68rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      margin-bottom: 12px;
-    }
-    .share-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
+    .share-section { margin-top: 52px; padding-top: 22px; border-top: 1px solid var(--border); }
+    .share-section h3 { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 12px; }
+    .share-row { display: flex; gap: 10px; align-items: center; }
     .share-url-input {
-      flex: 1;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 9px 13px;
-      border-radius: var(--r);
-      font-size: .78rem;
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      outline: none;
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      color: var(--muted); padding: 9px 13px; border-radius: var(--r);
+      font-size: .78rem; font-family: 'SF Mono','Fira Code',monospace; outline: none;
     }
 
     /* ── Toast ── */
     #toast {
-      position: fixed;
-      bottom: 28px;
-      right: 28px;
-      background: var(--surface);
-      border: 1px solid var(--border-h);
-      border-radius: var(--r);
-      padding: 11px 18px;
-      font-size: .82rem;
-      color: var(--text);
-      opacity: 0;
-      transform: translateY(6px);
-      transition: opacity .2s, transform .2s;
-      pointer-events: none;
-      z-index: 9999;
+      position: fixed; bottom: 28px; right: 28px;
+      background: var(--surface); border: 1px solid var(--border-h);
+      border-radius: var(--r); padding: 11px 18px; font-size: .82rem; color: var(--text);
+      opacity: 0; transform: translateY(6px); transition: opacity .2s, transform .2s;
+      pointer-events: none; z-index: 9999;
     }
     #toast.show { opacity: 1; transform: translateY(0); }
 
-    /* ── Loading ── */
-    .loading {
-      text-align: center;
-      padding: 80px 0;
-      color: var(--muted);
-      font-size: .88rem;
-    }
+    .loading { text-align: center; padding: 80px 0; color: var(--muted); font-size: .88rem; }
 
-    /* ── Responsive ── */
-    @media (max-width: 620px) {
-      .form-grid { grid-template-columns: 1fr; }
-      .stats { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 680px) {
+      .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2,1fr); }
       .app-date { display: none; }
+      .apikey-input { width: 140px; }
     }
   </style>
 </head>
@@ -383,6 +282,7 @@
 <script>
 const SUPABASE_URL = 'https://jxophknjulubgnbbekgp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4b3Boa25qdWx1YmduYmJla2dwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzI5NjQsImV4cCI6MjA5MjUwODk2NH0.pYp_8uKIjYiSf2TDA5Ty_Q7SUDoRKsaHkhqalVfMdHM';
+const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -392,6 +292,11 @@ const STATUSES = ['Applied', 'Interview', 'Rejected', 'Offer'];
 
 let applications = [];
 let activeFilter = 'All';
+let showApiKeyInput = false;
+
+// ── API key (localStorage) ─────────────────────────────
+function getApiKey() { return localStorage.getItem('anthropic_api_key') || ''; }
+function saveApiKey(k) { localStorage.setItem('anthropic_api_key', k.trim()); }
 
 // ── Toast ──────────────────────────────────────────────
 let toastTimer;
@@ -400,7 +305,7 @@ function toast(msg) {
   el.textContent = msg;
   el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
 }
 
 // ── Data ───────────────────────────────────────────────
@@ -417,24 +322,32 @@ async function load() {
 async function addApplication(e) {
   e.preventDefault();
   const form = e.target;
-  const company    = form.company.value.trim();
-  const role       = form.role.value.trim();
-  const date_applied = form.date_applied.value;
-  const status     = form.status.value;
+  const payload = {
+    company:       form.company.value.trim(),
+    role:          form.role.value.trim(),
+    date_applied:  form.date_applied.value,
+    status:        form.status.value,
+    contact_name:  form.contact_name.value.trim() || null,
+    contact_email: form.contact_email.value.trim() || null,
+    contact_phone: form.contact_phone.value.trim() || null,
+    job_url:       form.job_url.value.trim() || null,
+  };
 
-  if (!company || !role || !date_applied) return;
+  if (!payload.company || !payload.role || !payload.date_applied) return;
 
-  const btn = form.querySelector('.btn');
+  const btn = form.querySelector('button[type="submit"]');
   btn.disabled = true;
   btn.textContent = 'Saving…';
 
-  const { error } = await db.from('job_applications').insert({ company, role, date_applied, status });
+  const { error } = await db.from('job_applications').insert(payload);
   btn.disabled = false;
   btn.textContent = 'Add Application';
 
   if (error) { toast('Error saving'); console.error(error); return; }
   form.reset();
-  form.date_applied.value = new Date().toISOString().split('T')[0];
+  form.date_applied.value = today();
+  setFetchStatus('', '');
+  document.getElementById('url-input').value = '';
   toast('Application added');
   await load();
 }
@@ -454,13 +367,223 @@ async function deleteApp(id) {
   render();
 }
 
+// ── Job URL extraction ─────────────────────────────────
+const PROXIES = [
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+];
+
+async function fetchViaProxies(url) {
+  for (let i = 0; i < PROXIES.length; i++) {
+    const proxyUrl = PROXIES[i](url);
+    setFetchStatus('loading', `Försöker proxy ${i + 1}/${PROXIES.length}…`);
+    try {
+      const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(10000) });
+      if (!res.ok) continue;
+      const text = await res.text();
+      if (text && text.length > 100) return text;
+    } catch (_) {
+      // try next
+    }
+  }
+  return null;
+}
+
+async function fetchJobInfo() {
+  const urlEl  = document.getElementById('url-input');
+  const url    = urlEl.value.trim();
+  const apiKey = getApiKey();
+
+  if (!url) { setFetchStatus('error', 'Klistra in en URL först.'); return; }
+  if (!apiKey) { setFetchStatus('error', 'Lägg till din Anthropic API-nyckel ovan först.'); return; }
+  if (!url.startsWith('http')) { setFetchStatus('error', 'URL:en måste börja med http/https.'); return; }
+
+  const fetchBtn = document.getElementById('fetch-btn');
+  fetchBtn.disabled = true;
+  hideFallback();
+
+  const html = await fetchViaProxies(url);
+
+  if (!html) {
+    fetchBtn.disabled = false;
+    setFetchStatus('error', 'Alla proxies misslyckades.');
+    showFallback();
+    return;
+  }
+
+  setFetchStatus('loading', 'Extraherar detaljer med Claude…');
+  const text = extractText(html);
+
+  let extracted;
+  try {
+    extracted = await callClaude(apiKey, text);
+  } catch (err) {
+    setFetchStatus('error', `Claude-fel: ${err.message}`);
+    fetchBtn.disabled = false;
+    return;
+  }
+
+  fetchBtn.disabled = false;
+  applyExtracted(extracted, url);
+}
+
+async function extractFromManualText() {
+  const apiKey  = getApiKey();
+  const rawText = document.getElementById('manual-text')?.value.trim();
+  const url     = document.getElementById('url-input')?.value.trim() || '';
+
+  if (!rawText) { setFetchStatus('error', 'Klistra in annonstext först.'); return; }
+  if (!apiKey)  { setFetchStatus('error', 'Lägg till din Anthropic API-nyckel ovan först.'); return; }
+
+  const btn = document.getElementById('manual-extract-btn');
+  if (btn) btn.disabled = true;
+  setFetchStatus('loading', 'Extraherar detaljer med Claude…');
+
+  let extracted;
+  try {
+    extracted = await callClaude(apiKey, rawText.slice(0, 7000));
+  } catch (err) {
+    setFetchStatus('error', `Claude-fel: ${err.message}`);
+    if (btn) btn.disabled = false;
+    return;
+  }
+
+  if (btn) btn.disabled = false;
+  hideFallback();
+  applyExtracted(extracted, url);
+}
+
+function applyExtracted(extracted, url) {
+  const form = document.getElementById('add-form');
+  const filled = [];
+
+  if (extracted.company)       { form.company.value = extracted.company; form.company.classList.add('autofilled'); filled.push('företag'); }
+  if (extracted.role)          { form.role.value = extracted.role; form.role.classList.add('autofilled'); filled.push('roll'); }
+  if (extracted.contact_name)  { form.contact_name.value  = extracted.contact_name; }
+  if (extracted.contact_email) { form.contact_email.value = extracted.contact_email; }
+  if (extracted.contact_phone) { form.contact_phone.value = extracted.contact_phone; }
+  if (url) { document.getElementById('form-job-url').value = url; }
+
+  if (filled.length === 0) {
+    setFetchStatus('error', 'Kunde inte extrahera detaljer — fyll i manuellt.');
+    showFallback();
+  } else {
+    setFetchStatus('success', `Ifyllt: ${filled.join(', ')}. Granska och spara.`);
+  }
+}
+
+function showFallback() {
+  let el = document.getElementById('manual-fallback');
+  if (!el) {
+    const anchor = document.getElementById('fetch-status');
+    if (!anchor) return;
+    el = document.createElement('div');
+    el.id = 'manual-fallback';
+    el.className = 'manual-fallback';
+    el.innerHTML = `
+      <div class="fallback-msg">Kunde inte hämta sidan automatiskt. Klistra in jobbannonsen som text istället.</div>
+      <textarea id="manual-text" class="manual-textarea" placeholder="Klistra in hela jobbannonsen här…"></textarea>
+      <div class="fallback-actions">
+        <button id="manual-extract-btn" class="btn btn-sm" onclick="extractFromManualText()">Extrahera med Claude</button>
+      </div>`;
+    anchor.after(el);
+  }
+  el.style.display = 'block';
+  el.querySelector('textarea')?.focus();
+}
+
+function hideFallback() {
+  const el = document.getElementById('manual-fallback');
+  if (el) el.style.display = 'none';
+}
+
+function extractText(html) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  ['script','style','nav','footer','header','noscript','iframe','svg'].forEach(tag => {
+    doc.querySelectorAll(tag).forEach(el => el.remove());
+  });
+  const text = (doc.body?.innerText || doc.body?.textContent || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 7000);
+  return text;
+}
+
+async function callClaude(apiKey, text) {
+  const prompt = `Extract job listing details from the text below. Return ONLY valid JSON — no explanation, no markdown, just the JSON object.
+
+Fields:
+- company: the hiring company name (string or null)
+- role: the job title / position name (string or null)
+- contact_name: name of hiring manager or contact person (string or null)
+- contact_email: contact email address (string or null)
+- contact_phone: contact phone number (string or null)
+
+Job listing text:
+"""
+${text}
+"""`;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: CLAUDE_MODEL,
+      max_tokens: 300,
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${res.status}`);
+  }
+
+  const data = await res.json();
+  const raw = data.content?.[0]?.text || '';
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('No JSON in Claude response');
+  return JSON.parse(jsonMatch[0]);
+}
+
+function setFetchStatus(type, msg) {
+  const el = document.getElementById('fetch-status');
+  if (!el) return;
+  el.className = 'fetch-status' + (type ? ' ' + type : '');
+  el.innerHTML = type === 'loading'
+    ? `<span class="spinner"></span> ${esc(msg)}`
+    : esc(msg);
+}
+
+// ── API key UI ─────────────────────────────────────────
+function handleApiKeySave() {
+  const val = document.getElementById('apikey-field')?.value.trim();
+  if (val) { saveApiKey(val); showApiKeyInput = false; render(); toast('API key saved'); }
+}
+
+function toggleApiKey() {
+  showApiKeyInput = !showApiKeyInput;
+  render();
+  if (showApiKeyInput) setTimeout(() => document.getElementById('apikey-field')?.focus(), 50);
+}
+
 // ── Render ─────────────────────────────────────────────
-function stats() {
-  const total     = applications.length;
-  const applied   = applications.filter(a => a.status === 'Applied').length;
-  const interview = applications.filter(a => a.status === 'Interview').length;
-  const offer     = applications.filter(a => a.status === 'Offer').length;
-  return { total, applied, interview, offer };
+function today() { return new Date().toISOString().split('T')[0]; }
+
+function statsCount() {
+  return {
+    total:     applications.length,
+    applied:   applications.filter(a => a.status === 'Applied').length,
+    interview: applications.filter(a => a.status === 'Interview').length,
+    offer:     applications.filter(a => a.status === 'Offer').length,
+  };
 }
 
 function formatDate(d) {
@@ -472,13 +595,41 @@ function filteredApps() {
   return applications.filter(a => a.status === activeFilter);
 }
 
+function renderApiKeySection() {
+  const key = getApiKey();
+  if (key && !showApiKeyInput) {
+    return `
+      <div class="apikey-row">
+        <span class="apikey-label">Claude API key</span>
+        <span class="apikey-saved">✓ saved</span>
+        <span class="apikey-change" onclick="toggleApiKey()">change</span>
+      </div>`;
+  }
+  return `
+    <div class="apikey-row">
+      <span class="apikey-label">Claude API key</span>
+      <input id="apikey-field" class="apikey-input" type="password" placeholder="sk-ant-…" value="${esc(key)}"
+        onkeydown="if(event.key==='Enter')handleApiKeySave()">
+      <button class="btn btn-ghost btn-sm" onclick="handleApiKeySave()">Save</button>
+      ${key ? `<span class="apikey-change" onclick="toggleApiKey()">cancel</span>` : ''}
+    </div>`;
+}
+
+function renderContactMeta(a) {
+  const parts = [];
+  if (a.contact_name)  parts.push(`<span class="app-contact-item"><span class="contact-icon">👤</span>${esc(a.contact_name)}</span>`);
+  if (a.contact_email) parts.push(`<span class="app-contact-item"><span class="contact-icon">✉</span><a href="mailto:${esc(a.contact_email)}">${esc(a.contact_email)}</a></span>`);
+  if (a.contact_phone) parts.push(`<span class="app-contact-item"><span class="contact-icon">📞</span><a href="tel:${esc(a.contact_phone)}">${esc(a.contact_phone)}</a></span>`);
+  return parts.length ? `<div class="app-contact">${parts.join('')}</div>` : '';
+}
+
 function render() {
-  const app = document.getElementById('app');
-  const s = stats();
+  const root = document.getElementById('app');
+  const s = statsCount();
   const list = filteredApps();
   const shareUrl = window.location.href.split('?')[0] + '?view=readonly';
 
-  app.innerHTML = `
+  root.innerHTML = `
     <header>
       <div>
         <div class="sub">Job Tracker</div>
@@ -490,28 +641,38 @@ function render() {
     ${isReadOnly ? `<div class="ro-banner">Read-only view — no changes can be made</div>` : ''}
 
     <div class="stats">
-      <div class="stat">
-        <div class="stat-val">${s.total}</div>
-        <div class="stat-label">Total</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val c-applied">${s.applied}</div>
-        <div class="stat-label">Applied</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val c-interview">${s.interview}</div>
-        <div class="stat-label">Interviews</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val c-offer">${s.offer}</div>
-        <div class="stat-label">Offers</div>
-      </div>
+      <div class="stat"><div class="stat-val">${s.total}</div><div class="stat-label">Total</div></div>
+      <div class="stat"><div class="stat-val c-applied">${s.applied}</div><div class="stat-label">Applied</div></div>
+      <div class="stat"><div class="stat-val c-interview">${s.interview}</div><div class="stat-label">Interviews</div></div>
+      <div class="stat"><div class="stat-val c-offer">${s.offer}</div><div class="stat-label">Offers</div></div>
     </div>
 
     ${!isReadOnly ? `
     <div class="form-card">
-      <h2>New Application</h2>
+      <div class="form-card-header">
+        <h2>New Application</h2>
+        ${renderApiKeySection()}
+      </div>
+
+      <div class="url-fetcher">
+        <div class="url-fetcher-label">Auto-fill from job listing</div>
+        <div class="url-fetcher-row">
+          <input id="url-input" class="url-input" type="url" placeholder="Paste job listing URL…"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();fetchJobInfo()}">
+          <button id="fetch-btn" class="btn btn-sm" onclick="fetchJobInfo()">Hämta jobbinfo</button>
+        </div>
+        <div id="fetch-status" class="fetch-status"></div>
+        <div id="manual-fallback" class="manual-fallback">
+          <div class="fallback-msg">Kunde inte hämta sidan automatiskt. Klistra in jobbannonsen som text istället.</div>
+          <textarea id="manual-text" class="manual-textarea" placeholder="Klistra in hela jobbannonsen här…"></textarea>
+          <div class="fallback-actions">
+            <button id="manual-extract-btn" class="btn btn-sm" onclick="extractFromManualText()">Extrahera med Claude</button>
+          </div>
+        </div>
+      </div>
+
       <form id="add-form">
+        <input type="hidden" name="job_url" id="form-job-url">
         <div class="form-grid">
           <div class="fg">
             <label>Company</label>
@@ -523,7 +684,7 @@ function render() {
           </div>
           <div class="fg">
             <label>Date Applied</label>
-            <input name="date_applied" type="date" required value="${new Date().toISOString().split('T')[0]}">
+            <input name="date_applied" type="date" required value="${today()}">
           </div>
           <div class="fg">
             <label>Status</label>
@@ -532,6 +693,24 @@ function render() {
             </select>
           </div>
         </div>
+
+        <div class="form-divider">Contact info</div>
+
+        <div class="form-grid-3">
+          <div class="fg">
+            <label>Contact Person</label>
+            <input name="contact_name" placeholder="Anna Andersson" autocomplete="off">
+          </div>
+          <div class="fg">
+            <label>Email</label>
+            <input name="contact_email" type="email" placeholder="anna@company.se" autocomplete="off">
+          </div>
+          <div class="fg">
+            <label>Phone</label>
+            <input name="contact_phone" type="tel" placeholder="+46 70 …" autocomplete="off">
+          </div>
+        </div>
+
         <div class="form-actions">
           <button class="btn" type="submit">Add Application</button>
         </div>
@@ -540,9 +719,9 @@ function render() {
     ` : ''}
 
     <div class="filter-bar">
-      ${['All', ...STATUSES].map(f => `
-        <button class="filter-chip ${activeFilter === f ? 'active' : ''}" onclick="setFilter('${f}')">${f}</button>
-      `).join('')}
+      ${['All', ...STATUSES].map(f =>
+        `<button class="filter-chip ${activeFilter === f ? 'active' : ''}" onclick="setFilter('${f}')">${f}</button>`
+      ).join('')}
     </div>
 
     <div class="sh">
@@ -552,22 +731,27 @@ function render() {
 
     <div class="applications">
       ${list.length === 0 ? `
-        <div class="empty">
-          No applications yet.<br>Add your first one above.
-        </div>
+        <div class="empty">No applications yet.<br>Add your first one above.</div>
       ` : list.map(a => `
         <div class="app-row">
           <div class="app-main">
-            <div class="app-company">${esc(a.company)}</div>
+            <div class="app-company">
+              ${a.job_url
+                ? `<a class="job-link" href="${esc(a.job_url)}" target="_blank" rel="noopener" title="Open job listing">${esc(a.company)} ↗</a>`
+                : esc(a.company)}
+            </div>
             <div class="app-role">${esc(a.role)}</div>
+            ${renderContactMeta(a)}
           </div>
           <div class="app-date">${formatDate(a.date_applied)}</div>
           ${isReadOnly
             ? `<span class="badge b-${a.status}">${a.status}</span>`
-            : `<select class="status-select" onchange="updateStatus('${a.id}', this.value)">
-                ${STATUSES.map(s => `<option value="${s}" ${a.status === s ? 'selected' : ''}>${s}</option>`).join('')}
-              </select>
-              <button class="delete-btn" onclick="confirmDelete('${a.id}')" title="Remove">✕</button>`
+            : `<div class="app-actions">
+                <select class="status-select" onchange="updateStatus('${a.id}', this.value)">
+                  ${STATUSES.map(s => `<option value="${s}" ${a.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+                </select>
+                <button class="icon-btn del" onclick="confirmDelete('${a.id}')" title="Remove">✕</button>
+              </div>`
           }
         </div>
       `).join('')}
@@ -585,25 +769,33 @@ function render() {
   `;
 
   if (!isReadOnly) {
-    document.getElementById('add-form').addEventListener('submit', addApplication);
+    const form = document.getElementById('add-form');
+    form.addEventListener('submit', addApplication);
+
+    // Wire up the hidden job_url field to the visible url-input
+    const urlInput = document.getElementById('url-input');
+    const jobUrlField = document.getElementById('form-job-url');
+    if (urlInput && jobUrlField) {
+      urlInput.addEventListener('input', () => { jobUrlField.value = urlInput.value.trim(); });
+    }
   }
 }
 
 function esc(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function setFilter(f) {
-  activeFilter = f;
-  render();
-}
+function setFilter(f) { activeFilter = f; render(); }
 
 function copyShare() {
   const url = window.location.href.split('?')[0] + '?view=readonly';
-  navigator.clipboard.writeText(url).then(() => toast('Read-only link copied!')).catch(() => {
-    const el = document.getElementById('share-url');
-    if (el) { el.select(); document.execCommand('copy'); toast('Link copied!'); }
-  });
+  navigator.clipboard.writeText(url)
+    .then(() => toast('Read-only link copied!'))
+    .catch(() => {
+      const el = document.getElementById('share-url');
+      if (el) { el.select(); document.execCommand('copy'); toast('Link copied!'); }
+    });
 }
 
 function confirmDelete(id) {
