@@ -292,23 +292,31 @@ function initAuth(){
   });
 }
 
-async function doLogin(e){
-  e.preventDefault();
-  const f=e.target, btn=f.querySelector('.auth-btn'), err=document.getElementById('auth-error');
+async function doLogin(){
+  console.log('login clicked');
+  const email=document.getElementById('auth-email')?.value.trim();
+  const pw=document.getElementById('auth-password')?.value;
+  const btn=document.querySelector('.auth-btn');
+  const err=document.getElementById('auth-error');
+  if(!email||!pw||!btn||!err) return;
   btn.disabled=true; btn.textContent='Loggar in…'; err.textContent='';
-  const {error}=await db.auth.signInWithPassword({email:f.email.value.trim(),password:f.password.value});
+  const {error}=await db.auth.signInWithPassword({email,password:pw});
   btn.disabled=false; btn.textContent='Logga in';
   if(error) err.textContent=xlateErr(error.message);
 }
 
-async function doSignup(e){
-  e.preventDefault();
-  const f=e.target, btn=f.querySelector('.auth-btn'), err=document.getElementById('auth-error');
+async function doSignup(){
+  console.log('signup clicked');
+  const email=document.getElementById('auth-email')?.value.trim();
+  const pw=document.getElementById('auth-password')?.value;
+  const btn=document.querySelector('.auth-btn');
+  const err=document.getElementById('auth-error');
+  if(!email||!pw||!btn||!err) return;
   btn.disabled=true; btn.textContent='Skapar konto…'; err.textContent='';
-  const {error}=await db.auth.signUp({email:f.email.value.trim(),password:f.password.value});
+  const {error}=await db.auth.signUp({email,password:pw});
   btn.disabled=false; btn.textContent='Skapa konto';
   if(error){ err.textContent=xlateErr(error.message); }
-  else { err.style.color='#34d399'; err.textContent='Konto skapat! Kontrollera din e-post.'; }
+  else{ err.style.color='#34d399'; err.textContent='Konto skapat! Kontrollera din e-post.'; }
 }
 
 async function logout(){ await db.auth.signOut(); }
@@ -700,23 +708,20 @@ function confirmDelete(id){ if(confirm('Ta bort denna ansökan?')) deleteApp(id)
 // ── Render: auth ─────────────────────────────────────────────────────
 function renderAuth(){
   const isLogin=authMode==='login';
+  const action=isLogin?'doLogin()':'doSignup()';
   document.getElementById('app').innerHTML=`
     <div class="auth-screen"><div class="auth-card">
       <div class="auth-brand"><div class="sub">Job Tracker</div><h1>W-Tracker</h1></div>
       <div class="auth-heading">${isLogin?'Logga in på ditt konto':'Skapa ett nytt konto'}</div>
-      <form id="auth-form">
-        <div class="auth-fields">
-          <div class="auth-field"><label>E-post</label><input name="email" type="email" placeholder="du@exempel.se" required autocomplete="email"></div>
-          <div class="auth-field"><label>Lösenord</label><input name="password" type="password" placeholder="••••••••" required autocomplete="${isLogin?'current-password':'new-password'}"></div>
-        </div>
-        <div id="auth-error" class="auth-error"></div>
-        <button class="auth-btn" type="submit">${isLogin?'Logga in':'Skapa konto'}</button>
-      </form>
+      <div class="auth-fields">
+        <div class="auth-field"><label>E-post</label><input id="auth-email" type="email" placeholder="du@exempel.se" autocomplete="email" onkeydown="if(event.key==='Enter')${action}"></div>
+        <div class="auth-field"><label>Lösenord</label><input id="auth-password" type="password" placeholder="••••••••" autocomplete="${isLogin?'current-password':'new-password'}" onkeydown="if(event.key==='Enter')${action}"></div>
+      </div>
+      <div id="auth-error" class="auth-error"></div>
+      <button class="auth-btn" type="button" onclick="${action}">${isLogin?'Logga in':'Skapa konto'}</button>
       <div class="auth-toggle">${isLogin?`Inget konto? <span onclick="setAuthMode('signup')">Skapa ett här</span>`:`Har du ett konto? <span onclick="setAuthMode('login')">Logga in</span>`}</div>
     </div></div>`;
-  const form=document.getElementById('auth-form');
-  form.addEventListener('submit',isLogin?doLogin:doSignup);
-  setTimeout(()=>form.querySelector('input')?.focus(),40);
+  setTimeout(()=>document.getElementById('auth-email')?.focus(),40);
 }
 
 function renderNoUser(){
