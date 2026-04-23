@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>W-Tracker</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.js"></script>
   <style>
     :root {
       --bg:         #080809;
@@ -242,8 +242,6 @@
 <script>
 const SUPABASE_URL  = 'https://jxophknjulubgnbbekgp.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4b3Boa25qdWx1YmduYmJla2dwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzI5NjQsImV4cCI6MjA5MjUwODk2NH0.pYp_8uKIjYiSf2TDA5Ty_Q7SUDoRKsaHkhqalVfMdHM';
-const CLAUDE_KEY    = 'ANTHROPIC_KEY_PLACEHOLDER';
-const CLAUDE_MODEL  = 'claude-sonnet-4-20250514';
 const BUCKET        = 'wtrackerfiles';
 
 const { createClient } = supabase;
@@ -266,7 +264,7 @@ let docLangs     = {};          // { appId: 'sv'|'en' }
 let generatedDocs= {};          // { `${appId}-${type}`: content|'loading' }
 
 function defaultProfile() {
-  return { full_name:'', phone:'', address:'', linkedin_url:'', photo_url:'', bio:'', work_experiences:[], education:[], skills:[] };
+  return { full_name:'', phone:'', address:'', linkedin_url:'', photo_url:'', bio:'', work_experiences:[], education:[], skills:[], cv_template_url:'', cv_template_name:'' };
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────
@@ -294,26 +292,23 @@ function initAuth(){
   });
 }
 
-async function doLogin(){
-  console.log('login clicked');
+function doLogin(){
   const email=document.getElementById('auth-email')?.value.trim();
   const pw=document.getElementById('auth-password')?.value;
   const btn=document.querySelector('.auth-btn');
   const err=document.getElementById('auth-error');
-  console.log('email:', email, '| pw set:', !!pw, '| btn:', !!btn, '| err el:', !!err);
-  if(!email||!pw){ console.log('aborting: missing email or password'); return; }
+  if(!email||!pw) return;
   if(btn){ btn.disabled=true; btn.textContent='Loggar in…'; }
   if(err) err.textContent='';
-  console.log('calling supabase auth...');
-  try {
-    const {data, error}=await db.auth.signInWithPassword({email, password:pw});
-    console.log('auth complete', data, error);
-    if(btn){ btn.disabled=false; btn.textContent='Logga in'; }
-    if(error && err) err.textContent=xlateErr(error.message);
-  } catch(e) {
-    console.log('auth exception:', e);
-    if(btn){ btn.disabled=false; btn.textContent='Logga in'; }
-  }
+  db.auth.signInWithPassword({email, password:pw})
+    .then(function(result){
+      if(btn){ btn.disabled=false; btn.textContent='Logga in'; }
+      if(result.error && err) err.textContent=xlateErr(result.error.message);
+    })
+    .catch(function(e){
+      if(btn){ btn.disabled=false; btn.textContent='Logga in'; }
+      if(err) err.textContent=xlateErr(e.message);
+    });
 }
 
 async function doSignup(){
@@ -357,6 +352,8 @@ async function loadProfile(){
       work_experiences: data.work_experiences||[],
       education: data.education||[],
       skills: data.skills||[],
+      cv_template_url: data.cv_template_url||'',
+      cv_template_name: data.cv_template_name||'',
     };
   }
 }
@@ -408,6 +405,29 @@ function triggerPhotoUpload(){
   inp.onchange=async e=>{ const f=e.target.files[0]; if(f) await uploadProfilePhoto(f); };
   inp.click();
 }
+function triggerCvTemplateUpload(){
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='.pdf,.docx,.doc,.txt';
+  inp.onchange=async e=>{ const f=e.target.files[0]; if(f) await uploadCvTemplate(f); };
+  inp.click();
+}
+async function uploadCvTemplate(file){
+  toast('Laddar upp CV-mall…');
+  const ext=file.name.split('.').pop()||'pdf';
+  const path=`cv-templates/${currentUser.id}/template.${ext}`;
+  const {error}=await db.storage.from(BUCKET).upload(path,file,{upsert:true});
+  if(error){ toast('Fel: '+error.message); return; }
+  const {data}=db.storage.from(BUCKET).getPublicUrl(path);
+  profile.cv_template_url=data.publicUrl;
+  profile.cv_template_name=file.name;
+  await saveProfile();
+  renderTabContent();
+}
+async function removeCvTemplate(){
+  profile.cv_template_url=''; profile.cv_template_name='';
+  await saveProfile();
+  renderTabContent();
+}
+
 async function uploadProfilePhoto(file){
   toast('Laddar upp foto…');
   const ext=file.name.split('.').pop()||'jpg';
@@ -607,19 +627,15 @@ function setFetchStatus(type,msg){
   el.innerHTML=type==='loading'?`<span class="spinner"></span> ${esc(msg)}`:esc(msg);
 }
 
-// ── Claude API ───────────────────────────────────────────────────────
-async function callClaude(messages, maxTokens=1200){
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':CLAUDE_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:CLAUDE_MODEL,max_tokens:maxTokens,messages}),
-  });
-  if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||`HTTP ${res.status}`); }
-  const d=await res.json(); return d.content?.[0]?.text||'';
+// ── Generate API ─────────────────────────────────────────────────────
+async function callGenerateAPI(payload){
+  const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error||`HTTP ${res.status}`); }
+  const d=await res.json(); return d.content||'';
 }
 
 async function callClaudeExtract(text){
-  const raw=await callClaude([{role:'user',content:`Extract job listing details. Return ONLY valid JSON with keys: company, role, contact_name, contact_email, contact_phone (string or null).\n\n"""${text}"""`}],300);
+  const raw=await callGenerateAPI({type:'extract',text});
   const m=raw.match(/\{[\s\S]*\}/); if(!m) throw new Error('No JSON');
   return JSON.parse(m[0]);
 }
@@ -631,64 +647,18 @@ function setDocLang(appId,lang){ docLangs[appId]=lang; renderTabContent(); }
 async function generateDocument(appId, type){
   const app=applications.find(a=>a.id===appId); if(!app) return;
   const lang=getDocLang(appId);
-  const key=`${appId}-${type}`;
+  const key=`${appId}-${type==='cv'?'cv':'cover'}`;
   generatedDocs[key]='loading'; renderTabContent();
-
-  const we=profile.work_experiences.map(w=>`${w.title} — ${w.company} (${w.start_date||'?'} – ${w.end_date||'nu'})\n${w.description||''}`).join('\n\n');
-  const edu=profile.education.map(e=>`${e.degree} — ${e.school} (${e.start_date||'?'} – ${e.end_date||'?'})`).join('\n');
-  const skills=profile.skills.join(', ');
-  const langWord=lang==='sv'?'Swedish':'English';
-
-  let prompt;
-  if(type==='cv'){
-    prompt=`Generate a professional, tailored CV in ${langWord} for the following candidate applying to the specified position. Format it as plain text with clear section headers (no markdown symbols). Make it ATS-friendly and tailored to the role.
-
-CANDIDATE:
-Name: ${profile.full_name||'[Name]'}
-Phone: ${profile.phone||''}
-Email: ${currentUser?.email||''}
-Address: ${profile.address||''}
-LinkedIn: ${profile.linkedin_url||''}
-
-SUMMARY:
-${profile.bio||''}
-
-WORK EXPERIENCE:
-${we||'(none provided)'}
-
-EDUCATION:
-${edu||'(none provided)'}
-
-SKILLS: ${skills||'(none provided)'}
-
-TARGET ROLE: ${app.role} at ${app.company}
-
-Write the complete CV now.`;
-  } else {
-    const contact=app.contact_name?`\nAttn: ${app.contact_name}`:'';
-    prompt=`Write a professional, tailored cover letter in ${langWord}. Keep it to one page (~300–380 words). Be specific to the role and company. Use a warm but professional tone.
-
-CANDIDATE:
-Name: ${profile.full_name||'[Name]'}
-Phone: ${profile.phone||''} | Email: ${currentUser?.email||''}
-LinkedIn: ${profile.linkedin_url||''}
-
-SUMMARY: ${profile.bio||''}
-EXPERIENCE: ${we||'(none provided)'}
-EDUCATION: ${edu||'(none provided)'}
-SKILLS: ${skills||'(none provided)'}
-
-TARGET:
-Company: ${app.company}${contact}
-Role: ${app.role}
-
-Write the complete cover letter now.`;
-  }
-
   try{
-    const content=await callClaude([{role:'user',content:prompt}],1500);
+    const content=await callGenerateAPI({
+      type:type==='cv'?'cv':'cover_letter',
+      profile:{...profile,email:currentUser?.email||''},
+      job:{company:app.company,role:app.role,contact_name:app.contact_name||null},
+      language:lang,
+      cvTemplateUrl:profile.cv_template_url||null,
+    });
     generatedDocs[key]=content;
-  } catch(err){
+  }catch(err){
     generatedDocs[key]='ERROR: '+err.message;
   }
   renderTabContent();
@@ -941,6 +911,20 @@ function renderProfileTab(){
         <input id="skill-inp" class="skill-inp" placeholder="Lägg till kompetens…" onkeydown="if(event.key==='Enter'){event.preventDefault();addSkill()}">
         <button type="button" class="btn btn-ghost btn-sm" onclick="addSkill()">Lägg till</button>
       </div>
+    </div>
+
+    <div class="p-card">
+      <div class="p-section-hd">CV-mall för dokumentgenerering</div>
+      ${p.cv_template_url?
+        `<div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:.82rem;color:var(--muted)">📄 ${esc(p.cv_template_name||'Mall uppladdad')}</span>
+          <button type="button" class="btn btn-ghost btn-xs" onclick="triggerCvTemplateUpload()">Byt ut</button>
+          <button type="button" class="btn btn-ghost btn-xs" style="color:#f87171" onclick="removeCvTemplate()">Ta bort</button>
+        </div>`:
+        `<div>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:10px">Ladda upp din befintliga CV (PDF eller Word) som stilmall. AI:n använder den som referens när dokument genereras.</p>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="triggerCvTemplateUpload()">+ Ladda upp CV-mall</button>
+        </div>`}
     </div>
 
     <div class="profile-save-row">
