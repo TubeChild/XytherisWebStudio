@@ -300,7 +300,9 @@ async function doLogin(){
   const err=document.getElementById('auth-error');
   if(!email||!pw||!btn||!err) return;
   btn.disabled=true; btn.textContent='Loggar in…'; err.textContent='';
-  const {error}=await db.auth.signInWithPassword({email,password:pw});
+  console.log('calling supabase auth...');
+  const {data, error}=await db.auth.signInWithPassword({email,password:pw});
+  console.log('auth result:', data, error);
   btn.disabled=false; btn.textContent='Logga in';
   if(error) err.textContent=xlateErr(error.message);
 }
