@@ -755,9 +755,13 @@ function populateCvIframes(){
     applications.forEach(a=>{
       const cvKey=`${a.id}-cv`;
       const cvDoc=generatedDocs[cvKey];
-      if(cvDoc && cvDoc!=='loading' && cvDoc.includes('<html')){
-        const iframe=document.getElementById('cv-iframe-'+cvKey);
-        if(iframe) iframe.srcdoc=cvDoc;
+      if(!cvDoc || cvDoc==='loading') return;
+      const iframe=document.getElementById('cv-iframe-'+cvKey);
+      if(!iframe) return;
+      if(cvDoc.includes('<html') || cvDoc.includes('<!DOCTYPE')){
+        iframe.srcdoc=cvDoc;
+      } else {
+        iframe.srcdoc=`<!DOCTYPE html><html><body style="font-family:system-ui;padding:30px;color:#c00;background:#fff"><h2>Fel vid generering</h2><pre style="white-space:pre-wrap">${cvDoc.replace(/</g,'&lt;')}</pre></body></html>`;
       }
     });
   }, 0);

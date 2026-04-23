@@ -96,7 +96,7 @@ Write the complete cover letter now.`;
   }
 
   try {
-    const model = type === 'cv' ? 'claude-opus-4-6' : 'claude-sonnet-4-20250514';
+    const model = type === 'cv' ? 'claude-opus-4-7' : 'claude-sonnet-4-20250514';
     const upstream = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -117,7 +117,15 @@ Write the complete cover letter now.`;
     }
 
     const data = await upstream.json();
-    return res.status(200).json({ content: data.content?.[0]?.text || '' });
+    let content = data.content?.[0]?.text || '';
+    if (type === 'cv') {
+      content = content.replace(/^```(?:html)?\s*\n?/i, '').replace(/\n?```\s*$/, '').trim();
+      const htmlStart = content.indexOf('<!DOCTYPE');
+      const htmlStart2 = content.indexOf('<html');
+      const start = htmlStart >= 0 ? htmlStart : htmlStart2;
+      if (start > 0) content = content.slice(start);
+    }
+    return res.status(200).json({ content });
   } catch (e) {
     return res.status(502).json({ error: e.message });
   }
