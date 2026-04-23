@@ -48,28 +48,33 @@ DESIGN REQUIREMENTS:
 - Self-contained: No external dependencies except Google Fonts
 - Photo: ${profile.photo_url ? `use this image as a circular profile photo in the sidebar: <img src="${profile.photo_url}" alt="${profile.full_name || 'Profile'}" style="width:140px;height:140px;border-radius:50%;object-fit:cover;border:3px solid #C17B5C"> — place it at the top of the left sidebar` : 'no photo provided — use a circular placeholder with the person\'s initials on a soft gradient background'}
 
-CONTENT TO INCLUDE:
+CANDIDATE DATA (use exactly as given — do NOT invent qualifications):
 Name: ${profile.full_name || 'Name'}
 Email: ${profile.email || ''}
 Phone: ${profile.phone || ''}
 Location: ${profile.address || ''}
 LinkedIn: ${profile.linkedin_url || ''}
-Summary: ${profile.bio || ''}
+Professional Summary: ${profile.bio || ''}
 
 Work Experience:
 ${we || '(none provided)'}
 
-Education:
+Education (these are the candidate's ACTUAL credentials):
 ${edu || '(none provided)'}
 
-Skills: ${skills || '(none provided)'}
+Skills (the candidate's ACTUAL skills): ${skills || '(none provided)'}
 
-Target Position: ${job.role} at ${job.company}
+TARGET POSITION (the job being applied for — NOT the candidate's existing credentials):
+Role being applied for: ${job.role}
+Company: ${job.company}
 
-INSTRUCTIONS:
+CRITICAL INSTRUCTIONS:
 - Generate a complete <html> document with <head>, <style>, and <body>
+- Display the target position in a clearly labeled "Söker tjänst som" (Swedish) or "Applying for" (English) section near the top — typically a small highlighted box with an accent border. This makes it clear what job the candidate is applying for.
+- The candidate's tagline/subtitle under their name should reflect ONLY their actual credentials and experience — NEVER merge the target role into the subtitle as if it were a credential. For example, if the candidate is a qualified English teacher applying for a position that also involves Swedish, the subtitle must say "Qualified teacher in English" (their real credential), NOT "Qualified teacher in English and Swedish" (inventing a credential).
+- Do not fabricate qualifications, certifications, or experience. Only restructure and present what was provided.
+- Tailor the WORDING of the summary to highlight relevance to the target role, but never claim credentials the candidate doesn't have.
 - Make it visually warm and welcoming while maintaining professionalism
-- Tailor the summary and content to the target role
 - Ensure it renders beautifully on screen and prints cleanly on A4
 - Return ONLY the HTML code, no markdown or explanations`;
     } else {
