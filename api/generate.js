@@ -46,6 +46,7 @@ DESIGN REQUIREMENTS:
 - Print-friendly: Include @media print CSS for A4 page layout, no page breaks in sections
 - Contact icons: Use simple unicode symbols (✉ for email, ☎ for phone, 📍 for location, 🔗 for LinkedIn)
 - Self-contained: No external dependencies except Google Fonts
+- Photo: ${profile.photo_url ? `use this image as a circular profile photo in the sidebar: <img src="${profile.photo_url}" alt="${profile.full_name || 'Profile'}" style="width:140px;height:140px;border-radius:50%;object-fit:cover;border:3px solid #C17B5C"> — place it at the top of the left sidebar` : 'no photo provided — use a circular placeholder with the person\'s initials on a soft gradient background'}
 
 CONTENT TO INCLUDE:
 Name: ${profile.full_name || 'Name'}
