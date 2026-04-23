@@ -25,22 +25,77 @@
       color: var(--text);
       font-family: 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
-      padding: 56px 24px 100px;
       -webkit-font-smoothing: antialiased;
     }
+
+    /* ── Auth screen ── */
+    .auth-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .auth-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 380px;
+    }
+    .auth-brand { margin-bottom: 36px; }
+    .auth-brand .sub {
+      font-size: .68rem; color: var(--muted); text-transform: uppercase;
+      letter-spacing: .12em; margin-bottom: 6px;
+    }
+    .auth-brand h1 { font-size: 1.3rem; font-weight: 500; letter-spacing: -.025em; }
+    .auth-heading {
+      font-size: .82rem; color: var(--muted); margin-bottom: 24px; font-weight: 400;
+    }
+    .auth-fields { display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px; }
+    .auth-field { display: flex; flex-direction: column; gap: 6px; }
+    .auth-field label {
+      font-size: .67rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em;
+    }
+    .auth-field input {
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--text); padding: 10px 13px; border-radius: var(--r);
+      font-size: .9rem; outline: none; transition: border-color .15s;
+      font-family: inherit; width: 100%;
+    }
+    .auth-field input:focus { border-color: var(--accent); }
+    .auth-error {
+      font-size: .76rem; color: #f87171; min-height: 20px;
+      margin-bottom: 4px; line-height: 1.4;
+    }
+    .auth-btn {
+      width: 100%; background: var(--accent); color: #fff; border: none;
+      padding: 11px; border-radius: var(--r); font-size: .88rem; font-weight: 500;
+      cursor: pointer; transition: opacity .15s; font-family: inherit;
+      margin-top: 12px;
+    }
+    .auth-btn:hover { opacity: .85; }
+    .auth-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .auth-toggle {
+      font-size: .78rem; color: var(--muted); text-align: center; margin-top: 20px;
+    }
+    .auth-toggle span { color: var(--accent); cursor: pointer; }
+    .auth-toggle span:hover { opacity: .8; }
+
+    /* ── App screen ── */
+    .app-screen { padding: 56px 24px 100px; }
     .container { max-width: 880px; margin: 0 auto; }
 
     /* ── Header ── */
     header {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      margin-bottom: 48px;
-      padding-bottom: 22px;
-      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 48px; padding-bottom: 22px; border-bottom: 1px solid var(--border);
     }
     header h1 { font-size: 1.25rem; font-weight: 500; letter-spacing: -.025em; }
     header .sub { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .user-email { font-size: .74rem; color: var(--muted); }
 
     /* ── Buttons ── */
     .btn {
@@ -87,9 +142,7 @@
     }
 
     /* ── API key section ── */
-    .apikey-row {
-      display: flex; align-items: center; gap: 8px;
-    }
+    .apikey-row { display: flex; align-items: center; gap: 8px; }
     .apikey-label { font-size: .68rem; color: var(--muted); white-space: nowrap; }
     .apikey-input {
       background: var(--surface-2); border: 1px solid var(--border);
@@ -115,8 +168,7 @@
     .url-input {
       flex: 1; background: var(--bg); border: 1px solid var(--border);
       color: var(--text); padding: 9px 13px; border-radius: var(--r);
-      font-size: .84rem; outline: none; font-family: inherit;
-      transition: border-color .15s;
+      font-size: .84rem; outline: none; font-family: inherit; transition: border-color .15s;
     }
     .url-input:focus { border-color: var(--accent); }
     .url-input::placeholder { color: var(--muted); }
@@ -128,13 +180,8 @@
     .fetch-status.success { color: #34d399; }
 
     /* ── Manual fallback ── */
-    .manual-fallback {
-      margin-top: 12px; display: none;
-    }
-    .manual-fallback.visible { display: block; }
-    .fallback-msg {
-      font-size: .78rem; color: #fbbf24; margin-bottom: 10px; line-height: 1.5;
-    }
+    .manual-fallback { margin-top: 12px; display: none; }
+    .fallback-msg { font-size: .78rem; color: #fbbf24; margin-bottom: 10px; line-height: 1.5; }
     .manual-textarea {
       width: 100%; background: var(--bg); border: 1px solid var(--border);
       color: var(--text); padding: 10px 13px; border-radius: var(--r);
@@ -144,6 +191,7 @@
     .manual-textarea:focus { border-color: var(--accent); }
     .manual-textarea::placeholder { color: var(--muted); }
     .fallback-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
+
     .spinner {
       width: 12px; height: 12px; border: 2px solid var(--border-h);
       border-top-color: var(--accent); border-radius: 50%;
@@ -192,19 +240,14 @@
     .app-row {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--r); padding: 15px 20px;
-      display: flex; align-items: center; gap: 18px;
-      transition: border-color .15s;
+      display: flex; align-items: center; gap: 18px; transition: border-color .15s;
     }
     .app-row:hover { border-color: var(--border-h); }
     .app-main { flex: 1; min-width: 0; }
     .app-company { font-size: .92rem; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .app-role { font-size: .78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
-    .app-contact {
-      display: flex; gap: 14px; flex-wrap: wrap; margin-top: 5px;
-    }
-    .app-contact-item {
-      font-size: .71rem; color: var(--muted); display: flex; align-items: center; gap: 4px;
-    }
+    .app-contact { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 5px; }
+    .app-contact-item { font-size: .71rem; color: var(--muted); display: flex; align-items: center; gap: 4px; }
     .app-contact-item a { color: var(--muted); text-decoration: none; }
     .app-contact-item a:hover { color: var(--text); }
     .contact-icon { font-size: .75rem; opacity: .6; }
@@ -237,8 +280,8 @@
     .icon-btn:hover { color: var(--text); }
     .icon-btn.del:hover { color: #f87171; }
 
-    .job-link { color: var(--muted); text-decoration: none; font-size: .82rem; }
-    .job-link:hover { color: var(--text); }
+    .job-link { color: inherit; text-decoration: none; }
+    .job-link:hover { opacity: .75; }
 
     /* ── Empty ── */
     .empty { text-align: center; padding: 64px 0; color: var(--muted); font-size: .88rem; line-height: 1.7; }
@@ -270,13 +313,13 @@
       .stats { grid-template-columns: repeat(2,1fr); }
       .app-date { display: none; }
       .apikey-input { width: 140px; }
+      .user-email { display: none; }
+      .auth-card { padding: 32px 24px; }
     }
   </style>
 </head>
 <body>
-<div class="container" id="app">
-  <div class="loading">Loading…</div>
-</div>
+<div id="app"><div class="loading" style="padding:80px 0;text-align:center;color:var(--muted)">Loading…</div></div>
 <div id="toast"></div>
 
 <script>
@@ -287,18 +330,24 @@ const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const isReadOnly = new URLSearchParams(window.location.search).has('view');
-const STATUSES = ['Applied', 'Interview', 'Rejected', 'Offer'];
+const params      = new URLSearchParams(window.location.search);
+const isReadOnly  = params.has('view');
+const sharedUID   = params.get('user') || '';   // UID in the share URL
+const STATUSES    = ['Applied', 'Interview', 'Rejected', 'Offer'];
 
-let applications = [];
-let activeFilter = 'All';
+let currentUser     = null;
+let applications    = [];
+let activeFilter    = 'All';
+let authMode        = 'login';   // 'login' | 'signup'
 let showApiKeyInput = false;
 
-// ── API key (localStorage) ─────────────────────────────
-function getApiKey() { return localStorage.getItem('anthropic_api_key') || ''; }
-function saveApiKey(k) { localStorage.setItem('anthropic_api_key', k.trim()); }
+// ── Helpers ────────────────────────────────────────────
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function today() { return new Date().toISOString().split('T')[0]; }
 
-// ── Toast ──────────────────────────────────────────────
 let toastTimer;
 function toast(msg) {
   const el = document.getElementById('toast');
@@ -308,13 +357,104 @@ function toast(msg) {
   toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
 }
 
+// ── API key (localStorage) ─────────────────────────────
+function getApiKey() { return localStorage.getItem('anthropic_api_key') || ''; }
+function saveApiKey(k) { localStorage.setItem('anthropic_api_key', k.trim()); }
+
+// ── Auth ───────────────────────────────────────────────
+function initAuth() {
+  // Readonly share links skip authentication entirely
+  if (isReadOnly) {
+    load();
+    return;
+  }
+
+  db.auth.onAuthStateChange((_event, session) => {
+    currentUser = session?.user || null;
+    if (currentUser) {
+      load();
+    } else {
+      renderAuth();
+    }
+  });
+}
+
+async function doLogin(e) {
+  e.preventDefault();
+  const form  = e.target;
+  const email = form.email.value.trim();
+  const pw    = form.password.value;
+  const btn   = form.querySelector('.auth-btn');
+  const errEl = document.getElementById('auth-error');
+
+  btn.disabled = true;
+  btn.textContent = 'Loggar in…';
+  errEl.textContent = '';
+
+  const { error } = await db.auth.signInWithPassword({ email, password: pw });
+  btn.disabled = false;
+  btn.textContent = 'Logga in';
+
+  if (error) errEl.textContent = translateAuthError(error.message);
+  // on success, onAuthStateChange fires and calls load()
+}
+
+async function doSignup(e) {
+  e.preventDefault();
+  const form  = e.target;
+  const email = form.email.value.trim();
+  const pw    = form.password.value;
+  const btn   = form.querySelector('.auth-btn');
+  const errEl = document.getElementById('auth-error');
+
+  btn.disabled = true;
+  btn.textContent = 'Skapar konto…';
+  errEl.textContent = '';
+
+  const { error } = await db.auth.signUp({ email, password: pw });
+  btn.disabled = false;
+  btn.textContent = 'Skapa konto';
+
+  if (error) {
+    errEl.textContent = translateAuthError(error.message);
+  } else {
+    errEl.style.color = '#34d399';
+    errEl.textContent = 'Konto skapat! Kontrollera din e-post för bekräftelse.';
+  }
+}
+
+async function logout() {
+  await db.auth.signOut();
+  // onAuthStateChange fires and calls renderAuth()
+}
+
+function translateAuthError(msg) {
+  if (msg.includes('Invalid login')) return 'Fel e-post eller lösenord.';
+  if (msg.includes('Email not confirmed')) return 'Bekräfta din e-post innan du loggar in.';
+  if (msg.includes('User already registered')) return 'Det finns redan ett konto med den e-postadressen.';
+  if (msg.includes('Password should be')) return 'Lösenordet måste vara minst 6 tecken.';
+  return msg;
+}
+
+function setAuthMode(mode) {
+  authMode = mode;
+  renderAuth();
+}
+
 // ── Data ───────────────────────────────────────────────
 async function load() {
-  const { data, error } = await db
-    .from('job_applications')
-    .select('*')
-    .order('date_applied', { ascending: false });
-  if (error) { console.error(error); toast('Failed to load data'); return; }
+  let query = db.from('job_applications').select('*').order('date_applied', { ascending: false });
+
+  if (isReadOnly) {
+    if (!sharedUID) { renderNoUser(); return; }
+    query = query.eq('user_id', sharedUID);
+  } else {
+    if (!currentUser) return;
+    query = query.eq('user_id', currentUser.id);
+  }
+
+  const { data, error } = await query;
+  if (error) { console.error(error); toast('Kunde inte ladda data'); return; }
   applications = data || [];
   render();
 }
@@ -323,6 +463,7 @@ async function addApplication(e) {
   e.preventDefault();
   const form = e.target;
   const payload = {
+    user_id:       currentUser.id,
     company:       form.company.value.trim(),
     role:          form.role.value.trim(),
     date_applied:  form.date_applied.value,
@@ -337,66 +478,64 @@ async function addApplication(e) {
 
   const btn = form.querySelector('button[type="submit"]');
   btn.disabled = true;
-  btn.textContent = 'Saving…';
+  btn.textContent = 'Sparar…';
 
   const { error } = await db.from('job_applications').insert(payload);
   btn.disabled = false;
-  btn.textContent = 'Add Application';
+  btn.textContent = 'Lägg till ansökan';
 
-  if (error) { toast('Error saving'); console.error(error); return; }
+  if (error) { toast('Fel vid sparning'); console.error(error); return; }
   form.reset();
   form.date_applied.value = today();
   setFetchStatus('', '');
-  document.getElementById('url-input').value = '';
-  toast('Application added');
+  const ui = document.getElementById('url-input');
+  if (ui) ui.value = '';
+  toast('Ansökan sparad');
   await load();
 }
 
 async function updateStatus(id, status) {
   const { error } = await db.from('job_applications').update({ status }).eq('id', id);
-  if (error) { toast('Update failed'); return; }
+  if (error) { toast('Uppdatering misslyckades'); return; }
   applications = applications.map(a => a.id === id ? { ...a, status } : a);
   render();
 }
 
 async function deleteApp(id) {
   const { error } = await db.from('job_applications').delete().eq('id', id);
-  if (error) { toast('Delete failed'); return; }
+  if (error) { toast('Borttagning misslyckades'); return; }
   applications = applications.filter(a => a.id !== id);
-  toast('Removed');
+  toast('Borttagen');
   render();
 }
 
 // ── Job URL extraction ─────────────────────────────────
 const PROXIES = [
-  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-  url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
 ];
 
 async function fetchViaProxies(url) {
   for (let i = 0; i < PROXIES.length; i++) {
-    const proxyUrl = PROXIES[i](url);
     setFetchStatus('loading', `Försöker proxy ${i + 1}/${PROXIES.length}…`);
     try {
-      const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(10000) });
+      const res = await fetch(PROXIES[i](url), { signal: AbortSignal.timeout(10000) });
       if (!res.ok) continue;
       const text = await res.text();
       if (text && text.length > 100) return text;
-    } catch (_) {
-      // try next
-    }
+    } catch (_) { /* try next */ }
   }
   return null;
 }
 
 async function fetchJobInfo() {
   const urlEl  = document.getElementById('url-input');
-  const url    = urlEl.value.trim();
+  const url    = urlEl?.value.trim();
   const apiKey = getApiKey();
 
-  if (!url) { setFetchStatus('error', 'Klistra in en URL först.'); return; }
-  if (!apiKey) { setFetchStatus('error', 'Lägg till din Anthropic API-nyckel ovan först.'); return; }
+  if (!url)   { setFetchStatus('error', 'Klistra in en URL först.'); return; }
+  if (!apiKey){ setFetchStatus('error', 'Lägg till din Anthropic API-nyckel ovan först.'); return; }
   if (!url.startsWith('http')) { setFetchStatus('error', 'URL:en måste börja med http/https.'); return; }
 
   const fetchBtn = document.getElementById('fetch-btn');
@@ -413,11 +552,10 @@ async function fetchJobInfo() {
   }
 
   setFetchStatus('loading', 'Extraherar detaljer med Claude…');
-  const text = extractText(html);
 
   let extracted;
   try {
-    extracted = await callClaude(apiKey, text);
+    extracted = await callClaude(apiKey, extractText(html));
   } catch (err) {
     setFetchStatus('error', `Claude-fel: ${err.message}`);
     fetchBtn.disabled = false;
@@ -504,11 +642,8 @@ function extractText(html) {
   ['script','style','nav','footer','header','noscript','iframe','svg'].forEach(tag => {
     doc.querySelectorAll(tag).forEach(el => el.remove());
   });
-  const text = (doc.body?.innerText || doc.body?.textContent || '')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 7000);
-  return text;
+  return (doc.body?.innerText || doc.body?.textContent || '')
+    .replace(/\s+/g, ' ').trim().slice(0, 7000);
 }
 
 async function callClaude(apiKey, text) {
@@ -534,18 +669,13 @@ ${text}
       'anthropic-version': '2023-06-01',
       'anthropic-dangerous-direct-browser-access': 'true',
     },
-    body: JSON.stringify({
-      model: CLAUDE_MODEL,
-      max_tokens: 300,
-      messages: [{ role: 'user', content: prompt }],
-    }),
+    body: JSON.stringify({ model: CLAUDE_MODEL, max_tokens: 300, messages: [{ role: 'user', content: prompt }] }),
   });
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error?.message || `HTTP ${res.status}`);
   }
-
   const data = await res.json();
   const raw = data.content?.[0]?.text || '';
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
@@ -557,26 +687,39 @@ function setFetchStatus(type, msg) {
   const el = document.getElementById('fetch-status');
   if (!el) return;
   el.className = 'fetch-status' + (type ? ' ' + type : '');
-  el.innerHTML = type === 'loading'
-    ? `<span class="spinner"></span> ${esc(msg)}`
-    : esc(msg);
+  el.innerHTML = type === 'loading' ? `<span class="spinner"></span> ${esc(msg)}` : esc(msg);
 }
 
 // ── API key UI ─────────────────────────────────────────
 function handleApiKeySave() {
   const val = document.getElementById('apikey-field')?.value.trim();
-  if (val) { saveApiKey(val); showApiKeyInput = false; render(); toast('API key saved'); }
+  if (val) { saveApiKey(val); showApiKeyInput = false; render(); toast('API-nyckel sparad'); }
 }
-
 function toggleApiKey() {
   showApiKeyInput = !showApiKeyInput;
   render();
   if (showApiKeyInput) setTimeout(() => document.getElementById('apikey-field')?.focus(), 50);
 }
 
-// ── Render ─────────────────────────────────────────────
-function today() { return new Date().toISOString().split('T')[0]; }
+function renderApiKeySection() {
+  const key = getApiKey();
+  if (key && !showApiKeyInput) {
+    return `<div class="apikey-row">
+      <span class="apikey-label">Claude API-nyckel</span>
+      <span class="apikey-saved">✓ sparad</span>
+      <span class="apikey-change" onclick="toggleApiKey()">ändra</span>
+    </div>`;
+  }
+  return `<div class="apikey-row">
+    <span class="apikey-label">Claude API-nyckel</span>
+    <input id="apikey-field" class="apikey-input" type="password" placeholder="sk-ant-…" value="${esc(key)}"
+      onkeydown="if(event.key==='Enter')handleApiKeySave()">
+    <button class="btn btn-ghost btn-sm" onclick="handleApiKeySave()">Spara</button>
+    ${key ? `<span class="apikey-change" onclick="toggleApiKey()">avbryt</span>` : ''}
+  </div>`;
+}
 
+// ── Stats / filters ────────────────────────────────────
 function statsCount() {
   return {
     total:     applications.length,
@@ -585,35 +728,14 @@ function statsCount() {
     offer:     applications.filter(a => a.status === 'Offer').length,
   };
 }
-
 function formatDate(d) {
   return new Date(d + 'T00:00:00').toLocaleDateString('sv-SE', { day: 'numeric', month: 'short', year: 'numeric' });
 }
-
 function filteredApps() {
   if (activeFilter === 'All') return applications;
   return applications.filter(a => a.status === activeFilter);
 }
-
-function renderApiKeySection() {
-  const key = getApiKey();
-  if (key && !showApiKeyInput) {
-    return `
-      <div class="apikey-row">
-        <span class="apikey-label">Claude API key</span>
-        <span class="apikey-saved">✓ saved</span>
-        <span class="apikey-change" onclick="toggleApiKey()">change</span>
-      </div>`;
-  }
-  return `
-    <div class="apikey-row">
-      <span class="apikey-label">Claude API key</span>
-      <input id="apikey-field" class="apikey-input" type="password" placeholder="sk-ant-…" value="${esc(key)}"
-        onkeydown="if(event.key==='Enter')handleApiKeySave()">
-      <button class="btn btn-ghost btn-sm" onclick="handleApiKeySave()">Save</button>
-      ${key ? `<span class="apikey-change" onclick="toggleApiKey()">cancel</span>` : ''}
-    </div>`;
-}
+function setFilter(f) { activeFilter = f; render(); }
 
 function renderContactMeta(a) {
   const parts = [];
@@ -623,69 +745,129 @@ function renderContactMeta(a) {
   return parts.length ? `<div class="app-contact">${parts.join('')}</div>` : '';
 }
 
-function render() {
+function copyShare() {
+  const base  = window.location.href.split('?')[0];
+  const uid   = currentUser?.id || sharedUID;
+  const url   = `${base}?view=readonly&user=${uid}`;
+  navigator.clipboard.writeText(url)
+    .then(() => toast('Länk kopierad!'))
+    .catch(() => {
+      const el = document.getElementById('share-url');
+      if (el) { el.select(); document.execCommand('copy'); toast('Länk kopierad!'); }
+    });
+}
+
+function confirmDelete(id) {
+  if (confirm('Ta bort denna ansökan?')) deleteApp(id);
+}
+
+// ── Render: auth screen ────────────────────────────────
+function renderAuth() {
   const root = document.getElementById('app');
-  const s = statsCount();
-  const list = filteredApps();
-  const shareUrl = window.location.href.split('?')[0] + '?view=readonly';
+  const isLogin = authMode === 'login';
+  root.innerHTML = `
+    <div class="auth-screen">
+      <div class="auth-card">
+        <div class="auth-brand">
+          <div class="sub">Job Tracker</div>
+          <h1>Jobbspåraren</h1>
+        </div>
+        <div class="auth-heading">${isLogin ? 'Logga in på ditt konto' : 'Skapa ett nytt konto'}</div>
+        <form id="auth-form">
+          <div class="auth-fields">
+            <div class="auth-field">
+              <label>E-post</label>
+              <input name="email" type="email" placeholder="du@exempel.se" required autocomplete="email">
+            </div>
+            <div class="auth-field">
+              <label>Lösenord</label>
+              <input name="password" type="password" placeholder="••••••••" required autocomplete="${isLogin ? 'current-password' : 'new-password'}">
+            </div>
+          </div>
+          <div id="auth-error" class="auth-error"></div>
+          <button class="auth-btn" type="submit">${isLogin ? 'Logga in' : 'Skapa konto'}</button>
+        </form>
+        <div class="auth-toggle">
+          ${isLogin
+            ? `Inget konto? <span onclick="setAuthMode('signup')">Skapa ett här</span>`
+            : `Har du redan ett konto? <span onclick="setAuthMode('login')">Logga in</span>`}
+        </div>
+      </div>
+    </div>`;
+
+  const form = document.getElementById('auth-form');
+  form.addEventListener('submit', isLogin ? doLogin : doSignup);
+  setTimeout(() => form.querySelector('input[name="email"]')?.focus(), 50);
+}
+
+// ── Render: no user param on share link ───────────────
+function renderNoUser() {
+  document.getElementById('app').innerHTML = `
+    <div class="auth-screen">
+      <div style="text-align:center;color:var(--muted);font-size:.9rem;line-height:1.8">
+        Den här delningslänken saknar ett användar-ID.<br>Be ägaren dela länken på nytt från appen.
+      </div>
+    </div>`;
+}
+
+// ── Render: main app ───────────────────────────────────
+function render() {
+  const root     = document.getElementById('app');
+  const s        = statsCount();
+  const list     = filteredApps();
+  const base     = window.location.href.split('?')[0];
+  const shareUrl = currentUser ? `${base}?view=readonly&user=${currentUser.id}` : '';
 
   root.innerHTML = `
+    <div class="app-screen">
+    <div class="container">
+
     <header>
       <div>
         <div class="sub">Job Tracker</div>
         <h1>Jobbspåraren</h1>
       </div>
-      ${isReadOnly ? '' : `<button class="btn btn-ghost btn-sm" onclick="copyShare()">Share read-only link</button>`}
+      <div class="header-right">
+        ${isReadOnly
+          ? ''
+          : `<span class="user-email">${esc(currentUser?.email || '')}</span>
+             <button class="btn btn-ghost btn-sm" onclick="copyShare()">Dela länk</button>
+             <button class="btn btn-ghost btn-sm" onclick="logout()">Logga ut</button>`}
+      </div>
     </header>
 
-    ${isReadOnly ? `<div class="ro-banner">Read-only view — no changes can be made</div>` : ''}
+    ${isReadOnly ? `<div class="ro-banner">Skrivskyddad vy — inga ändringar kan göras</div>` : ''}
 
     <div class="stats">
-      <div class="stat"><div class="stat-val">${s.total}</div><div class="stat-label">Total</div></div>
-      <div class="stat"><div class="stat-val c-applied">${s.applied}</div><div class="stat-label">Applied</div></div>
-      <div class="stat"><div class="stat-val c-interview">${s.interview}</div><div class="stat-label">Interviews</div></div>
-      <div class="stat"><div class="stat-val c-offer">${s.offer}</div><div class="stat-label">Offers</div></div>
+      <div class="stat"><div class="stat-val">${s.total}</div><div class="stat-label">Totalt</div></div>
+      <div class="stat"><div class="stat-val c-applied">${s.applied}</div><div class="stat-label">Skickade</div></div>
+      <div class="stat"><div class="stat-val c-interview">${s.interview}</div><div class="stat-label">Intervjuer</div></div>
+      <div class="stat"><div class="stat-val c-offer">${s.offer}</div><div class="stat-label">Erbjudanden</div></div>
     </div>
 
     ${!isReadOnly ? `
     <div class="form-card">
       <div class="form-card-header">
-        <h2>New Application</h2>
+        <h2>Ny ansökan</h2>
         ${renderApiKeySection()}
       </div>
 
       <div class="url-fetcher">
-        <div class="url-fetcher-label">Auto-fill from job listing</div>
+        <div class="url-fetcher-label">Hämta info från jobbannons</div>
         <div class="url-fetcher-row">
-          <input id="url-input" class="url-input" type="url" placeholder="Paste job listing URL…"
+          <input id="url-input" class="url-input" type="url" placeholder="Klistra in URL till jobbannonsen…"
             onkeydown="if(event.key==='Enter'){event.preventDefault();fetchJobInfo()}">
           <button id="fetch-btn" class="btn btn-sm" onclick="fetchJobInfo()">Hämta jobbinfo</button>
         </div>
         <div id="fetch-status" class="fetch-status"></div>
-        <div id="manual-fallback" class="manual-fallback">
-          <div class="fallback-msg">Kunde inte hämta sidan automatiskt. Klistra in jobbannonsen som text istället.</div>
-          <textarea id="manual-text" class="manual-textarea" placeholder="Klistra in hela jobbannonsen här…"></textarea>
-          <div class="fallback-actions">
-            <button id="manual-extract-btn" class="btn btn-sm" onclick="extractFromManualText()">Extrahera med Claude</button>
-          </div>
-        </div>
       </div>
 
       <form id="add-form">
         <input type="hidden" name="job_url" id="form-job-url">
         <div class="form-grid">
-          <div class="fg">
-            <label>Company</label>
-            <input name="company" placeholder="Acme Corp" required autocomplete="off">
-          </div>
-          <div class="fg">
-            <label>Role</label>
-            <input name="role" placeholder="Frontend Engineer" required autocomplete="off">
-          </div>
-          <div class="fg">
-            <label>Date Applied</label>
-            <input name="date_applied" type="date" required value="${today()}">
-          </div>
+          <div class="fg"><label>Företag</label><input name="company" placeholder="Acme AB" required autocomplete="off"></div>
+          <div class="fg"><label>Roll</label><input name="role" placeholder="Frontend-utvecklare" required autocomplete="off"></div>
+          <div class="fg"><label>Datum ansökt</label><input name="date_applied" type="date" required value="${today()}"></div>
           <div class="fg">
             <label>Status</label>
             <select name="status">
@@ -693,26 +875,14 @@ function render() {
             </select>
           </div>
         </div>
-
-        <div class="form-divider">Contact info</div>
-
+        <div class="form-divider">Kontaktinfo</div>
         <div class="form-grid-3">
-          <div class="fg">
-            <label>Contact Person</label>
-            <input name="contact_name" placeholder="Anna Andersson" autocomplete="off">
-          </div>
-          <div class="fg">
-            <label>Email</label>
-            <input name="contact_email" type="email" placeholder="anna@company.se" autocomplete="off">
-          </div>
-          <div class="fg">
-            <label>Phone</label>
-            <input name="contact_phone" type="tel" placeholder="+46 70 …" autocomplete="off">
-          </div>
+          <div class="fg"><label>Kontaktperson</label><input name="contact_name" placeholder="Anna Andersson" autocomplete="off"></div>
+          <div class="fg"><label>E-post</label><input name="contact_email" type="email" placeholder="anna@foretag.se" autocomplete="off"></div>
+          <div class="fg"><label>Telefon</label><input name="contact_phone" type="tel" placeholder="+46 70 …" autocomplete="off"></div>
         </div>
-
         <div class="form-actions">
-          <button class="btn" type="submit">Add Application</button>
+          <button class="btn" type="submit">Lägg till ansökan</button>
         </div>
       </form>
     </div>
@@ -720,24 +890,24 @@ function render() {
 
     <div class="filter-bar">
       ${['All', ...STATUSES].map(f =>
-        `<button class="filter-chip ${activeFilter === f ? 'active' : ''}" onclick="setFilter('${f}')">${f}</button>`
+        `<button class="filter-chip ${activeFilter === f ? 'active' : ''}" onclick="setFilter('${f}')">${f === 'All' ? 'Alla' : f}</button>`
       ).join('')}
     </div>
 
     <div class="sh">
-      <h2>Applications</h2>
-      <span class="count">${list.length} shown</span>
+      <h2>Ansökningar</h2>
+      <span class="count">${list.length} visas</span>
     </div>
 
     <div class="applications">
       ${list.length === 0 ? `
-        <div class="empty">No applications yet.<br>Add your first one above.</div>
+        <div class="empty">Inga ansökningar ännu.<br>Lägg till din första ovan.</div>
       ` : list.map(a => `
         <div class="app-row">
           <div class="app-main">
             <div class="app-company">
               ${a.job_url
-                ? `<a class="job-link" href="${esc(a.job_url)}" target="_blank" rel="noopener" title="Open job listing">${esc(a.company)} ↗</a>`
+                ? `<a class="job-link" href="${esc(a.job_url)}" target="_blank" rel="noopener">${esc(a.company)} ↗</a>`
                 : esc(a.company)}
             </div>
             <div class="app-role">${esc(a.role)}</div>
@@ -750,7 +920,7 @@ function render() {
                 <select class="status-select" onchange="updateStatus('${a.id}', this.value)">
                   ${STATUSES.map(s => `<option value="${s}" ${a.status === s ? 'selected' : ''}>${s}</option>`).join('')}
                 </select>
-                <button class="icon-btn del" onclick="confirmDelete('${a.id}')" title="Remove">✕</button>
+                <button class="icon-btn del" onclick="confirmDelete('${a.id}')" title="Ta bort">✕</button>
               </div>`
           }
         </div>
@@ -759,21 +929,21 @@ function render() {
 
     ${!isReadOnly ? `
     <div class="share-section">
-      <h3>Shareable Read-Only Link</h3>
+      <h3>Dela skrivskyddad länk</h3>
       <div class="share-row">
-        <input class="share-url-input" id="share-url" readonly value="${shareUrl}">
-        <button class="btn btn-ghost btn-sm" onclick="copyShare()">Copy</button>
+        <input class="share-url-input" id="share-url" readonly value="${esc(shareUrl)}">
+        <button class="btn btn-ghost btn-sm" onclick="copyShare()">Kopiera</button>
       </div>
     </div>
     ` : ''}
-  `;
+
+    </div>
+    </div>`;
 
   if (!isReadOnly) {
     const form = document.getElementById('add-form');
     form.addEventListener('submit', addApplication);
-
-    // Wire up the hidden job_url field to the visible url-input
-    const urlInput = document.getElementById('url-input');
+    const urlInput    = document.getElementById('url-input');
     const jobUrlField = document.getElementById('form-job-url');
     if (urlInput && jobUrlField) {
       urlInput.addEventListener('input', () => { jobUrlField.value = urlInput.value.trim(); });
@@ -781,29 +951,8 @@ function render() {
   }
 }
 
-function esc(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function setFilter(f) { activeFilter = f; render(); }
-
-function copyShare() {
-  const url = window.location.href.split('?')[0] + '?view=readonly';
-  navigator.clipboard.writeText(url)
-    .then(() => toast('Read-only link copied!'))
-    .catch(() => {
-      const el = document.getElementById('share-url');
-      if (el) { el.select(); document.execCommand('copy'); toast('Link copied!'); }
-    });
-}
-
-function confirmDelete(id) {
-  if (confirm('Remove this application?')) deleteApp(id);
-}
-
 // ── Init ───────────────────────────────────────────────
-load();
+initAuth();
 </script>
 </body>
 </html>
