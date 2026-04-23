@@ -666,8 +666,14 @@ async function generateDocument(appId, type){
 
 async function copyDoc(key){
   const c=generatedDocs[key]; if(!c||c==='loading') return;
-  try{ await navigator.clipboard.writeText(c); toast('Kopierad till urklipp!'); }
+  try{ navigator.clipboard.writeText(c); toast('Kopierad till urklipp!'); }
   catch(_){ toast('Kunde inte kopiera'); }
+}
+
+function printCvIframe(cvKey){
+  const iframe=document.getElementById('cv-iframe-'+cvKey);
+  if(!iframe) return;
+  setTimeout(()=>{ iframe.contentWindow.print(); },300);
 }
 
 // ── Share URL ────────────────────────────────────────────────────────
@@ -741,6 +747,20 @@ function renderTabContent(){
   else if(currentTab==='profile')  el.innerHTML=renderProfileTab();
   else if(currentTab==='documents') el.innerHTML=renderDocumentsTab();
   attachTabListeners();
+  if(currentTab==='documents') populateCvIframes();
+}
+
+function populateCvIframes(){
+  setTimeout(()=>{
+    applications.forEach(a=>{
+      const cvKey=`${a.id}-cv`;
+      const cvDoc=generatedDocs[cvKey];
+      if(cvDoc && cvDoc!=='loading' && cvDoc.includes('<html')){
+        const iframe=document.getElementById('cv-iframe-'+cvKey);
+        if(iframe) iframe.srcdoc=cvDoc;
+      }
+    });
+  }, 0);
 }
 
 // ── Render: applications tab ─────────────────────────────────────────
@@ -960,7 +980,7 @@ function renderDocumentsTab(){
               ${clDoc==='loading'?`<span class="spinner"></span> Genererar…`:'Generera personligt brev'}
             </button>
           </div>
-          ${cvDoc&&cvDoc!=='loading'?`<div class="gen-panel"><div class="gen-panel-hd"><span class="gen-panel-lbl">CV — ${lang==='sv'?'Svenska':'English'}</span><button class="btn btn-ghost btn-sm" onclick="copyDoc('${cvKey}')">Kopiera</button></div><div class="gen-content">${esc(cvDoc)}</div></div>`:''}
+          ${cvDoc&&cvDoc!=='loading'?`<div class="gen-panel"><div class="gen-panel-hd"><span class="gen-panel-lbl">CV — ${lang==='sv'?'Svenska':'English'}</span><button class="btn btn-ghost btn-sm" onclick="printCvIframe('${cvKey}')">Skriv ut / Spara som PDF</button></div><div id="cv-iframe-wrapper-${cvKey}" style="margin-top:12px"><iframe id="cv-iframe-${cvKey}" style="width:100%;height:800px;border:1px solid var(--border);border-radius:var(--r);background:#fff"></iframe></div></div>`:''}
           ${clDoc&&clDoc!=='loading'?`<div class="gen-panel"><div class="gen-panel-hd"><span class="gen-panel-lbl">Personligt brev — ${lang==='sv'?'Svenska':'English'}</span><button class="btn btn-ghost btn-sm" onclick="copyDoc('${clKey}')">Kopiera</button></div><div class="gen-content">${esc(clDoc)}</div></div>`:''}
         </div>`;
       }).join('')}

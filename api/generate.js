@@ -30,49 +30,50 @@ module.exports = async function handler(req, res) {
     const skills = (profile.skills || []).join(', ');
     const langWord = language === 'sv' ? 'Swedish' : 'English';
 
-    let templateNote = '';
-    if (cvTemplateUrl) {
-      try {
-        const tr = await fetch(cvTemplateUrl, { signal: AbortSignal.timeout(5000) });
-        const ct = tr.headers.get('content-type') || '';
-        if (ct.includes('text/plain')) {
-          const tmpl = await tr.text();
-          if (tmpl && tmpl.length > 50) {
-            templateNote = `\n\nEXISTING CV TEMPLATE (maintain this structure and style):\n${tmpl.slice(0, 2000)}`;
-          }
-        } else {
-          templateNote = '\n\nNote: The user has an existing CV template — please generate a document that follows a similar professional structure and style.';
-        }
-      } catch (_) {}
-    }
-
     if (type === 'cv') {
-      prompt = `Generate a professional, tailored CV in ${langWord} for the following candidate applying to the specified position. Format it as plain text with clear section headers (no markdown symbols). Make it ATS-friendly and tailored to the role.${templateNote}
+      maxTokens = 4000;
+      prompt = `Generate a complete, self-contained HTML document for a professional CV/resume. The document must be fully self-contained (all CSS inline, Google Fonts imported via @import in <style> tag).
 
-CANDIDATE:
-Name: ${profile.full_name || '[Name]'}
-Phone: ${profile.phone || ''}
+DESIGN REQUIREMENTS:
+- Background: warm off-white (#FAFAF8)
+- Accent color: warm terracotta/dusty rose (#C17B5C) for headings and highlights
+- Font: Import "Inter" from Google Fonts (fallback: system sans-serif)
+- Layout: Two-column with left sidebar (25%) and right content area (75%)
+  * Left: Contact info, photo placeholder (if available), skills tags
+  * Right: Name (large, warm), professional summary, work experience, education
+- Typography: Warm and professional, NOT cold corporate
+- Spacing: Generous whitespace, subtle section dividers
+- Print-friendly: Include @media print CSS for A4 page layout, no page breaks in sections
+- Contact icons: Use simple unicode symbols (✉ for email, ☎ for phone, 📍 for location, 🔗 for LinkedIn)
+- Self-contained: No external dependencies except Google Fonts
+
+CONTENT TO INCLUDE:
+Name: ${profile.full_name || 'Name'}
 Email: ${profile.email || ''}
-Address: ${profile.address || ''}
+Phone: ${profile.phone || ''}
+Location: ${profile.address || ''}
 LinkedIn: ${profile.linkedin_url || ''}
+Summary: ${profile.bio || ''}
 
-SUMMARY:
-${profile.bio || ''}
-
-WORK EXPERIENCE:
+Work Experience:
 ${we || '(none provided)'}
 
-EDUCATION:
+Education:
 ${edu || '(none provided)'}
 
-SKILLS: ${skills || '(none provided)'}
+Skills: ${skills || '(none provided)'}
 
-TARGET ROLE: ${job.role} at ${job.company}
+Target Position: ${job.role} at ${job.company}
 
-Write the complete CV now.`;
+INSTRUCTIONS:
+- Generate a complete <html> document with <head>, <style>, and <body>
+- Make it visually warm and welcoming while maintaining professionalism
+- Tailor the summary and content to the target role
+- Ensure it renders beautifully on screen and prints cleanly on A4
+- Return ONLY the HTML code, no markdown or explanations`;
     } else {
       const contact = job.contact_name ? `\nAttn: ${job.contact_name}` : '';
-      prompt = `Write a professional, tailored cover letter in ${langWord}. Keep it to one page (~300–380 words). Be specific to the role and company. Use a warm but professional tone.${templateNote}
+      prompt = `Write a professional, tailored cover letter in ${langWord}. Keep it to one page (~300–380 words). Be specific to the role and company. Use a warm but professional tone.
 
 CANDIDATE:
 Name: ${profile.full_name || '[Name]'}
@@ -95,6 +96,7 @@ Write the complete cover letter now.`;
   }
 
   try {
+    const model = type === 'cv' ? 'claude-opus-4-6' : 'claude-sonnet-4-20250514';
     const upstream = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -103,7 +105,7 @@ Write the complete cover letter now.`;
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: model,
         max_tokens: maxTokens,
         messages: [{ role: 'user', content: prompt }],
       }),
