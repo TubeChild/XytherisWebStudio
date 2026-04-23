@@ -283,12 +283,14 @@ function toast(msg){ const el=document.getElementById('toast'); el.textContent=m
 function initAuth(){
   if(isReadOnly){ load().then(()=>render()); return; }
   render(); // show login immediately — no waiting
-  db.auth.onAuthStateChange(async(_,session)=>{
-    currentUser = session?.user||null;
-    if(currentUser){
-      await Promise.all([load(), loadProfile()]);
-    }
-    render();
+  db.auth.onAuthStateChange((_,session)=>{
+    setTimeout(async()=>{
+      currentUser = session?.user||null;
+      if(currentUser){
+        await Promise.all([load(), loadProfile()]);
+      }
+      render();
+    }, 0);
   });
 }
 
