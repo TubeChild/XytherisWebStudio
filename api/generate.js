@@ -66,7 +66,14 @@ DESIGN REQUIREMENTS:
   * Right: Name (large, warm), "Söker tjänst som"/"Applying for" box, professional summary, work experience, education
 - Typography: Warm and professional, NOT cold corporate
 - Spacing: Generous whitespace, subtle section dividers
-- Print-friendly: Include @media print CSS for A4 page layout, no page breaks in sections
+- Print-friendly: Include these exact rules in the <style> tag so the browser's default print header (timestamp) and footer (URL) are suppressed and colors render correctly:
+  @page { size: A4; margin: 1.5cm; }
+  @media print {
+    html, body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+    header, footer { display: none !important; }
+    .no-print { display: none !important; }
+  }
+  Also avoid page breaks inside sections (use break-inside: avoid / page-break-inside: avoid on each section/card).
 - Contact icons: Use simple unicode symbols (✉ for email, ☎ for phone, 📍 for location, 🔗 for LinkedIn)
 - Self-contained: No external dependencies except Google Fonts
 - EMAIL OVERFLOW FIX: The email (and any long contact string) MUST have CSS \`word-break: break-all; overflow-wrap: anywhere; white-space: normal;\` and the sidebar container must allow wrapping. Never let the email get cut off, hidden, or clipped. Use a small font-size (e.g. 0.82rem) in the sidebar if needed.
@@ -88,7 +95,7 @@ ${edu || '(none provided)'}
 
 Skills (the candidate's ACTUAL skills): ${skills || '(none provided)'}
 
-Languages:
+Languages (render each as "Name — Level" with a visible em-dash or colon separator, never concatenated without spacing):
 ${languages || '(none provided)'}
 
 Driver's License: ${driverLicense || '(none provided)'}
