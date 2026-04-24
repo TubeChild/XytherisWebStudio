@@ -783,7 +783,9 @@ async function generateDocument(appId, type){
     });
     if(type==='cv'){
       const m=content.match(/\{[\s\S]*\}/); if(!m) throw new Error('Inget JSON från API');
-      const cvData=JSON.parse(m[0]);
+      // Sanitise: replace literal newlines inside JSON string values with \n
+      const sanitised=m[0].replace(/"((?:[^"\\]|\\.)*)"/gs,(match,inner)=>'"'+inner.replace(/\r?\n/g,'\\n')+'"');
+      const cvData=JSON.parse(sanitised);
       cvData.photo_url=profile.photo_url||'';
       generatedDocs[key]=buildCvHtml(cvData,lang);
     } else {

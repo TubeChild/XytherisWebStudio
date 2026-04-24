@@ -112,6 +112,7 @@ RULES:
 - Include EVERY work experience and education entry — do not drop or summarize any.
 - The "title" field must reflect the candidate's ACTUAL credentials, never the target role.
 - Write "summary" in ${langWord}.
+- CRITICAL JSON FORMATTING: All string values must be valid JSON strings on a single line. Use \\n (escaped backslash-n) for line breaks within description text — NEVER insert a literal newline character inside a JSON string value. Escape any double-quotes inside strings as \\". Do not use trailing commas.
 - Return ONLY the JSON object. Nothing else.`;
     } else {
       const contact = job.contact_name ? `\nAttn: ${job.contact_name}` : '';
