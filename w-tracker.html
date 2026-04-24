@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>W-Tracker</title>
+  <title>W-Tracker — Jobbansökningshanterare</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.js"></script>
   <style>
     :root {
@@ -264,7 +264,7 @@ let docLangs     = {};          // { appId: 'sv'|'en' }
 let generatedDocs= {};          // { `${appId}-${type}`: content|'loading' }
 
 function defaultProfile() {
-  return { full_name:'', phone:'', address:'', linkedin_url:'', photo_url:'', bio:'', work_experiences:[], education:[], skills:[], cv_template_url:'', cv_template_name:'' };
+  return { full_name:'', phone:'', address:'', linkedin_url:'', photo_url:'', bio:'', work_experiences:[], education:[], skills:[], languages:[], driver_license:false, driver_license_type:'', reference_list:[], references_on_request:false, courses:[], cv_template_url:'', cv_template_name:'' };
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────
@@ -352,6 +352,12 @@ async function loadProfile(){
       work_experiences: data.work_experiences||[],
       education: data.education||[],
       skills: data.skills||[],
+      languages: data.languages||[],
+      driver_license: !!data.driver_license,
+      driver_license_type: data.driver_license_type||'',
+      reference_list: data.reference_list||[],
+      references_on_request: !!data.references_on_request,
+      courses: data.courses||[],
       cv_template_url: data.cv_template_url||'',
       cv_template_name: data.cv_template_name||'',
     };
@@ -375,6 +381,33 @@ function collectProfileFormData(){
   if(eduEls.length) profile.education=Array.from(eduEls).map(el=>({
     degree:el.querySelector('.edu-degree')?.value||'', school:el.querySelector('.edu-school')?.value||'',
     start_date:el.querySelector('.edu-start')?.value||'', end_date:el.querySelector('.edu-end')?.value||'',
+    description:el.querySelector('.edu-desc')?.value||'',
+  }));
+  const langEls=f.querySelectorAll('.lang-item');
+  if(langEls.length) profile.languages=Array.from(langEls).map(el=>({
+    name:el.querySelector('.lang-name')?.value||'',
+    level:el.querySelector('.lang-level')?.value||'',
+  }));
+  const dlCheck=f.querySelector('[name="driver_license"]');
+  if(dlCheck) profile.driver_license=dlCheck.checked;
+  const dlType=f.querySelector('[name="driver_license_type"]');
+  if(dlType) profile.driver_license_type=dlType.value;
+  const refToggle=f.querySelector('[name="references_on_request"]');
+  if(refToggle) profile.references_on_request=refToggle.checked;
+  const refEls=f.querySelectorAll('.ref-item');
+  if(refEls.length) profile.reference_list=Array.from(refEls).map(el=>({
+    name:el.querySelector('.ref-name')?.value||'',
+    title:el.querySelector('.ref-title')?.value||'',
+    company:el.querySelector('.ref-company')?.value||'',
+    email:el.querySelector('.ref-email')?.value||'',
+    phone:el.querySelector('.ref-phone')?.value||'',
+  }));
+  const courseEls=f.querySelectorAll('.course-item');
+  if(courseEls.length) profile.courses=Array.from(courseEls).map(el=>({
+    name:el.querySelector('.course-name')?.value||'',
+    issuer:el.querySelector('.course-issuer')?.value||'',
+    date:el.querySelector('.course-date')?.value||'',
+    description:el.querySelector('.course-desc')?.value||'',
   }));
 }
 
@@ -389,8 +422,15 @@ async function saveProfile(){
 
 function addWorkExp(){ collectProfileFormData(); profile.work_experiences.push({title:'',company:'',start_date:'',end_date:'',description:''}); renderTabContent(); }
 function removeWorkExp(i){ collectProfileFormData(); profile.work_experiences.splice(i,1); renderTabContent(); }
-function addEducation(){ collectProfileFormData(); profile.education.push({degree:'',school:'',start_date:'',end_date:''}); renderTabContent(); }
+function addEducation(){ collectProfileFormData(); profile.education.push({degree:'',school:'',start_date:'',end_date:'',description:''}); renderTabContent(); }
 function removeEducation(i){ collectProfileFormData(); profile.education.splice(i,1); renderTabContent(); }
+function addLanguage(){ collectProfileFormData(); profile.languages.push({name:'',level:'Grundläggande'}); renderTabContent(); }
+function removeLanguage(i){ collectProfileFormData(); profile.languages.splice(i,1); renderTabContent(); }
+function addReference(){ collectProfileFormData(); profile.reference_list.push({name:'',title:'',company:'',email:'',phone:''}); renderTabContent(); }
+function removeReference(i){ collectProfileFormData(); profile.reference_list.splice(i,1); renderTabContent(); }
+function addCourse(){ collectProfileFormData(); profile.courses.push({name:'',issuer:'',date:'',description:''}); renderTabContent(); }
+function removeCourse(i){ collectProfileFormData(); profile.courses.splice(i,1); renderTabContent(); }
+function toggleDriverLicense(checked){ collectProfileFormData(); profile.driver_license=checked; renderTabContent(); }
 
 function addSkill(){
   const inp=document.getElementById('skill-inp'); if(!inp) return;
@@ -698,7 +738,7 @@ function renderAuth(){
   const action=isLogin?'doLogin()':'doSignup()';
   document.getElementById('app').innerHTML=`
     <div class="auth-screen"><div class="auth-card">
-      <div class="auth-brand"><div class="sub">Job Tracker</div><h1>W-Tracker</h1></div>
+      <div class="auth-brand"><h1>W-Tracker</h1></div>
       <div class="auth-heading">${isLogin?'Logga in på ditt konto':'Skapa ett nytt konto'}</div>
       <div class="auth-fields">
         <div class="auth-field"><label>E-post</label><input id="auth-email" type="email" placeholder="du@exempel.se" autocomplete="email" onkeydown="if(event.key==='Enter')${action}"></div>
@@ -723,7 +763,7 @@ function render(){
   document.getElementById('app').innerHTML=`
     <div class="app-screen"><div class="container">
       <header>
-        <div><div class="sub">Job Tracker</div><h1>W-Tracker</h1></div>
+        <div><h1>W-Tracker</h1></div>
         <div class="header-right">
           <span class="user-email">${esc(currentUser?.email||'')}</span>
           <button class="btn btn-ghost btn-sm" onclick="copyShare()">Dela länk</button>
@@ -922,6 +962,7 @@ function renderProfileTab(){
             <div class="fg"><label>Startdatum</label><input class="edu-start" type="month" value="${esc(e.start_date)}"></div>
             <div class="fg"><label>Slutdatum</label><input class="edu-end" type="month" value="${esc(e.end_date)}"></div>
           </div>
+          <div class="fg"><label>Beskrivning</label><textarea class="edu-desc" rows="2" placeholder="Beskrivning av utbildningen, inriktning, utmärkelser…">${esc(e.description||'')}</textarea></div>
         </div>`).join('')}
     </div>
 
@@ -935,6 +976,66 @@ function renderProfileTab(){
         <input id="skill-inp" class="skill-inp" placeholder="Lägg till kompetens…" onkeydown="if(event.key==='Enter'){event.preventDefault();addSkill()}">
         <button type="button" class="btn btn-ghost btn-sm" onclick="addSkill()">Lägg till</button>
       </div>
+    </div>
+
+    <div class="p-card">
+      <div class="p-section-hd">Språk <button type="button" class="btn btn-ghost btn-sm" onclick="addLanguage()">+ Lägg till</button></div>
+      ${p.languages.length===0?`<div style="color:var(--muted);font-size:.82rem">Inga språk tillagda ännu.</div>`:''}
+      ${p.languages.map((l,i)=>`
+        <div class="list-item-card lang-item">
+          <div class="list-item-hd"><span class="list-item-num">Språk ${i+1}</span><button type="button" class="list-item-rm" onclick="removeLanguage(${i})">Ta bort</button></div>
+          <div class="list-grid-2">
+            <div class="fg"><label>Språk</label><input class="lang-name" placeholder="Svenska" value="${esc(l.name)}"></div>
+            <div class="fg"><label>Nivå</label><select class="lang-level">
+              ${['Nybörjare','Grundläggande','Flytande','Modersmål'].map(lvl=>`<option value="${lvl}"${l.level===lvl?' selected':''}>${lvl}</option>`).join('')}
+            </select></div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <div class="p-card">
+      <div class="p-section-hd">Körkort</div>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.87rem;margin-bottom:${p.driver_license?'12px':'0'}">
+        <input type="checkbox" name="driver_license" ${p.driver_license?'checked':''} onchange="toggleDriverLicense(this.checked)" style="width:16px;height:16px;accent-color:var(--accent)">
+        <span>Jag har körkort</span>
+      </label>
+      ${p.driver_license?`<div class="fg"><label>Körkortstyp</label><input name="driver_license_type" placeholder="B, BE, C…" value="${esc(p.driver_license_type)}"></div>`:''}
+    </div>
+
+    <div class="p-card">
+      <div class="p-section-hd">Referenser <button type="button" class="btn btn-ghost btn-sm" onclick="addReference()">+ Lägg till</button></div>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.87rem;margin-bottom:14px">
+        <input type="checkbox" name="references_on_request" ${p.references_on_request?'checked':''} style="width:16px;height:16px;accent-color:var(--accent)">
+        <span>Referenser lämnas på begäran (dölj enskilda referenser på CV)</span>
+      </label>
+      ${p.reference_list.length===0?`<div style="color:var(--muted);font-size:.82rem">Inga referenser tillagda ännu.</div>`:''}
+      ${p.reference_list.map((r,i)=>`
+        <div class="list-item-card ref-item">
+          <div class="list-item-hd"><span class="list-item-num">Referens ${i+1}</span><button type="button" class="list-item-rm" onclick="removeReference(${i})">Ta bort</button></div>
+          <div class="list-grid-2">
+            <div class="fg"><label>Namn</label><input class="ref-name" placeholder="Anna Andersson" value="${esc(r.name)}"></div>
+            <div class="fg"><label>Titel</label><input class="ref-title" placeholder="Chef" value="${esc(r.title)}"></div>
+            <div class="fg"><label>Företag</label><input class="ref-company" placeholder="Acme AB" value="${esc(r.company)}"></div>
+            <div class="fg"><label>E-post</label><input class="ref-email" type="email" placeholder="anna@foretag.se" value="${esc(r.email)}"></div>
+            <div class="fg"><label>Telefon</label><input class="ref-phone" type="tel" placeholder="+46 70 …" value="${esc(r.phone)}"></div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <div class="p-card">
+      <div class="p-section-hd">Kurser & certifikat <button type="button" class="btn btn-ghost btn-sm" onclick="addCourse()">+ Lägg till</button></div>
+      ${p.courses.length===0?`<div style="color:var(--muted);font-size:.82rem">Inga kurser tillagda ännu.</div>`:''}
+      ${p.courses.map((c,i)=>`
+        <div class="list-item-card course-item">
+          <div class="list-item-hd"><span class="list-item-num">Kurs ${i+1}</span><button type="button" class="list-item-rm" onclick="removeCourse(${i})">Ta bort</button></div>
+          <div class="list-grid-4" style="grid-template-columns:2fr 1.2fr 1fr 0fr">
+            <div class="fg"><label>Namn</label><input class="course-name" placeholder="AWS Cloud Practitioner" value="${esc(c.name)}"></div>
+            <div class="fg"><label>Utfärdare</label><input class="course-issuer" placeholder="Amazon" value="${esc(c.issuer)}"></div>
+            <div class="fg"><label>Datum</label><input class="course-date" type="month" value="${esc(c.date)}"></div>
+            <div></div>
+          </div>
+          <div class="fg"><label>Beskrivning</label><textarea class="course-desc" rows="2" placeholder="Kort beskrivning av kursen eller certifieringen…">${esc(c.description||'')}</textarea></div>
+        </div>`).join('')}
     </div>
 
     <div class="p-card">
@@ -997,7 +1098,7 @@ function renderReadOnly(){
   document.getElementById('app').innerHTML=`
     <div class="app-screen"><div class="container">
       <header>
-        <div><div class="sub">Job Tracker</div><h1>W-Tracker</h1></div>
+        <div><h1>W-Tracker</h1></div>
       </header>
       <div class="ro-banner">Skrivskyddad vy — visar endast offentlig information</div>
       <div class="stats">
