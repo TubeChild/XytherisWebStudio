@@ -54,7 +54,7 @@ module.exports = async function handler(req, res) {
     const refLabel = language === 'sv' ? 'Referenser lämnas på begäran' : 'References available on request';
 
     if (type === 'cv') {
-      maxTokens = 8000;
+      maxTokens = 6000;
       prompt = `Generate a complete, self-contained HTML document for a professional CV/resume. The document must be fully self-contained (all CSS inline, Google Fonts imported via @import in <style> tag).
 
 DESIGN REQUIREMENTS:
@@ -140,7 +140,7 @@ Write the complete cover letter now.`;
   }
 
   try {
-    const model = type === 'cv' ? 'claude-sonnet-4-6' : 'claude-sonnet-4-20250514';
+    const model = 'claude-sonnet-4-20250514';
     const upstream = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {

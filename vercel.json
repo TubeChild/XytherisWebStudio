@@ -3,5 +3,17 @@
     "api/*.js": {
       "maxDuration": 60
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/jobbspåraren.html",
+      "destination": "/w-tracker.html",
+      "permanent": true
+    },
+    {
+      "source": "/jobbsp%C3%A5raren.html",
+      "destination": "/w-tracker.html",
+      "permanent": true
+    }
+  ]
 }
