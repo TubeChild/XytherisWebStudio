@@ -61,31 +61,51 @@ DESIGN REQUIREMENTS:
 - Background: warm off-white (#FAFAF8)
 - Accent color: warm terracotta/dusty rose (#C17B5C) for headings and highlights
 - Font: Import "Inter" from Google Fonts (fallback: system sans-serif)
-- Layout: Two-column with left sidebar (25%) and right content area (75%).
-  CRITICAL LAYOUT RULE: Use a flex row wrapper div for the two columns. The sidebar must have 'align-self: flex-start' so its background colour only covers the sidebar content, NOT the full page height — do NOT use min-height:100vh or stretch tricks that create a large empty coloured box at the bottom of the last page.
-  * Left sidebar: Photo (if any), contact info, skills tags, languages, driver's license, courses (short), references block
-  * Right column: Name (large, warm), "Söker tjänst som"/"Applying for" box, professional summary, work experience, education
 - Typography: Warm and professional, NOT cold corporate
 - Spacing: Generous whitespace, subtle section dividers
-- PRINT PAGE BREAK RULES — apply all of the following:
-  * Each section block (work entry, education entry, sidebar section): break-inside: avoid; page-break-inside: avoid;
-  * Skill tags and language pills: display:inline-block; break-inside: avoid;
-  * Section headings: break-after: avoid; page-break-after: avoid;
-  * The sidebar itself: break-inside: avoid; — but if content forces a page break, each column flows independently (do NOT use CSS columns or multi-column layout; use flex row).
-  * For multi-page CVs: the sidebar colour block does NOT repeat on pages 2+ — only the right column continues. To achieve this, do NOT set the sidebar background on the html/body or a full-height wrapper. Set it only on the sidebar div itself with align-self:flex-start.
-- Print-friendly: Include these exact rules in the <style> tag:
+
+LAYOUT — use this exact two-zone structure to avoid page break column problems:
+
+ZONE 1 — HEADER BLOCK (top of page 1 only, two-column flex row, no min-height):
+  Left column (~28%, background #2D2D2D or dark warm tone, padding 1.5rem, align-self:flex-start):
+    - Circular photo (or initials placeholder)
+    - Name in large warm white text
+    - Tagline/subtitle (candidate's actual role/credential, NOT the target position)
+    - Contact info: ✉ email (word-break:break-all), ☎ phone, 📍 location, 🔗 LinkedIn
+    - Skills as small pill tags
+  Right column (~72%, background #FAFAF8, padding 1.5rem):
+    - "Söker tjänst som" / "Applying for" highlighted box with #C17B5C left border
+    - Professional Summary paragraph
+
+ZONE 2 — META-INFO STRIP (full width, below header, before work experience):
+  A single-row or two-row compact section (background: #F0EDE8, border-left: 3px solid #C17B5C, padding: 0.8rem 1.5rem) showing inline chips/items for:
+  - Languages: each as "Name — Level"
+  - Driver's license (if present)
+  - Courses/certificates (name only, comma-separated)
+  - References note (if REFERENCES_ON_REQUEST: show "${refLabel}")
+  Omit this strip entirely if none of languages/license/courses/references have data.
+
+ZONE 3 — SINGLE-COLUMN BODY (full width, all remaining content):
+  Use full page width (no sidebar) for ALL of the following sections in order:
+  1. Arbetslivserfarenhet / Work Experience
+  2. Utbildning / Education
+  Each work/education entry: break-inside:avoid; page-break-inside:avoid. Heading above each entry: break-after:avoid.
+
+PRINT RULES — include these exact CSS rules in <style>:
   @page { size: A4; margin: 1.5cm; }
   @media print {
     html, body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
     header, footer { display: none !important; }
     .no-print { display: none !important; }
-    .section-block { break-inside: avoid; page-break-inside: avoid; }
+    .entry { break-inside: avoid; page-break-inside: avoid; }
     h2, h3 { break-after: avoid; page-break-after: avoid; }
+    .header-block { break-inside: avoid; }
+    .meta-strip { break-inside: avoid; }
   }
+
 - Contact icons: Use simple unicode symbols (✉ for email, ☎ for phone, 📍 for location, 🔗 for LinkedIn)
 - Self-contained: No external dependencies except Google Fonts
-- EMAIL OVERFLOW FIX: The email (and any long contact string) MUST have CSS \`word-break: break-all; overflow-wrap: anywhere; white-space: normal;\` and the sidebar container must allow wrapping. Never let the email get cut off, hidden, or clipped. Use a small font-size (e.g. 0.82rem) in the sidebar if needed.
-- Photo: ${profile.photo_url ? `use this image as a circular profile photo in the sidebar: <img src="${profile.photo_url}" alt="${profile.full_name || 'Profile'}" style="width:140px;height:140px;border-radius:50%;object-fit:cover;border:3px solid #C17B5C"> — place it at the top of the left sidebar` : 'no photo provided — use a circular placeholder with the person\'s initials on a soft gradient background'}
+- Photo: ${profile.photo_url ? `use this image as a circular profile photo: <img src="${profile.photo_url}" alt="${profile.full_name || 'Profile'}" style="width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid #C17B5C;display:block;margin:0 auto 1rem">` : 'no photo — render a circular div with the person\'s initials, warm gradient background (#C17B5C to #8B4513), white text, 120px diameter, centered'}
 
 CANDIDATE DATA (use exactly as given — do NOT invent qualifications):
 Name: ${profile.full_name || 'Name'}
@@ -121,12 +141,13 @@ Company: ${job.company}
 CRITICAL INSTRUCTIONS:
 - Generate a complete <html> document with <head>, <style>, and <body>, and ALWAYS close with </body></html>.
 - DO NOT TRUNCATE. Render EVERY work experience, EVERY education entry, EVERY course/certificate in full. Never write "..." or "additional experience omitted". Finish the document cleanly.
-- Display the target position in a clearly labeled "Söker tjänst som" (Swedish) or "Applying for" (English) section near the top of the right column — a small highlighted box with an accent border.
-- The candidate's tagline/subtitle under their name must reflect ONLY their actual credentials and experience — NEVER merge the target role into the subtitle as if it were a credential. Example: if applying for a role that includes Swedish but the candidate is only qualified in English, the subtitle must say "Qualified teacher in English", NOT "Qualified teacher in English and Swedish".
-- Do not fabricate qualifications, certifications, or experience. Only restructure and present what was provided.
-- Tailor the WORDING of the summary to highlight relevance to the target role, but never claim credentials the candidate doesn't have.
-- If Languages, Driver's License, Courses, or References data is "(none provided)", simply OMIT that section entirely — do not show empty headings.
-- For references: if the data note says REFERENCES_ON_REQUEST, render a single small line with "${refLabel}" in the sidebar — do NOT invent reference names.
+- Follow the three-zone layout exactly: header block (two-col) → meta-info strip (full-width) → single-column body. Do NOT put work experience or education in a sidebar.
+- "Söker tjänst som" / "Applying for" box goes in the right column of the header block.
+- The candidate's tagline/subtitle must reflect ONLY their actual credentials — NEVER merge the target role into it as a credential.
+- Do not fabricate qualifications, certifications, or experience.
+- Tailor WORDING of the summary to the role but never claim credentials the candidate doesn't have.
+- Omit the meta-info strip entirely if languages, driver's license, courses, and references are all "(none provided)".
+- For references in the meta-strip: if REFERENCES_ON_REQUEST, show only "${refLabel}" — do NOT invent names.
 - Make it visually warm and welcoming while maintaining professionalism.
 - Ensure it renders beautifully on screen and prints cleanly on A4.
 - Return ONLY the HTML code, no markdown or explanations.`;
