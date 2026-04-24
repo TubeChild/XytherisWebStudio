@@ -62,7 +62,7 @@ DESIGN REQUIREMENTS:
 - Accent color: warm terracotta/dusty rose (#C17B5C) for headings and highlights
 - Font: Import "Inter" from Google Fonts (fallback: system sans-serif)
 - Layout: Two-column with left sidebar (25%) and right content area (75%).
-  CRITICAL LAYOUT RULE: Use a flex row wrapper div for the two columns. The sidebar must have `align-self: flex-start` so its background colour only covers the sidebar content, NOT the full page height — do NOT use min-height:100vh or stretch tricks that create a large empty coloured box at the bottom of the last page.
+  CRITICAL LAYOUT RULE: Use a flex row wrapper div for the two columns. The sidebar must have 'align-self: flex-start' so its background colour only covers the sidebar content, NOT the full page height — do NOT use min-height:100vh or stretch tricks that create a large empty coloured box at the bottom of the last page.
   * Left sidebar: Photo (if any), contact info, skills tags, languages, driver's license, courses (short), references block
   * Right column: Name (large, warm), "Söker tjänst som"/"Applying for" box, professional summary, work experience, education
 - Typography: Warm and professional, NOT cold corporate
