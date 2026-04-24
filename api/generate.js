@@ -61,19 +61,27 @@ DESIGN REQUIREMENTS:
 - Background: warm off-white (#FAFAF8)
 - Accent color: warm terracotta/dusty rose (#C17B5C) for headings and highlights
 - Font: Import "Inter" from Google Fonts (fallback: system sans-serif)
-- Layout: Two-column with left sidebar (25%) and right content area (75%)
-  * Left: Photo (if any), contact info, skills tags, languages, driver's license, courses (short), references block
-  * Right: Name (large, warm), "Söker tjänst som"/"Applying for" box, professional summary, work experience, education
+- Layout: Two-column with left sidebar (25%) and right content area (75%).
+  CRITICAL LAYOUT RULE: Use a flex row wrapper div for the two columns. The sidebar must have `align-self: flex-start` so its background colour only covers the sidebar content, NOT the full page height — do NOT use min-height:100vh or stretch tricks that create a large empty coloured box at the bottom of the last page.
+  * Left sidebar: Photo (if any), contact info, skills tags, languages, driver's license, courses (short), references block
+  * Right column: Name (large, warm), "Söker tjänst som"/"Applying for" box, professional summary, work experience, education
 - Typography: Warm and professional, NOT cold corporate
 - Spacing: Generous whitespace, subtle section dividers
-- Print-friendly: Include these exact rules in the <style> tag so the browser's default print header (timestamp) and footer (URL) are suppressed and colors render correctly:
+- PRINT PAGE BREAK RULES — apply all of the following:
+  * Each section block (work entry, education entry, sidebar section): break-inside: avoid; page-break-inside: avoid;
+  * Skill tags and language pills: display:inline-block; break-inside: avoid;
+  * Section headings: break-after: avoid; page-break-after: avoid;
+  * The sidebar itself: break-inside: avoid; — but if content forces a page break, each column flows independently (do NOT use CSS columns or multi-column layout; use flex row).
+  * For multi-page CVs: the sidebar colour block does NOT repeat on pages 2+ — only the right column continues. To achieve this, do NOT set the sidebar background on the html/body or a full-height wrapper. Set it only on the sidebar div itself with align-self:flex-start.
+- Print-friendly: Include these exact rules in the <style> tag:
   @page { size: A4; margin: 1.5cm; }
   @media print {
     html, body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
     header, footer { display: none !important; }
     .no-print { display: none !important; }
+    .section-block { break-inside: avoid; page-break-inside: avoid; }
+    h2, h3 { break-after: avoid; page-break-after: avoid; }
   }
-  Also avoid page breaks inside sections (use break-inside: avoid / page-break-inside: avoid on each section/card).
 - Contact icons: Use simple unicode symbols (✉ for email, ☎ for phone, 📍 for location, 🔗 for LinkedIn)
 - Self-contained: No external dependencies except Google Fonts
 - EMAIL OVERFLOW FIX: The email (and any long contact string) MUST have CSS \`word-break: break-all; overflow-wrap: anywhere; white-space: normal;\` and the sidebar container must allow wrapping. Never let the email get cut off, hidden, or clipped. Use a small font-size (e.g. 0.82rem) in the sidebar if needed.
