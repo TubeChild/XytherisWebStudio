@@ -680,6 +680,90 @@ async function callClaudeExtract(text){
   return JSON.parse(m[0]);
 }
 
+// ── CV HTML template ─────────────────────────────────────────────────
+function buildCvHtml(d, lang){
+  const sv=lang==='sv';
+  const e=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const nl=s=>e(s).replace(/\n/g,'<br>');
+
+  const photo=d.photo_url
+    ?`<img src="${e(d.photo_url)}" alt="${e(d.name)}" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:3px solid #C17B5C;display:block;margin:0 auto 1rem">`
+    :(()=>{const i=(d.name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();return`<div style="width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,#C17B5C,#8B4513);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:2rem;font-weight:700;color:#fff">${e(i)}</div>`;})();
+
+  const contact=[
+    d.contact?.email&&`<div style="word-break:break-all;overflow-wrap:anywhere">✉ ${e(d.contact.email)}</div>`,
+    d.contact?.phone&&`<div>☎ ${e(d.contact.phone)}</div>`,
+    d.contact?.location&&`<div>📍 ${e(d.contact.location)}</div>`,
+    d.contact?.linkedin&&`<div style="word-break:break-all;overflow-wrap:anywhere">🔗 ${e(d.contact.linkedin)}</div>`,
+  ].filter(Boolean).join('');
+
+  const skills=(d.skills||[]).map(s=>`<span style="display:inline-block;background:rgba(193,123,92,0.25);color:#C17B5C;border-radius:12px;padding:2px 10px;font-size:0.72rem;margin:2px;break-inside:avoid">${e(s)}</span>`).join('');
+
+  const applying=d.applying_for?`<div style="border-left:4px solid #C17B5C;padding:0.6rem 1rem;background:#fff;border-radius:0 6px 6px 0;margin-bottom:1.5rem"><div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:#C17B5C;font-weight:600;margin-bottom:0.2rem">${sv?'Söker tjänst som':'Applying for'}</div><div style="font-weight:600;color:#2D2D2D">${e(d.applying_for)}</div></div>`:'';
+
+  const metaItems=[
+    ...(d.languages||[]).map(l=>`<span style="background:#fff;border:1px solid #C17B5C;border-radius:10px;padding:2px 10px;font-size:0.78rem;color:#5a3a28;margin:2px;display:inline-block">🌐 ${e(l.name)} — ${e(l.level)}</span>`),
+    d.license?`<span style="background:#fff;border:1px solid #C17B5C;border-radius:10px;padding:2px 10px;font-size:0.78rem;color:#5a3a28;margin:2px;display:inline-block">🚗 ${sv?'Körkort':"Driver's license"}: ${e(d.license)}</span>`:'',
+    ...(d.courses||[]).map(c=>`<span style="background:#fff;border:1px solid #C17B5C;border-radius:10px;padding:2px 10px;font-size:0.78rem;color:#5a3a28;margin:2px;display:inline-block">📜 ${e(c.name)}${c.issuer?' — '+e(c.issuer):''}${c.date?' ('+e(c.date)+')':''}</span>`),
+    d.references_text?`<span style="background:#fff;border:1px solid #C17B5C;border-radius:10px;padding:2px 10px;font-size:0.78rem;color:#5a3a28;margin:2px;display:inline-block">👤 ${e(d.references_text)}</span>`:'',
+  ].filter(Boolean);
+  const metaStrip=metaItems.length?`<div class="meta-strip" style="background:#F0EDE8;border-left:4px solid #C17B5C;padding:0.8rem 1.5rem;margin:0 0 2rem;break-inside:avoid"><div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:#C17B5C;font-weight:600;margin-bottom:0.5rem">${sv?'Övrigt':'Additional'}</div><div>${metaItems.join('')}</div></div>`:'';
+
+  const secHead=label=>`<h2 style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:#C17B5C;font-weight:700;border-bottom:2px solid #C17B5C;padding-bottom:0.35rem;margin-bottom:1rem;break-after:avoid;page-break-after:avoid">${label}</h2>`;
+
+  const workHtml=(d.experiences||[]).map(x=>`<div class="entry" style="margin-bottom:1.4rem;break-inside:avoid;page-break-inside:avoid"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.3rem;align-items:baseline"><div><span style="font-weight:600;color:#2D2D2D">${e(x.title)}</span><span style="color:#C17B5C;font-weight:500"> · ${e(x.company)}</span>${x.location?`<span style="color:#999;font-size:0.82rem"> · ${e(x.location)}</span>`:''}</div><span style="color:#999;font-size:0.82rem;white-space:nowrap">${e(x.dates||'')}</span></div>${x.description?`<div style="margin-top:0.35rem;color:#444;font-size:0.88rem;line-height:1.65">${nl(x.description)}</div>`:''}</div>`).join('');
+
+  const eduHtml=(d.education||[]).map(x=>`<div class="entry" style="margin-bottom:1.4rem;break-inside:avoid;page-break-inside:avoid"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.3rem;align-items:baseline"><div><span style="font-weight:600;color:#2D2D2D">${e(x.degree)}</span><span style="color:#C17B5C;font-weight:500"> · ${e(x.school)}</span></div><span style="color:#999;font-size:0.82rem;white-space:nowrap">${e(x.dates||'')}</span></div>${x.description?`<div style="margin-top:0.35rem;color:#444;font-size:0.88rem;line-height:1.65">${nl(x.description)}</div>`:''}</div>`).join('');
+
+  return`<!DOCTYPE html>
+<html lang="${sv?'sv':'en'}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'Inter',system-ui,sans-serif;background:#FAFAF8;color:#2D2D2D;font-size:15px;line-height:1.6;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact}
+@page{size:A4;margin:1.5cm}
+@media print{
+  html,body{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+  header,footer{display:none!important}
+  .entry{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  .header-block{break-inside:avoid;page-break-inside:avoid}
+  .meta-strip{break-inside:avoid;page-break-inside:avoid}
+}
+</style>
+</head>
+<body style="max-width:210mm;margin:0 auto;padding:0">
+<!-- Zone 1: two-col header -->
+<div class="header-block" style="display:flex;break-inside:avoid;page-break-inside:avoid">
+  <div style="width:30%;background:#2D2D2D;color:#fff;padding:2rem 1.4rem;flex-shrink:0;align-self:flex-start">
+    ${photo}
+    <div style="text-align:center;margin-bottom:1.25rem">
+      <div style="font-size:1.2rem;font-weight:700;color:#fff;line-height:1.2;margin-bottom:0.25rem">${e(d.name)}</div>
+      ${d.title?`<div style="color:#C17B5C;font-size:0.8rem;font-weight:500">${e(d.title)}</div>`:''}
+    </div>
+    <div style="font-size:0.78rem;line-height:1.85;color:#c8c4c0;margin-bottom:1.25rem">${contact}</div>
+    ${skills?`<div><div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:#C17B5C;font-weight:600;margin-bottom:0.4rem">${sv?'Kompetenser':'Skills'}</div>${skills}</div>`:''}
+  </div>
+  <div style="flex:1;padding:2rem 2rem">
+    ${applying}
+    <h2 style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:#C17B5C;font-weight:700;margin-bottom:0.5rem">${sv?'Profil':'Profile'}</h2>
+    <p style="color:#444;font-size:0.88rem;line-height:1.7">${nl(d.summary||'')}</p>
+  </div>
+</div>
+<!-- Zone 2: meta strip -->
+${metaStrip}
+<!-- Zone 3: single-col body -->
+<div style="padding:0 0 2rem">
+  ${workHtml?secHead(sv?'Arbetslivserfarenhet':'Work Experience')+workHtml:''}
+  ${eduHtml?secHead(sv?'Utbildning':'Education')+eduHtml:''}
+</div>
+</body>
+</html>`;
+}
+
 // ── Document generation ──────────────────────────────────────────────
 function getDocLang(appId){ return docLangs[appId]||'sv'; }
 function setDocLang(appId,lang){ docLangs[appId]=lang; renderTabContent(); }
@@ -697,7 +781,14 @@ async function generateDocument(appId, type){
       language:lang,
       cvTemplateUrl:profile.cv_template_url||null,
     });
-    generatedDocs[key]=content;
+    if(type==='cv'){
+      const m=content.match(/\{[\s\S]*\}/); if(!m) throw new Error('Inget JSON från API');
+      const cvData=JSON.parse(m[0]);
+      cvData.photo_url=profile.photo_url||'';
+      generatedDocs[key]=buildCvHtml(cvData,lang);
+    } else {
+      generatedDocs[key]=content;
+    }
   }catch(err){
     generatedDocs[key]='ERROR: '+err.message;
   }
