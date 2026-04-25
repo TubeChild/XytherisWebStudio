@@ -54,7 +54,7 @@ module.exports = async function handler(req, res) {
     const refLabel = language === 'sv' ? 'Referenser lämnas på begäran' : 'References available on request';
 
     if (type === 'cv') {
-      maxTokens = 2000;
+      maxTokens = 4000;
       const refsText = referencesSection === 'REFERENCES_ON_REQUEST' ? refLabel : referencesSection;
       prompt = `You are generating CV content. Return ONLY a valid JSON object — no markdown, no explanation, no code fences.
 
