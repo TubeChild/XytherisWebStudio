@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>W-Tracker — Jobbsökning utan huvudvärk</title>
+  <meta name="description" content="Spåra dina jobbansökningar, generera CV och personligt brev med AI — allt på ett ställe.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --terra: #C17B5C;
+      --terra-dark: #a3613f;
+      --terra-light: #f5ede7;
+      --bg: #FAFAF8;
+      --surface: #ffffff;
+      --text: #1e1e1e;
+      --muted: #6b6b6b;
+      --border: #e8e2db;
+      --r: 14px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(250, 250, 248, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .nav-logo {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo span { color: var(--terra); }
+
+    .nav-login {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--terra);
+      padding: 0.45rem 1.1rem;
+      border: 2px solid var(--terra);
+      border-radius: 8px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .nav-login:hover { background: var(--terra); color: #fff; }
+
+    /* ── Shared layout ── */
+    .section { padding: 5rem 2rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--terra);
+      margin-bottom: 0.75rem;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(160deg, #fff 0%, var(--terra-light) 100%);
+      padding: 6rem 2rem 5rem;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: var(--terra-light);
+      color: var(--terra-dark);
+      border: 1px solid rgba(193,123,92,0.3);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.3rem 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 1.25rem;
+      max-width: 780px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--terra);
+    }
+
+    .hero p {
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.65;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--terra);
+      color: #fff;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      text-decoration: none;
+    }
+
+    .btn-primary:hover { background: var(--terra-dark); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .hero-sub {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    /* ── Pain points ── */
+    .pain { background: var(--bg); }
+
+    .pain h2 {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 3rem;
+      max-width: 540px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.75rem;
+    }
+
+    .card-icon {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .card.accent {
+      background: var(--terra-light);
+      border-color: rgba(193,123,92,0.25);
+    }
+
+    /* ── Features ── */
+    .features { background: var(--surface); }
+
+    .features h2 {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+
+    .features-intro {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 3rem;
+      max-width: 480px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--terra-light);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .feature h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .feature p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── How it works ── */
+    .how { background: var(--bg); }
+
+    .how h2 {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2rem;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .step {
+      text-align: center;
+    }
+
+    .step-num {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--terra);
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.1rem;
+    }
+
+    .step h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .step p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .steps-connector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    /* ── Bottom CTA ── */
+    .cta-section {
+      background: linear-gradient(135deg, #2d2d2d 0%, #3d2a1e 100%);
+      color: #fff;
+      text-align: center;
+      padding: 6rem 2rem;
+    }
+
+    .cta-section h2 {
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-section p {
+      color: rgba(255,255,255,0.7);
+      font-size: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .btn-light {
+      display: inline-block;
+      background: #fff;
+      color: var(--terra-dark);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      text-decoration: none;
+    }
+
+    .btn-light:hover { opacity: 0.92; transform: translateY(-1px); }
+
+    /* ── Footer ── */
+    footer {
+      background: #1e1e1e;
+      color: rgba(255,255,255,0.45);
+      text-align: center;
+      padding: 1.5rem 2rem;
+      font-size: 0.82rem;
+    }
+
+    footer a { color: rgba(255,255,255,0.55); }
+    footer a:hover { color: var(--terra); }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .section { padding: 3.5rem 1.25rem; }
+      .hero { padding: 4rem 1.25rem 3.5rem; }
+      .cta-section { padding: 4rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">W<span>-</span>Tracker</div>
+    <a href="/w-tracker.html" class="nav-login">Logga in</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge">✦ Gratis att använda</div>
+  <h1>Jobbsökning utan <em>huvudvärk</em></h1>
+  <p>Spåra ansökningar, generera CV och personligt brev med AI — allt på ett ställe.</p>
+  <a href="/w-tracker.html" class="btn-primary">Kom igång gratis →</a>
+  <div class="hero-sub">Inget kreditkort krävs.</div>
+</section>
+
+<!-- Pain points -->
+<section class="section pain">
+  <div class="container">
+    <div class="section-label">Känner du igen det här?</div>
+    <h2>Jobbsökning är mer stressigt än det behöver vara</h2>
+    <div class="cards">
+      <div class="card accent">
+        <div class="card-icon">📋</div>
+        <h3>Tappar bort vart du sökt</h3>
+        <p>Kalkylark, sticky notes och browser-flikar — du minns inte längre om du skickade in den där ansökan eller inte.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">😤</div>
+        <h3>Fyller i samma sak om och om igen</h3>
+        <p>Varje rekryteringsformulär vill ha samma uppgifter. Ditt namn, din utbildning, dina tidigare jobb — igen och igen.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">✍️</div>
+        <h3>Vet inte vad man ska skriva</h3>
+        <p>Personliga brev är jobbiga. Hur gör man det specifikt nog för tjänsten utan att det tar en halvdag?</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="section features">
+  <div class="container">
+    <div class="section-label">Vad du får</div>
+    <h2>Allt du behöver, inget du inte behöver</h2>
+    <p class="features-intro">W-Tracker är byggt för att göra jobbsökning faktiskt hanterbar — inte mer komplicerat.</p>
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-icon">🔗</div>
+        <h3>AI hämtar jobbannonsen</h3>
+        <p>Klistra in en URL — AI:n extraherar företag, roll och kontaktuppgifter automatiskt.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">👤</div>
+        <h3>En profil räcker</h3>
+        <p>Fyll i din profil en gång. Namn, erfarenheter, utbildning, färdigheter — sedan används den till allt.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📄</div>
+        <h3>AI skriver CV och brev</h3>
+        <p>Generera ett skräddarsytt CV och personligt brev för varje tjänst med ett klick. Anpassat, inte generiskt.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔒</div>
+        <h3>Dela med din partner</h3>
+        <p>Skapa en delbar länk så att din partner kan följa hur det går — utan att behöva ett eget konto.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="section how">
+  <div class="container">
+    <div class="section-label">Så enkelt är det</div>
+    <h2>Tre steg, sedan är du igång</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Skapa konto</h3>
+        <p>Registrera dig med din e-post. Gratis, inga kreditkortsuppgifter.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Fyll i din profil</h3>
+        <p>Lägg in dina erfarenheter, utbildning och färdigheter en enda gång.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Spåra och generera</h3>
+        <p>Lägg till ansökningar, generera dokument och håll koll på statusen.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="cta-section">
+  <h2>Redo att förenkla din jobbsökning?</h2>
+  <p>Gå med idag och sluta jonglera med kalkylark.</p>
+  <a href="/w-tracker.html" class="btn-light">Skapa konto gratis →</a>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>© W-Tracker 2026 &nbsp;·&nbsp; <a href="/w-tracker.html">Öppna appen</a></p>
+</footer>
+
+</body>
+</html>
