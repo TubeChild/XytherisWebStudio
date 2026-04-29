@@ -14,7 +14,44 @@ module.exports = async function handler(req, res) {
   let prompt;
   let maxTokens = 1500;
 
-  if (type === 'extract') {
+  if (type === 'polish_cv') {
+    if (!text) return res.status(400).json({ error: 'Missing text' });
+    maxTokens = 4000;
+    prompt = `Extract all information from this CV/resume and return ONLY a valid JSON object — no markdown, no explanation, no code fences.
+
+CV TEXT:
+"""${text.slice(0, 9000)}"""
+
+Return this exact JSON structure (all fields required; use empty string or empty array if data is absent):
+{
+  "lang": "sv or en — whichever language the CV is written in",
+  "name": "full name",
+  "title": "professional title or current role",
+  "applying_for": "",
+  "summary": "professional summary or objective statement",
+  "contact": {
+    "email": "",
+    "phone": "",
+    "location": "",
+    "linkedin": ""
+  },
+  "skills": ["skill1", "skill2"],
+  "languages": [{"name": "...", "level": "..."}],
+  "license": "driver license type or empty string",
+  "experiences": [
+    {"title": "", "company": "", "location": "", "dates": "", "description": ""}
+  ],
+  "education": [
+    {"degree": "", "school": "", "dates": "", "description": ""}
+  ],
+  "courses": [
+    {"name": "", "issuer": "", "date": "", "description": ""}
+  ],
+  "references_text": "references note or empty string"
+}
+
+CRITICAL JSON FORMATTING: All string values must be on a single line. Use \\n for line breaks within descriptions — NEVER literal newlines inside JSON strings. No trailing commas. Return ONLY the JSON object.`;
+  } else if (type === 'extract') {
     if (!text) return res.status(400).json({ error: 'Missing text' });
     prompt = `Extract job listing details. Return ONLY valid JSON with keys: company, role, contact_name, contact_email, contact_phone (string or null).\n\n"""${text.slice(0, 7000)}"""`;
     maxTokens = 300;

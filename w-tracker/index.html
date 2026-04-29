@@ -118,10 +118,7 @@
       margin-right: auto;
     }
 
-    .hero h1 em {
-      font-style: normal;
-      color: var(--terra);
-    }
+    .hero h1 em { font-style: normal; color: var(--terra); }
 
     .hero p {
       font-size: clamp(1rem, 2.5vw, 1.2rem);
@@ -149,10 +146,175 @@
     .btn-primary:hover { background: var(--terra-dark); transform: translateY(-1px); }
     .btn-primary:active { transform: translateY(0); }
 
-    .hero-sub {
-      margin-top: 1rem;
-      font-size: 0.85rem;
+    .hero-sub { margin-top: 1rem; font-size: 0.85rem; color: var(--muted); }
+
+    /* ── Polish CV section ── */
+    .polish { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+    .polish-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .polish-inner h2 {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.6rem;
+    }
+
+    .polish-inner > p {
       color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--r);
+      padding: 2.5rem 2rem;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      background: var(--bg);
+      position: relative;
+    }
+
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--terra);
+      background: var(--terra-light);
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-icon { font-size: 2.2rem; margin-bottom: 0.75rem; }
+
+    .upload-zone p {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .upload-zone .upload-hint {
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+
+    .upload-filename {
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--terra-dark);
+    }
+
+    .polish-btn {
+      margin-top: 1.25rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--terra);
+      color: #fff;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .polish-btn:hover { background: var(--terra-dark); transform: translateY(-1px); }
+    .polish-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .polish-status {
+      margin-top: 1rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+      min-height: 1.4em;
+    }
+
+    .polish-status.error { color: #c00; }
+
+    .polish-result {
+      margin-top: 2rem;
+      display: none;
+    }
+
+    .polish-result-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .polish-result-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .btn-print {
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.4rem 1rem;
+      cursor: pointer;
+      color: var(--text);
+      transition: border-color 0.15s;
+    }
+
+    .btn-print:hover { border-color: var(--terra); color: var(--terra); }
+
+    .polish-iframe {
+      width: 100%;
+      height: 900px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: #fff;
+    }
+
+    .polish-cta {
+      margin-top: 1.5rem;
+      padding: 1.25rem 1.5rem;
+      background: var(--terra-light);
+      border-radius: var(--r);
+      border-left: 4px solid var(--terra);
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .polish-cta p {
+      font-size: 0.9rem;
+      color: #5a3a28;
+      font-weight: 500;
+    }
+
+    .polish-cta a {
+      white-space: nowrap;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--terra-dark);
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
 
     /* ── Pain points ── */
@@ -179,28 +341,13 @@
       padding: 1.75rem;
     }
 
-    .card-icon {
-      font-size: 1.8rem;
-      margin-bottom: 1rem;
-    }
+    .card-icon { font-size: 1.8rem; margin-bottom: 1rem; }
 
-    .card h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: var(--text);
-    }
+    .card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
 
-    .card p {
-      font-size: 0.9rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
+    .card p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
 
-    .card.accent {
-      background: var(--terra-light);
-      border-color: rgba(193,123,92,0.25);
-    }
+    .card.accent { background: var(--terra-light); border-color: rgba(193,123,92,0.25); }
 
     /* ── Features ── */
     .features { background: var(--surface); }
@@ -212,12 +359,7 @@
       margin-bottom: 0.75rem;
     }
 
-    .features-intro {
-      color: var(--muted);
-      font-size: 1rem;
-      margin-bottom: 3rem;
-      max-width: 480px;
-    }
+    .features-intro { color: var(--muted); font-size: 1rem; margin-bottom: 3rem; max-width: 480px; }
 
     .features-grid {
       display: grid;
@@ -225,11 +367,7 @@
       gap: 1.5rem;
     }
 
-    .feature {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
+    .feature { display: flex; flex-direction: column; gap: 0.75rem; }
 
     .feature-icon {
       width: 48px;
@@ -243,17 +381,9 @@
       flex-shrink: 0;
     }
 
-    .feature h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text);
-    }
+    .feature h3 { font-size: 1rem; font-weight: 700; }
 
-    .feature p {
-      font-size: 0.88rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
+    .feature p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
 
     /* ── How it works ── */
     .how { background: var(--bg); }
@@ -274,9 +404,7 @@
       margin: 0 auto;
     }
 
-    .step {
-      text-align: center;
-    }
+    .step { text-align: center; }
 
     .step-num {
       width: 52px;
@@ -292,25 +420,9 @@
       margin: 0 auto 1.1rem;
     }
 
-    .step h3 {
-      font-size: 1.05rem;
-      font-weight: 700;
-      margin-bottom: 0.4rem;
-    }
+    .step h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.4rem; }
 
-    .step p {
-      font-size: 0.88rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .steps-connector {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 3rem;
-    }
+    .step p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
 
     /* ── Bottom CTA ── */
     .cta-section {
@@ -330,11 +442,7 @@
       margin-right: auto;
     }
 
-    .cta-section p {
-      color: rgba(255,255,255,0.7);
-      font-size: 1rem;
-      margin-bottom: 2.5rem;
-    }
+    .cta-section p { color: rgba(255,255,255,0.7); font-size: 1rem; margin-bottom: 2.5rem; }
 
     .btn-light {
       display: inline-block;
@@ -365,11 +473,25 @@
     footer a { color: rgba(255,255,255,0.55); }
     footer a:hover { color: var(--terra); }
 
+    /* ── Spinner ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
     /* ── Responsive ── */
     @media (max-width: 600px) {
       .section { padding: 3.5rem 1.25rem; }
       .hero { padding: 4rem 1.25rem 3.5rem; }
       .cta-section { padding: 4rem 1.25rem; }
+      .polish-cta { flex-direction: column; }
     }
   </style>
 </head>
@@ -390,6 +512,43 @@
   <p>Spåra ansökningar, generera CV och personligt brev med AI — allt på ett ställe.</p>
   <a href="/w-tracker.html" class="btn-primary">Kom igång gratis →</a>
   <div class="hero-sub">Inget kreditkort krävs.</div>
+</section>
+
+<!-- Polish CV -->
+<section class="section polish">
+  <div class="polish-inner">
+    <div class="section-label">Prova det själv</div>
+    <h2>Ladda upp ditt CV — se det förvandlas</h2>
+    <p>Se hur ditt CV ser ut med W-Trackers design. Gratis, inget konto krävs.</p>
+
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="fileInput" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+      <div class="upload-icon">📄</div>
+      <p>Dra och släpp ditt CV här</p>
+      <p class="upload-hint">PDF eller Word (.docx) · Max 10 MB</p>
+      <div class="upload-filename" id="uploadFilename"></div>
+    </div>
+
+    <div>
+      <button class="polish-btn" id="polishBtn" disabled onclick="polishCv()">
+        Förvandla mitt CV →
+      </button>
+    </div>
+
+    <div class="polish-status" id="polishStatus"></div>
+
+    <div class="polish-result" id="polishResult">
+      <div class="polish-result-bar">
+        <span class="polish-result-label">Ditt CV — W-Tracker design</span>
+        <button class="btn-print" onclick="printPolishIframe()">Skriv ut / Spara som PDF</button>
+      </div>
+      <iframe id="polishIframe" class="polish-iframe"></iframe>
+      <div class="polish-cta">
+        <p>Vill du ha ett skräddarsytt CV för varje jobb du söker?</p>
+        <a href="/w-tracker.html">Skapa ett konto gratis →</a>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- Pain points -->
@@ -484,6 +643,218 @@
 <footer>
   <p>© W-Tracker 2026 &nbsp;·&nbsp; <a href="/w-tracker.html">Öppna appen</a></p>
 </footer>
+
+<!-- PDF.js + Mammoth for client-side file extraction -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+<script>
+// ── PDF.js worker ────────────────────────────────────────────────────
+if (typeof pdfjsLib !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+// ── Upload UI ────────────────────────────────────────────────────────
+const uploadZone = document.getElementById('uploadZone');
+const fileInput  = document.getElementById('fileInput');
+const polishBtn  = document.getElementById('polishBtn');
+const uploadFilename = document.getElementById('uploadFilename');
+let selectedFile = null;
+
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) selectFile(fileInput.files[0]);
+});
+
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  if (e.dataTransfer.files[0]) selectFile(e.dataTransfer.files[0]);
+});
+
+function selectFile(file) {
+  if (file.size > 10 * 1024 * 1024) { setStatus('Filen är för stor (max 10 MB).', true); return; }
+  const ok = file.type === 'application/pdf' || file.name.endsWith('.docx');
+  if (!ok) { setStatus('Endast PDF eller Word (.docx) stöds.', true); return; }
+  selectedFile = file;
+  uploadFilename.textContent = '✓ ' + file.name;
+  polishBtn.disabled = false;
+  setStatus('');
+}
+
+// ── Text extraction ──────────────────────────────────────────────────
+async function extractText(file) {
+  if (file.type === 'application/pdf') return extractPdf(file);
+  if (file.name.endsWith('.docx')) return extractDocx(file);
+  throw new Error('Okänt filformat');
+}
+
+async function extractPdf(file) {
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  let text = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map(it => it.str).join(' ') + '\n';
+  }
+  return text.trim();
+}
+
+async function extractDocx(file) {
+  const buf = await file.arrayBuffer();
+  const result = await mammoth.extractRawText({ arrayBuffer: buf });
+  return result.value.trim();
+}
+
+// ── Polish CV ────────────────────────────────────────────────────────
+async function polishCv() {
+  if (!selectedFile) return;
+  polishBtn.disabled = true;
+  document.getElementById('polishResult').style.display = 'none';
+
+  try {
+    setStatus('Läser filen…');
+    const text = await extractText(selectedFile);
+    if (!text || text.length < 50) throw new Error('Kunde inte läsa tillräckligt med text från filen.');
+
+    setStatus('AI analyserar ditt CV…');
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'polish_cv', text })
+    });
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e.error || 'HTTP ' + res.status);
+    }
+    const data = await res.json();
+    const content = data.content || '';
+
+    const m = content.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('Oväntat svar från AI.');
+    const sanitised = m[0].replace(/"((?:[^"\\]|\\.)*)"/gs, (_, inner) => '"' + inner.replace(/\r?\n/g, '\\n') + '"');
+    const cvData = JSON.parse(sanitised);
+
+    const lang = cvData.lang || 'sv';
+    const html = buildCvHtml(cvData, lang);
+
+    const iframe = document.getElementById('polishIframe');
+    iframe.srcdoc = html;
+    document.getElementById('polishResult').style.display = 'block';
+    setStatus('');
+    iframe.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (err) {
+    setStatus('Fel: ' + err.message, true);
+  } finally {
+    polishBtn.disabled = false;
+  }
+}
+
+function printPolishIframe() {
+  const iframe = document.getElementById('polishIframe');
+  setTimeout(() => iframe.contentWindow.print(), 200);
+}
+
+function setStatus(msg, isError) {
+  const el = document.getElementById('polishStatus');
+  el.textContent = msg;
+  el.className = 'polish-status' + (isError ? ' error' : '');
+}
+
+// ── CV HTML template (same as app) ───────────────────────────────────
+function buildCvHtml(d, lang) {
+  const sv = lang === 'sv';
+  const e = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const nl = s => e(s).replace(/\n/g,'<br>');
+
+  const photo = d.photo_url
+    ? `<img src="${e(d.photo_url)}" alt="${e(d.name)}" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:3px solid #C17B5C;display:block;margin:0 auto 1rem">`
+    : (() => {
+        const i = (d.name||'?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+        return `<div style="width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,#C17B5C,#8B4513);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:2rem;font-weight:700;color:#fff">${e(i)}</div>`;
+      })();
+
+  const contact = [
+    d.contact?.email && `<div style="word-break:break-all;overflow-wrap:anywhere">✉ ${e(d.contact.email)}</div>`,
+    d.contact?.phone && `<div>☎ ${e(d.contact.phone)}</div>`,
+    d.contact?.location && `<div>📍 ${e(d.contact.location)}</div>`,
+    d.contact?.linkedin && `<div style="word-break:break-all;overflow-wrap:anywhere">🔗 ${e(d.contact.linkedin)}</div>`,
+  ].filter(Boolean).join('');
+
+  const skills = (d.skills||[]).map(s => `<span style="display:inline-block;background:rgba(193,123,92,0.25);color:#C17B5C;border-radius:12px;padding:2px 10px;font-size:0.72rem;margin:2px;break-inside:avoid">${e(s)}</span>`).join('');
+
+  const applying = d.applying_for ? `<div style="border-left:4px solid #C17B5C;padding:0.6rem 1rem;background:#fff;border-radius:0 6px 6px 0;margin-bottom:1.5rem"><div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:#C17B5C;font-weight:600;margin-bottom:0.2rem">${sv?'Söker tjänst som':'Applying for'}</div><div style="font-weight:600;color:#2D2D2D">${e(d.applying_for)}</div></div>` : '';
+
+  const secHead = label => `<h2 style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:#C17B5C;font-weight:700;border-bottom:2px solid #C17B5C;padding-bottom:0.35rem;margin-bottom:1rem;break-after:avoid;page-break-after:avoid">${label}</h2>`;
+
+  const workHtml = (d.experiences||[]).map(x => `<div class="entry" style="margin-bottom:1.4rem;break-inside:avoid;page-break-inside:avoid"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.3rem;align-items:baseline"><div><span style="font-weight:600;color:#2D2D2D">${e(x.title)}</span><span style="color:#C17B5C;font-weight:500"> · ${e(x.company)}</span>${x.location?`<span style="color:#999;font-size:0.82rem"> · ${e(x.location)}</span>`:''}</div><span style="color:#999;font-size:0.82rem;white-space:nowrap">${e(x.dates||'')}</span></div>${x.description?`<div style="margin-top:0.35rem;color:#444;font-size:0.88rem;line-height:1.65">${nl(x.description)}</div>`:''}</div>`).join('');
+
+  const eduHtml = (d.education||[]).map(x => `<div class="entry" style="margin-bottom:1.4rem;break-inside:avoid;page-break-inside:avoid"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.3rem;align-items:baseline"><div><span style="font-weight:600;color:#2D2D2D">${e(x.degree)}</span><span style="color:#C17B5C;font-weight:500"> · ${e(x.school)}</span></div><span style="color:#999;font-size:0.82rem;white-space:nowrap">${e(x.dates||'')}</span></div>${x.description?`<div style="margin-top:0.35rem;color:#444;font-size:0.88rem;line-height:1.65">${nl(x.description)}</div>`:''}</div>`).join('');
+
+  const chip = txt => `<span style="display:inline-block;background:#F0EDE8;border:1px solid rgba(193,123,92,0.35);border-radius:10px;padding:3px 12px;font-size:0.85rem;color:#5a3a28;margin:2px">${txt}</span>`;
+
+  const langSection = (d.languages||[]).filter(l => l.name).length
+    ? `<div class="entry" style="margin-bottom:1.4rem;break-inside:avoid;page-break-inside:avoid">${(d.languages||[]).filter(l=>l.name).map(l=>chip(`${e(l.name)} — ${e(l.level)}`)).join('')}</div>` : '';
+
+  const licenseSection = d.license
+    ? `<div class="entry" style="margin-bottom:1.4rem;break-inside:avoid;page-break-inside:avoid">${chip(e(d.license))}</div>` : '';
+
+  const coursesSection = (d.courses||[]).filter(c => c.name).length
+    ? `<div style="margin-bottom:1.4rem">${(d.courses||[]).filter(c=>c.name).map(c=>`<div class="entry" style="margin-bottom:0.9rem;break-inside:avoid;page-break-inside:avoid"><div style="font-weight:600;font-size:0.9rem;color:#2D2D2D">${e(c.name)}${c.issuer?`<span style="color:#C17B5C;font-weight:500"> · ${e(c.issuer)}</span>`:''}</div>${c.date?`<div style="color:#999;font-size:0.82rem">${e(c.date)}</div>`:''}${c.description?`<div style="margin-top:0.25rem;color:#444;font-size:0.88rem;line-height:1.6">${nl(c.description)}</div>`:''}</div>`).join('')}</div>` : '';
+
+  const refsSection = d.references_text
+    ? `<div class="entry" style="margin-bottom:1.4rem;break-inside:avoid;page-break-inside:avoid"><p style="color:#444;font-size:0.88rem">${e(d.references_text)}</p></div>` : '';
+
+  return `<!DOCTYPE html>
+<html lang="${sv?'sv':'en'}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'Inter',system-ui,sans-serif;background:#FAFAF8;color:#2D2D2D;font-size:15px;line-height:1.6;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact}
+@page{size:A4;margin:1.5cm}
+@media print{
+  html,body{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+  header,footer{display:none!important}
+  .entry{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  .header-block{break-inside:avoid;page-break-inside:avoid}
+}
+</style>
+</head>
+<body style="max-width:210mm;margin:0 auto;padding:0">
+<div class="header-block" style="display:flex;break-inside:avoid;page-break-inside:avoid">
+  <div style="width:30%;background:#2D2D2D;color:#fff;padding:2rem 1.4rem;flex-shrink:0;align-self:flex-start">
+    ${photo}
+    <div style="text-align:center;margin-bottom:1.25rem">
+      <div style="font-size:1.2rem;font-weight:700;color:#fff;line-height:1.2;margin-bottom:0.25rem">${e(d.name)}</div>
+      ${d.title?`<div style="color:#C17B5C;font-size:0.8rem;font-weight:500">${e(d.title)}</div>`:''}
+    </div>
+    <div style="font-size:0.78rem;line-height:1.85;color:#c8c4c0;margin-bottom:1.25rem">${contact}</div>
+    ${skills?`<div><div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:#C17B5C;font-weight:600;margin-bottom:0.4rem">${sv?'Kompetenser':'Skills'}</div>${skills}</div>`:''}
+  </div>
+  <div style="flex:1;padding:2rem 2rem">
+    ${applying}
+    <h2 style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:#C17B5C;font-weight:700;margin-bottom:0.5rem">${sv?'Profil':'Profile'}</h2>
+    <p style="color:#444;font-size:0.88rem;line-height:1.7">${nl(d.summary||'')}</p>
+  </div>
+</div>
+<div style="padding:0 0 2rem">
+  ${workHtml ? secHead(sv?'Arbetslivserfarenhet':'Work Experience') + workHtml : ''}
+  ${eduHtml  ? secHead(sv?'Utbildning':'Education') + eduHtml : ''}
+  ${langSection    ? secHead(sv?'Språk':'Languages') + langSection : ''}
+  ${licenseSection ? secHead(sv?'Körkort':"Driver's License") + licenseSection : ''}
+  ${coursesSection ? secHead(sv?'Kurser & Certifieringar':'Courses & Certifications') + coursesSection : ''}
+  ${refsSection    ? secHead(sv?'Referenser':'References') + refsSection : ''}
+</div>
+</body>
+</html>`;
+}
+</script>
 
 </body>
 </html>
