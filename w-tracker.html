@@ -212,6 +212,14 @@
     .gen-content { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); padding: 18px 20px; font-size: .81rem; line-height: 1.85; white-space: pre-wrap; font-family: inherit; max-height: 500px; overflow-y: auto; color: var(--text); }
     .gen-loading { text-align: center; padding: 30px; color: var(--muted); font-size: .82rem; display: flex; align-items: center; justify-content: center; gap: 9px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); }
     .profile-warn { background: rgba(251,191,36,.07); border: 1px solid rgba(251,191,36,.2); border-radius: var(--r); padding: 11px 16px; font-size: .8rem; color: #fbbf24; margin-bottom: 20px; }
+    /* ── Q&A panel ── */
+    .qa-panel { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .qa-input { width: 100%; min-height: 110px; resize: vertical; font-family: inherit; font-size: .82rem; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--bg); color: var(--text); line-height: 1.6; }
+    .qa-input:focus { outline: none; border-color: var(--accent); }
+    .qa-entry { margin-top: 16px; padding: 14px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); }
+    .qa-question { font-size: .78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
+    .qa-answer { font-size: .85rem; line-height: 1.75; color: var(--text); white-space: pre-wrap; }
+    .qa-copy-row { display: flex; justify-content: flex-end; margin-top: 8px; }
 
     /* ── Share section ── */
     .share-section { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); }
@@ -262,6 +270,9 @@ let currentTab   = 'applications';
 let authMode     = 'login';
 let docLangs     = {};          // { appId: 'sv'|'en' }
 let generatedDocs= {};          // { `${appId}-${type}`: content|'loading' }
+let qaOpen       = {};          // { appId: bool }
+let qaTexts      = {};          // { appId: string } — textarea content
+let qaAnswers    = {};          // { appId: [{question,answer}]|'loading'|null }
 
 function defaultProfile() {
   return { full_name:'', phone:'', address:'', linkedin_url:'', photo_url:'', bio:'', work_experiences:[], education:[], skills:[], languages:[], driver_license:false, driver_license_type:'', reference_list:[], references_on_request:false, courses:[], cv_template_url:'', cv_template_name:'' };
@@ -813,6 +824,84 @@ async function copyDoc(key){
   catch(_){ toast('Kunde inte kopiera'); }
 }
 
+// ── Q&A: recruiter questions ─────────────────────────────────────────
+function toggleQaPanel(appId){
+  // save textarea before re-render
+  const el=document.querySelector(`[data-qa-text="${appId}"]`);
+  if(el) qaTexts[appId]=el.value;
+  qaOpen[appId]=!qaOpen[appId];
+  renderTabContent();
+}
+
+function saveQaText(appId){
+  const el=document.querySelector(`[data-qa-text="${appId}"]`);
+  if(el) qaTexts[appId]=el.value;
+}
+
+function renderQaPanel(app){
+  const answers=qaAnswers[app.id];
+  const answersHtml=answers==='loading'
+    ?`<div class="gen-loading"><span class="spinner"></span> Genererar svar…</div>`
+    :Array.isArray(answers)&&answers.length
+      ?answers.map((qa,i)=>`
+        <div class="qa-entry">
+          <div class="qa-question">${esc(qa.question)}</div>
+          <div class="qa-answer" id="qa-ans-${app.id}-${i}">${esc(qa.answer)}</div>
+          <div class="qa-copy-row">
+            <button class="btn btn-ghost btn-xs" onclick="copyQaAnswer('${app.id}',${i})">Kopiera svar</button>
+          </div>
+        </div>`).join('')
+      :typeof answers==='string'&&answers.startsWith('ERROR')
+        ?`<div style="color:#f87171;font-size:.82rem;margin-top:10px">${esc(answers)}</div>`
+        :'';
+
+  return `<div class="qa-panel">
+    <div class="gen-panel-hd">
+      <span class="gen-panel-lbl">Svara på rekryteringsfrågor</span>
+    </div>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:10px">Klistra in frågorna från ansökningsformuläret eller jobbannonsen nedan.</p>
+    <textarea class="qa-input" data-qa-text="${app.id}" placeholder="T.ex. Varför söker du det här jobbet?\nBeskriv en situation där du löste ett svårt problem.\nVilka är dina styrkor?" oninput="saveQaText('${app.id}')">${esc(qaTexts[app.id]||'')}</textarea>
+    <div style="margin-top:10px">
+      <button class="btn btn-sm" onclick="generateAnswers('${app.id}')" ${answers==='loading'?'disabled':''}>
+        ${answers==='loading'?`<span class="spinner"></span> Genererar…`:'Generera svar'}
+      </button>
+    </div>
+    ${answersHtml}
+  </div>`;
+}
+
+async function generateAnswers(appId){
+  const app=applications.find(a=>a.id===appId); if(!app) return;
+  const el=document.querySelector(`[data-qa-text="${appId}"]`);
+  if(el) qaTexts[appId]=el.value;
+  const questions=(qaTexts[appId]||'').trim();
+  if(!questions){ toast('Klistra in frågorna först.'); return; }
+
+  qaAnswers[appId]='loading'; renderTabContent();
+  try{
+    const content=await callGenerateAPI({
+      type:'answer_questions',
+      profile:{...profile, email:currentUser?.email||''},
+      job:{company:app.company, role:app.role, contact_name:app.contact_name||null},
+      questions,
+    });
+    const m=content.match(/\[[\s\S]*\]/);
+    if(!m) throw new Error('Oväntat svar från API');
+    const sanitised=m[0].replace(/"((?:[^"\\]|\\.)*)"/gs,(_,inner)=>'"'+inner.replace(/\r?\n/g,'\\n')+'"');
+    qaAnswers[appId]=JSON.parse(sanitised);
+  }catch(err){
+    qaAnswers[appId]='ERROR: '+err.message;
+  }
+  renderTabContent();
+}
+
+async function copyQaAnswer(appId, idx){
+  const answers=qaAnswers[appId];
+  if(!Array.isArray(answers)||!answers[idx]) return;
+  try{ await navigator.clipboard.writeText(answers[idx].answer); toast('Svar kopierat!'); }
+  catch(_){ toast('Kunde inte kopiera'); }
+}
+
 function printCvIframe(cvKey){
   const iframe=document.getElementById('cv-iframe-'+cvKey);
   if(!iframe) return;
@@ -1187,9 +1276,14 @@ function renderDocumentsTab(){
             <button class="btn btn-ghost btn-sm" onclick="generateDocument('${a.id}','cover')" ${clDoc==='loading'?'disabled':''}>
               ${clDoc==='loading'?`<span class="spinner"></span> Genererar…`:'Generera personligt brev'}
             </button>
+            <button class="btn btn-ghost btn-sm" onclick="toggleQaPanel('${a.id}')">
+              ${qaOpen[a.id]?'Dölj frågor':'Svara på frågor'}
+            </button>
           </div>
           ${cvDoc&&cvDoc!=='loading'?`<div class="gen-panel"><div class="gen-panel-hd"><span class="gen-panel-lbl">CV — ${lang==='sv'?'Svenska':'English'}</span><button class="btn btn-ghost btn-sm" onclick="printCvIframe('${cvKey}')">Skriv ut / Spara som PDF</button></div><div id="cv-iframe-wrapper-${cvKey}" style="margin-top:12px"><iframe id="cv-iframe-${cvKey}" style="width:100%;height:800px;border:1px solid var(--border);border-radius:var(--r);background:#fff"></iframe></div></div>`:''}
           ${clDoc&&clDoc!=='loading'?`<div class="gen-panel"><div class="gen-panel-hd"><span class="gen-panel-lbl">Personligt brev — ${lang==='sv'?'Svenska':'English'}</span><button class="btn btn-ghost btn-sm" onclick="copyDoc('${clKey}')">Kopiera</button></div><div class="gen-content">${esc(clDoc)}</div></div>`:''}
+          ${qaOpen[a.id]?renderQaPanel(a):''}
+
         </div>`;
       }).join('')}
     </div>`;

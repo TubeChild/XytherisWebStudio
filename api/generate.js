@@ -9,12 +9,56 @@ module.exports = async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured on server' });
 
-  const { type, profile, job, language, text, cvTemplateUrl } = req.body || {};
+  const { type, profile, job, language, text, questions, cvTemplateUrl } = req.body || {};
 
   let prompt;
   let maxTokens = 1500;
 
-  if (type === 'polish_cv') {
+  if (type === 'answer_questions') {
+    if (!profile || !job || !questions) return res.status(400).json({ error: 'Missing profile, job, or questions' });
+
+    const we = (profile.work_experiences || [])
+      .map(w => `${w.title} — ${w.company} (${w.start_date || '?'} – ${w.end_date || 'nu'})\n${w.description || ''}`)
+      .join('\n\n');
+    const edu = (profile.education || [])
+      .map(e => `${e.degree} — ${e.school} (${e.start_date || '?'} – ${e.end_date || '?'})${e.description ? `\n${e.description}` : ''}`)
+      .join('\n\n');
+    const skills = (profile.skills || []).join(', ');
+
+    maxTokens = 3000;
+    prompt = `You are helping a job applicant answer recruiter questions honestly and specifically using their real profile data.
+
+CANDIDATE PROFILE:
+Name: ${profile.full_name || ''}
+Summary: ${profile.bio || ''}
+Work Experience:
+${we || '(none)'}
+Education:
+${edu || '(none)'}
+Skills: ${skills || '(none)'}
+
+TARGET JOB:
+Company: ${job.company}
+Role: ${job.role}
+
+RECRUITER QUESTIONS:
+${questions}
+
+TASK:
+- Parse each question from the text above (they may be numbered, bulleted, or separated by newlines).
+- Write a specific, honest answer to each one using only the candidate's real experience — do not invent facts.
+- Answers should be professional and warm, 2–5 sentences each, in the same language as the questions.
+- Tailor each answer to this specific role at ${job.company}.
+
+Return ONLY a valid JSON array — no markdown, no explanation:
+[
+  {"question": "exact question text", "answer": "your answer"},
+  ...
+]
+
+CRITICAL JSON FORMATTING: Use \\n for line breaks inside strings — never literal newlines. Return ONLY the JSON array.`;
+
+  } else if (type === 'polish_cv') {
     if (!text) return res.status(400).json({ error: 'Missing text' });
     maxTokens = 4000;
     prompt = `Extract all information from this CV/resume and return ONLY a valid JSON object — no markdown, no explanation, no code fences.
