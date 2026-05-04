@@ -198,11 +198,18 @@
 
     /* ── Documents tab ── */
     .doc-list { display: flex; flex-direction: column; gap: 9px; }
-    .doc-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 20px; }
-    .doc-row-hd { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .doc-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+    .doc-row-summary { display: flex; align-items: center; gap: 12px; padding: 13px 16px; cursor: pointer; user-select: none; transition: background .12s; }
+    .doc-row-summary:hover { background: var(--bg); }
+    .doc-row-body { padding: 0 16px 16px; border-top: 1px solid var(--border); }
+    .doc-row-hd { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-top: 14px; }
     .doc-co { font-size: .9rem; font-weight: 500; margin-bottom: 2px; }
     .doc-role { font-size: .75rem; color: var(--muted); }
     .doc-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .doc-saved-chips { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+    .doc-saved-chip { font-size: .68rem; background: var(--accent-dim); color: var(--accent); border-radius: 5px; padding: 2px 7px; font-weight: 500; }
+    .doc-chevron { margin-left: 4px; font-size: .75rem; color: var(--muted); transition: transform .2s; flex-shrink: 0; }
+    .doc-chevron.open { transform: rotate(180deg); }
     .lang-tog { display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
     .lang-btn { background: transparent; border: none; color: var(--muted); padding: 5px 10px; font-size: .71rem; cursor: pointer; font-family: inherit; transition: all .15s; }
     .lang-btn.active { background: var(--accent-dim); color: var(--accent); }
@@ -274,6 +281,7 @@ let qaOpen       = {};          // { appId: bool }
 let qaTexts      = {};          // { appId: string } — textarea content
 let qaAnswers    = {};          // { appId: [{question,answer}]|'loading'|null }
 let savedDocsMeta= {};          // { `${appId}-type`: {created_at, language} }
+let docExpanded  = {};          // { appId: bool } — expanded state in Dokument tab
 
 function defaultProfile() {
   return { full_name:'', phone:'', address:'', linkedin_url:'', photo_url:'', bio:'', work_experiences:[], education:[], skills:[], languages:[], driver_license:false, driver_license_type:'', reference_list:[], references_on_request:false, courses:[], cv_template_url:'', cv_template_name:'' };
@@ -883,6 +891,7 @@ async function generateDocument(appId, type){
       generatedDocs[key]=buildCoverLetterHtml(content,{...profile,email:currentUser?.email||''},app,lang);
     }
     await saveGeneratedDoc(appId, type==='cv'?'cv':'cover', generatedDocs[key], lang);
+    docExpanded[appId]=true; // auto-expand to show the result
   }catch(err){
     generatedDocs[key]='ERROR: '+err.message;
   }
@@ -1340,6 +1349,11 @@ function renderProfileTab(){
 }
 
 // ── Render: documents tab ─────────────────────────────────────────────
+function toggleDocExpand(appId){
+  docExpanded[appId]=!docExpanded[appId];
+  renderTabContent();
+}
+
 function renderDocumentsTab(){
   const profileEmpty=!profile.full_name&&!profile.bio&&!profile.work_experiences.length;
   return `
@@ -1349,35 +1363,60 @@ function renderDocumentsTab(){
         const lang=getDocLang(a.id);
         const cvKey=`${a.id}-cv`, clKey=`${a.id}-cover`;
         const cvDoc=generatedDocs[cvKey], clDoc=generatedDocs[clKey];
-        return `<div class="doc-row">
-          <div class="doc-row-hd">
-            <div><div class="doc-co">${esc(a.company)}</div><div class="doc-role">${esc(a.role)}</div></div>
-            <span class="badge b-${a.status}">${a.status}</span>
-          </div>
-          <div class="doc-controls">
-            <div class="lang-tog">
-              <button class="lang-btn${lang==='sv'?' active':''}" onclick="setDocLang('${a.id}','sv')">Svenska</button>
-              <button class="lang-btn${lang==='en'?' active':''}" onclick="setDocLang('${a.id}','en')">English</button>
-            </div>
-            ${!cvDoc||cvDoc==='loading'?`<button class="btn btn-sm" onclick="generateDocument('${a.id}','cv')" ${cvDoc==='loading'?'disabled':''}>${cvDoc==='loading'?`<span class="spinner"></span> Genererar…`:'Generera CV'}</button>`:''}
-            ${!clDoc||clDoc==='loading'?`<button class="btn btn-ghost btn-sm" onclick="generateDocument('${a.id}','cover')" ${clDoc==='loading'?'disabled':''}>${clDoc==='loading'?`<span class="spinner"></span> Genererar…`:'Generera personligt brev'}</button>`:''}
-            <button class="btn btn-ghost btn-sm" onclick="toggleQaPanel('${a.id}')">
-              ${qaOpen[a.id]?'Dölj frågor':'Svara på frågor'}
-            </button>
-          </div>
-          ${cvDoc&&cvDoc!=='loading'?(()=>{
-            const meta=savedDocsMeta[cvKey];
-            const dateLabel=meta?.created_at?` · ${new Date(meta.created_at).toLocaleDateString('sv-SE',{day:'numeric',month:'short',year:'numeric'})}`:'';
-            return`<div class="gen-panel"><div class="gen-panel-hd"><span class="gen-panel-lbl">CV — ${lang==='sv'?'Svenska':'English'}${dateLabel}</span><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-xs" onclick="generateDocument('${a.id}','cv')">Regenerera</button><button class="btn btn-ghost btn-sm" onclick="printDocIframe('cv-iframe-${cvKey}')">Skriv ut / Spara som PDF</button></div></div><div id="cv-iframe-wrapper-${cvKey}" style="margin-top:12px"><iframe id="cv-iframe-${cvKey}" style="width:100%;height:800px;border:1px solid var(--border);border-radius:var(--r);background:#fff"></iframe></div></div>`;
-          })():''}
-          ${clDoc&&clDoc!=='loading'?(()=>{
-            const meta=savedDocsMeta[clKey];
-            const dateLabel=meta?.created_at?` · ${new Date(meta.created_at).toLocaleDateString('sv-SE',{day:'numeric',month:'short',year:'numeric'})}`:'';
-            return`<div class="gen-panel"><div class="gen-panel-hd"><span class="gen-panel-lbl">Personligt brev — ${lang==='sv'?'Svenska':'English'}${dateLabel}</span><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-xs" onclick="generateDocument('${a.id}','cover')">Regenerera</button><button class="btn btn-ghost btn-sm" onclick="copyDocIframeText('cl-iframe-${clKey}')">Kopiera text</button><button class="btn btn-ghost btn-sm" onclick="printDocIframe('cl-iframe-${clKey}')">Spara som PDF</button></div></div><div style="margin-top:12px"><iframe id="cl-iframe-${clKey}" style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--r);background:#fff"></iframe></div></div>`;
-          })():''}
-          ${qaOpen[a.id]?renderQaPanel(a):''}
+        const expanded=!!docExpanded[a.id];
 
-        </div>`;
+        // Saved-doc chips for collapsed view
+        const chips=[];
+        if(cvDoc&&cvDoc!=='loading'&&!cvDoc.startsWith('ERROR')) chips.push('CV');
+        if(clDoc&&clDoc!=='loading'&&!clDoc.startsWith('ERROR')) chips.push('Brev');
+        if(Array.isArray(qaAnswers[a.id])&&qaAnswers[a.id].length) chips.push('Svar');
+        const chipHtml=chips.length
+          ?`<div class="doc-saved-chips">${chips.map(c=>`<span class="doc-saved-chip">${c}</span>`).join('')}</div>`
+          :'';
+
+        const summaryRow=`
+          <div class="doc-row-summary" onclick="toggleDocExpand('${a.id}')">
+            <div style="flex:1;min-width:0">
+              <div class="doc-co">${esc(a.company)}</div>
+              <div class="doc-role">${esc(a.role)}</div>
+            </div>
+            <span class="badge b-${a.status}" style="flex-shrink:0">${a.status}</span>
+            ${chipHtml}
+            <span class="doc-chevron${expanded?' open':''}">▼</span>
+          </div>`;
+
+        if(!expanded) return `<div class="doc-row">${summaryRow}</div>`;
+
+        const bodyHtml=`
+          <div class="doc-row-body">
+            <div class="doc-row-hd" style="margin-bottom:12px;padding-top:14px">
+              <div style="flex:1"></div>
+            </div>
+            <div class="doc-controls">
+              <div class="lang-tog">
+                <button class="lang-btn${lang==='sv'?' active':''}" onclick="setDocLang('${a.id}','sv')">Svenska</button>
+                <button class="lang-btn${lang==='en'?' active':''}" onclick="setDocLang('${a.id}','en')">English</button>
+              </div>
+              ${!cvDoc||cvDoc==='loading'?`<button class="btn btn-sm" onclick="generateDocument('${a.id}','cv')" ${cvDoc==='loading'?'disabled':''}>${cvDoc==='loading'?`<span class="spinner"></span> Genererar…`:'Generera CV'}</button>`:''}
+              ${!clDoc||clDoc==='loading'?`<button class="btn btn-ghost btn-sm" onclick="generateDocument('${a.id}','cover')" ${clDoc==='loading'?'disabled':''}>${clDoc==='loading'?`<span class="spinner"></span> Genererar…`:'Generera personligt brev'}</button>`:''}
+              <button class="btn btn-ghost btn-sm" onclick="toggleQaPanel('${a.id}')">
+                ${qaOpen[a.id]?'Dölj frågor':'Svara på frågor'}
+              </button>
+            </div>
+            ${cvDoc&&cvDoc!=='loading'?(()=>{
+              const meta=savedDocsMeta[cvKey];
+              const dateLabel=meta?.created_at?` · ${new Date(meta.created_at).toLocaleDateString('sv-SE',{day:'numeric',month:'short',year:'numeric'})}`:'';
+              return`<div class="gen-panel"><div class="gen-panel-hd"><span class="gen-panel-lbl">CV — ${lang==='sv'?'Svenska':'English'}${dateLabel}</span><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-xs" onclick="generateDocument('${a.id}','cv')">Regenerera</button><button class="btn btn-ghost btn-sm" onclick="printDocIframe('cv-iframe-${cvKey}')">Skriv ut / Spara som PDF</button></div></div><div id="cv-iframe-wrapper-${cvKey}" style="margin-top:12px"><iframe id="cv-iframe-${cvKey}" style="width:100%;height:800px;border:1px solid var(--border);border-radius:var(--r);background:#fff"></iframe></div></div>`;
+            })():''}
+            ${clDoc&&clDoc!=='loading'?(()=>{
+              const meta=savedDocsMeta[clKey];
+              const dateLabel=meta?.created_at?` · ${new Date(meta.created_at).toLocaleDateString('sv-SE',{day:'numeric',month:'short',year:'numeric'})}`:'';
+              return`<div class="gen-panel"><div class="gen-panel-hd"><span class="gen-panel-lbl">Personligt brev — ${lang==='sv'?'Svenska':'English'}${dateLabel}</span><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-xs" onclick="generateDocument('${a.id}','cover')">Regenerera</button><button class="btn btn-ghost btn-sm" onclick="copyDocIframeText('cl-iframe-${clKey}')">Kopiera text</button><button class="btn btn-ghost btn-sm" onclick="printDocIframe('cl-iframe-${clKey}')">Spara som PDF</button></div></div><div style="margin-top:12px"><iframe id="cl-iframe-${clKey}" style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--r);background:#fff"></iframe></div></div>`;
+            })():''}
+            ${qaOpen[a.id]?renderQaPanel(a):''}
+          </div>`;
+
+        return `<div class="doc-row">${summaryRow}${bodyHtml}</div>`;
       }).join('')}
     </div>`;
 }
