@@ -273,6 +273,7 @@ let generatedDocs= {};          // { `${appId}-${type}`: content|'loading' }
 let qaOpen       = {};          // { appId: bool }
 let qaTexts      = {};          // { appId: string } — textarea content
 let qaAnswers    = {};          // { appId: [{question,answer}]|'loading'|null }
+let savedDocsMeta= {};          // { `${appId}-type`: {created_at, language} }
 
 function defaultProfile() {
   return { full_name:'', phone:'', address:'', linkedin_url:'', photo_url:'', bio:'', work_experiences:[], education:[], skills:[], languages:[], driver_license:false, driver_license_type:'', reference_list:[], references_on_request:false, courses:[], cv_template_url:'', cv_template_name:'' };
@@ -500,6 +501,35 @@ async function load(){
   if(error){ toast('Kunne inte ladda data'); return; }
   applications=data||[];
   await loadAllFiles();
+  await loadSavedDocs();
+}
+
+async function loadSavedDocs(){
+  if(!currentUser||!applications.length) return;
+  const ids=applications.map(a=>a.id);
+  const {data}=await db.from('generated_documents').select('*').eq('user_id',currentUser.id).in('application_id',ids);
+  if(!data) return;
+  savedDocsMeta={};
+  data.forEach(row=>{
+    const key=`${row.application_id}-${row.type}`;
+    generatedDocs[key]=row.content;
+    savedDocsMeta[key]={created_at:row.created_at,language:row.language};
+    if(row.language) docLangs[row.application_id]=row.language;
+  });
+}
+
+async function saveGeneratedDoc(appId, type, content, language){
+  if(!currentUser) return;
+  await db.from('generated_documents').upsert({
+    user_id: currentUser.id,
+    application_id: appId,
+    type,
+    content,
+    language: language||'sv',
+    created_at: new Date().toISOString(),
+  },{onConflict:'user_id,application_id,type'});
+  const key=`${appId}-${type}`;
+  savedDocsMeta[key]={created_at:new Date().toISOString(),language:language||'sv'};
 }
 
 async function addApplication(e){
@@ -785,6 +815,47 @@ html,body{font-family:'Inter',system-ui,sans-serif;background:#FAFAF8;color:#2D2
 </html>`;
 }
 
+// ── Cover letter HTML wrapper ─────────────────────────────────────────
+function buildCoverLetterHtml(text, prof, app, lang){
+  const sv=lang==='sv';
+  const e=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const dateStr=new Date().toLocaleDateString(sv?'sv-SE':'en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const senderLines=[
+    prof.full_name, prof.email||currentUser?.email||'', prof.phone, prof.address, prof.linkedin_url
+  ].filter(Boolean).map(l=>`<div>${e(l)}</div>`).join('');
+  const recipientLines=[app.company, app.contact_name].filter(Boolean).map(l=>`<div>${e(l)}</div>`).join('');
+  return`<!DOCTYPE html>
+<html lang="${sv?'sv':'en'}">
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'Inter',system-ui,sans-serif;background:#FAFAF8;color:#2D2D2D;font-size:14px;line-height:1.7;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:A4;margin:2cm}
+@media print{html,body{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}header,footer{display:none!important}}
+.page{max-width:680px;margin:0 auto;padding:2.5rem 2rem}
+.sender{font-size:0.82rem;color:#555;line-height:1.8;margin-bottom:2rem;border-left:3px solid #C17B5C;padding-left:0.75rem}
+.meta{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem;gap:1rem;flex-wrap:wrap}
+.recipient{font-size:0.9rem;font-weight:500}
+.date{font-size:0.82rem;color:#777;white-space:nowrap}
+.subject{font-size:1rem;font-weight:600;color:#C17B5C;margin-bottom:1.5rem;padding-bottom:0.6rem;border-bottom:1px solid #e8e2db}
+.body{font-size:0.9rem;white-space:pre-wrap;line-height:1.85;color:#333}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="sender">${senderLines||e(prof.full_name||'')}</div>
+  <div class="meta">
+    <div class="recipient">${recipientLines}</div>
+    <div class="date">${dateStr}</div>
+  </div>
+  <div class="subject">${sv?'Ansökan':'Application'} — ${e(app.role)} · ${e(app.company)}</div>
+  <div class="body">${e(text)}</div>
+</div>
+</body></html>`;
+}
+
 // ── Document generation ──────────────────────────────────────────────
 function getDocLang(appId){ return docLangs[appId]||'sv'; }
 function setDocLang(appId,lang){ docLangs[appId]=lang; renderTabContent(); }
@@ -804,14 +875,14 @@ async function generateDocument(appId, type){
     });
     if(type==='cv'){
       const m=content.match(/\{[\s\S]*\}/); if(!m) throw new Error('Inget JSON från API');
-      // Sanitise: replace literal newlines inside JSON string values with \n
       const sanitised=m[0].replace(/"((?:[^"\\]|\\.)*)"/gs,(match,inner)=>'"'+inner.replace(/\r?\n/g,'\\n')+'"');
       const cvData=JSON.parse(sanitised);
       cvData.photo_url=profile.photo_url||'';
       generatedDocs[key]=buildCvHtml(cvData,lang);
     } else {
-      generatedDocs[key]=content;
+      generatedDocs[key]=buildCoverLetterHtml(content,{...profile,email:currentUser?.email||''},app,lang);
     }
+    await saveGeneratedDoc(appId, type==='cv'?'cv':'cover', generatedDocs[key], lang);
   }catch(err){
     generatedDocs[key]='ERROR: '+err.message;
   }
@@ -907,6 +978,18 @@ function printCvIframe(cvKey){
   if(!iframe) return;
   setTimeout(()=>{ iframe.contentWindow.print(); },300);
 }
+function printDocIframe(iframeId){
+  const iframe=document.getElementById(iframeId);
+  if(!iframe) return;
+  setTimeout(()=>{ iframe.contentWindow.print(); },300);
+}
+async function copyDocIframeText(iframeId){
+  const iframe=document.getElementById(iframeId);
+  if(!iframe) return;
+  const text=(iframe.contentDocument||iframe.contentWindow?.document)?.body?.innerText||'';
+  try{ await navigator.clipboard.writeText(text); toast('Kopierad till urklipp!'); }
+  catch(_){ toast('Kunde inte kopiera'); }
+}
 
 // ── Share URL ────────────────────────────────────────────────────────
 function getShareUrl(){
@@ -979,21 +1062,27 @@ function renderTabContent(){
   else if(currentTab==='profile')  el.innerHTML=renderProfileTab();
   else if(currentTab==='documents') el.innerHTML=renderDocumentsTab();
   attachTabListeners();
-  if(currentTab==='documents') populateCvIframes();
+  if(currentTab==='documents') populateDocIframes();
 }
 
-function populateCvIframes(){
+function setIframeSrcdoc(iframe, html){
+  if(html.includes('<html')||html.includes('<!DOCTYPE')){
+    iframe.srcdoc=html;
+  } else {
+    iframe.srcdoc=`<!DOCTYPE html><html><body style="font-family:system-ui;padding:30px;color:#c00;background:#fff"><h2>Fel vid generering</h2><pre style="white-space:pre-wrap">${html.replace(/</g,'&lt;')}</pre></body></html>`;
+  }
+}
+
+function populateDocIframes(){
   setTimeout(()=>{
     applications.forEach(a=>{
-      const cvKey=`${a.id}-cv`;
-      const cvDoc=generatedDocs[cvKey];
-      if(!cvDoc || cvDoc==='loading') return;
-      const iframe=document.getElementById('cv-iframe-'+cvKey);
-      if(!iframe) return;
-      if(cvDoc.includes('<html') || cvDoc.includes('<!DOCTYPE')){
-        iframe.srcdoc=cvDoc;
-      } else {
-        iframe.srcdoc=`<!DOCTYPE html><html><body style="font-family:system-ui;padding:30px;color:#c00;background:#fff"><h2>Fel vid generering</h2><pre style="white-space:pre-wrap">${cvDoc.replace(/</g,'&lt;')}</pre></body></html>`;
+      const cvKey=`${a.id}-cv`, clKey=`${a.id}-cover`;
+      const cvDoc=generatedDocs[cvKey], clDoc=generatedDocs[clKey];
+      if(cvDoc&&cvDoc!=='loading'){
+        const f=document.getElementById('cv-iframe-'+cvKey); if(f) setIframeSrcdoc(f,cvDoc);
+      }
+      if(clDoc&&clDoc!=='loading'){
+        const f=document.getElementById('cl-iframe-'+clKey); if(f) setIframeSrcdoc(f,clDoc);
       }
     });
   }, 0);
@@ -1270,18 +1359,22 @@ function renderDocumentsTab(){
               <button class="lang-btn${lang==='sv'?' active':''}" onclick="setDocLang('${a.id}','sv')">Svenska</button>
               <button class="lang-btn${lang==='en'?' active':''}" onclick="setDocLang('${a.id}','en')">English</button>
             </div>
-            <button class="btn btn-sm" onclick="generateDocument('${a.id}','cv')" ${cvDoc==='loading'?'disabled':''}>
-              ${cvDoc==='loading'?`<span class="spinner"></span> Genererar…`:'Generera CV'}
-            </button>
-            <button class="btn btn-ghost btn-sm" onclick="generateDocument('${a.id}','cover')" ${clDoc==='loading'?'disabled':''}>
-              ${clDoc==='loading'?`<span class="spinner"></span> Genererar…`:'Generera personligt brev'}
-            </button>
+            ${!cvDoc||cvDoc==='loading'?`<button class="btn btn-sm" onclick="generateDocument('${a.id}','cv')" ${cvDoc==='loading'?'disabled':''}>${cvDoc==='loading'?`<span class="spinner"></span> Genererar…`:'Generera CV'}</button>`:''}
+            ${!clDoc||clDoc==='loading'?`<button class="btn btn-ghost btn-sm" onclick="generateDocument('${a.id}','cover')" ${clDoc==='loading'?'disabled':''}>${clDoc==='loading'?`<span class="spinner"></span> Genererar…`:'Generera personligt brev'}</button>`:''}
             <button class="btn btn-ghost btn-sm" onclick="toggleQaPanel('${a.id}')">
               ${qaOpen[a.id]?'Dölj frågor':'Svara på frågor'}
             </button>
           </div>
-          ${cvDoc&&cvDoc!=='loading'?`<div class="gen-panel"><div class="gen-panel-hd"><span class="gen-panel-lbl">CV — ${lang==='sv'?'Svenska':'English'}</span><button class="btn btn-ghost btn-sm" onclick="printCvIframe('${cvKey}')">Skriv ut / Spara som PDF</button></div><div id="cv-iframe-wrapper-${cvKey}" style="margin-top:12px"><iframe id="cv-iframe-${cvKey}" style="width:100%;height:800px;border:1px solid var(--border);border-radius:var(--r);background:#fff"></iframe></div></div>`:''}
-          ${clDoc&&clDoc!=='loading'?`<div class="gen-panel"><div class="gen-panel-hd"><span class="gen-panel-lbl">Personligt brev — ${lang==='sv'?'Svenska':'English'}</span><button class="btn btn-ghost btn-sm" onclick="copyDoc('${clKey}')">Kopiera</button></div><div class="gen-content">${esc(clDoc)}</div></div>`:''}
+          ${cvDoc&&cvDoc!=='loading'?(()=>{
+            const meta=savedDocsMeta[cvKey];
+            const dateLabel=meta?.created_at?` · ${new Date(meta.created_at).toLocaleDateString('sv-SE',{day:'numeric',month:'short',year:'numeric'})}`:'';
+            return`<div class="gen-panel"><div class="gen-panel-hd"><span class="gen-panel-lbl">CV — ${lang==='sv'?'Svenska':'English'}${dateLabel}</span><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-xs" onclick="generateDocument('${a.id}','cv')">Regenerera</button><button class="btn btn-ghost btn-sm" onclick="printDocIframe('cv-iframe-${cvKey}')">Skriv ut / Spara som PDF</button></div></div><div id="cv-iframe-wrapper-${cvKey}" style="margin-top:12px"><iframe id="cv-iframe-${cvKey}" style="width:100%;height:800px;border:1px solid var(--border);border-radius:var(--r);background:#fff"></iframe></div></div>`;
+          })():''}
+          ${clDoc&&clDoc!=='loading'?(()=>{
+            const meta=savedDocsMeta[clKey];
+            const dateLabel=meta?.created_at?` · ${new Date(meta.created_at).toLocaleDateString('sv-SE',{day:'numeric',month:'short',year:'numeric'})}`:'';
+            return`<div class="gen-panel"><div class="gen-panel-hd"><span class="gen-panel-lbl">Personligt brev — ${lang==='sv'?'Svenska':'English'}${dateLabel}</span><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-xs" onclick="generateDocument('${a.id}','cover')">Regenerera</button><button class="btn btn-ghost btn-sm" onclick="copyDocIframeText('cl-iframe-${clKey}')">Kopiera text</button><button class="btn btn-ghost btn-sm" onclick="printDocIframe('cl-iframe-${clKey}')">Spara som PDF</button></div></div><div style="margin-top:12px"><iframe id="cl-iframe-${clKey}" style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--r);background:#fff"></iframe></div></div>`;
+          })():''}
           ${qaOpen[a.id]?renderQaPanel(a):''}
 
         </div>`;
