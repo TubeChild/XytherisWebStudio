@@ -241,10 +241,8 @@ Write the complete cover letter now.`;
     }
 
     const data = await upstream.json();
-    let content = data.content?.[0]?.text || '';
-    if (!content) {
-      return res.status(502).json({ error: 'DEBUG empty content', stop_reason: data.stop_reason, content_blocks: (data.content||[]).map(b=>b.type), usage: data.usage });
-    }
+    const textBlock = (data.content || []).find(b => b.type === 'text');
+    let content = textBlock?.text || '';
     if (type === 'cv') {
       content = content.replace(/^```(?:html)?\s*\n?/i, '').replace(/\n?```\s*$/, '').trim();
       const htmlStart = content.indexOf('<!DOCTYPE');
