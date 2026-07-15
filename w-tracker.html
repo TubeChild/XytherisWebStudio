@@ -86,16 +86,8 @@
     /* ── URL fetcher ── */
     .url-fetcher { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r); padding: 13px 15px; margin-bottom: 18px; }
     .url-fetcher-label { font-size: .64rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 9px; }
-    .url-row { display: flex; gap: 8px; }
-    .url-input { flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: var(--r); font-size: .84rem; outline: none; font-family: inherit; transition: border-color .15s; }
-    .url-input:focus { border-color: var(--accent); }
-    .url-input::placeholder { color: var(--muted); }
     .fetch-status { margin-top: 9px; font-size: .75rem; color: var(--muted); min-height: 16px; display: flex; align-items: center; gap: 6px; }
     .fetch-status.error { color: #f87171; } .fetch-status.success { color: #34d399; }
-    .text-link { background: none; border: none; color: var(--accent); cursor: pointer; font-size: .74rem; font-family: inherit; text-decoration: underline; padding: 0; margin-top: 9px; display: inline-block; }
-    .text-link:hover { opacity: .8; }
-    .manual-fallback { margin-top: 10px; display: none; }
-    .fallback-msg { font-size: .76rem; color: #fbbf24; margin-bottom: 9px; line-height: 1.5; }
     .manual-textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 9px 12px; border-radius: var(--r); font-size: .82rem; font-family: inherit; outline: none; resize: vertical; min-height: 110px; transition: border-color .15s; display: block; }
     .manual-textarea:focus { border-color: var(--accent); }
     .fallback-actions { display: flex; justify-content: flex-end; margin-top: 7px; }
@@ -585,7 +577,7 @@ async function addApplication(e){
   if(error){ toast('Fel vid sparning'); return; }
   if(inserted) await logStatusChange(inserted.id, payload.status, payload.date_applied);
   f.reset(); f.date_applied.value=today(); setFetchStatus('','');
-  const ui=document.getElementById('url-input'); if(ui) ui.value='';
+  const mt=document.getElementById('manual-text'); if(mt) mt.value='';
   toast('Ansökan sparad'); await load(); renderTabContent();
 }
 
@@ -677,93 +669,27 @@ function getFileUrl(f){
   return data.publicUrl;
 }
 
-// ── URL fetcher ──────────────────────────────────────────────────────
-const PROXIES=[
-  u=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-  u=>`https://corsproxy.io/?${encodeURIComponent(u)}`,
-  u=>`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
-];
-
-async function fetchViaProxies(url){
-  for(let i=0;i<PROXIES.length;i++){
-    setFetchStatus('loading',`Försöker proxy ${i+1}/${PROXIES.length}…`);
-    try{
-      const res=await fetch(PROXIES[i](url),{signal:AbortSignal.timeout(10000)});
-      if(!res.ok) continue;
-      const t=await res.text(); if(t&&t.length>100) return t;
-    } catch(_){}
-  }
-  return null;
-}
-
-async function fetchJobInfo(){
-  const urlEl=document.getElementById('url-input');
-  const url=urlEl?.value.trim();
-  if(!url){ setFetchStatus('error','Klistra in en URL först.'); return; }
-  if(!url.startsWith('http')){ setFetchStatus('error','URL måste börja med http/https.'); return; }
-  const btn=document.getElementById('fetch-btn'); btn.disabled=true; hideFallback();
-  const html=await fetchViaProxies(url);
-  if(!html){ btn.disabled=false; setFetchStatus('error','Alla proxies misslyckades.'); showFallback('fetch-failed'); return; }
-  setFetchStatus('loading','Extraherar detaljer med Claude…');
-  let extracted;
-  try{ extracted=await callClaudeExtract(extractText(html)); }
-  catch(err){ setFetchStatus('error','Claude-fel: '+err.message); btn.disabled=false; return; }
-  btn.disabled=false; applyExtracted(extracted,url);
-}
-
+// ── Job info extraction ───────────────────────────────────────────────
 async function extractFromManualText(){
   const raw=document.getElementById('manual-text')?.value.trim();
-  const url=document.getElementById('url-input')?.value.trim()||'';
   if(!raw){ setFetchStatus('error','Klistra in annonstext först.'); return; }
   const btn=document.getElementById('manual-extract-btn'); if(btn) btn.disabled=true;
   setFetchStatus('loading','Extraherar detaljer med Claude…');
   let extracted;
   try{ extracted=await callClaudeExtract(raw.slice(0,7000)); }
   catch(err){ setFetchStatus('error','Claude-fel: '+err.message); if(btn) btn.disabled=false; return; }
-  if(btn) btn.disabled=false; applyExtracted(extracted,url,true);
+  if(btn) btn.disabled=false; applyExtracted(extracted);
 }
 
-function applyExtracted(ex,url,viaManual){
+function applyExtracted(ex){
   const f=document.getElementById('add-form'); const filled=[];
   if(ex.company){ f.company.value=ex.company; f.company.classList.add('autofilled'); filled.push('företag'); }
   if(ex.role){ f.role.value=ex.role; f.role.classList.add('autofilled'); filled.push('roll'); }
   if(ex.contact_name)  f.contact_name.value=ex.contact_name;
   if(ex.contact_email) f.contact_email.value=ex.contact_email;
   if(ex.contact_phone) f.contact_phone.value=ex.contact_phone;
-  if(url){ const jf=document.getElementById('form-job-url'); if(jf) jf.value=url; }
-  if(!filled.length){ setFetchStatus('error','Kunde inte extrahera — fyll i manuellt.'); showFallback(viaManual?'manual':'fetch-failed'); }
-  else { setFetchStatus('success',`Ifyllt: ${filled.join(', ')}. Granska och spara.`); if(viaManual) hideFallback(); }
-}
-
-function toggleManualFallback(){
-  const el=document.getElementById('manual-fallback');
-  if(el&&el.style.display==='block') hideFallback();
-  else showFallback('manual');
-}
-
-function showFallback(reason){
-  const msg = reason==='fetch-failed'
-    ? 'Kunde inte hämta sidan automatiskt. Klistra in jobbannonsen som text istället.'
-    : 'Ingen länk till hands? Klistra in hela jobbannonsen nedan så extraherar Claude detaljerna.';
-  let el=document.getElementById('manual-fallback');
-  if(!el){
-    const anchor=document.getElementById('fetch-status'); if(!anchor) return;
-    el=document.createElement('div'); el.id='manual-fallback'; el.className='manual-fallback';
-    el.innerHTML=`<div class="fallback-msg">${esc(msg)}</div>
-      <textarea id="manual-text" class="manual-textarea" placeholder="Klistra in hela jobbannonsen här…"></textarea>
-      <div class="fallback-actions"><button id="manual-extract-btn" class="btn btn-sm" onclick="extractFromManualText()">Extrahera med Claude</button></div>`;
-    anchor.after(el);
-  } else {
-    const msgEl=el.querySelector('.fallback-msg'); if(msgEl) msgEl.textContent=msg;
-  }
-  el.style.display='block'; el.querySelector('textarea')?.focus();
-}
-function hideFallback(){ const el=document.getElementById('manual-fallback'); if(el) el.style.display='none'; }
-
-function extractText(html){
-  const doc=new DOMParser().parseFromString(html,'text/html');
-  ['script','style','nav','footer','header','noscript','iframe','svg'].forEach(t=>doc.querySelectorAll(t).forEach(e=>e.remove()));
-  return (doc.body?.innerText||doc.body?.textContent||'').replace(/\s+/g,' ').trim().slice(0,7000);
+  if(!filled.length){ setFetchStatus('error','Kunde inte extrahera — fyll i manuellt.'); }
+  else setFetchStatus('success',`Ifyllt: ${filled.join(', ')}. Granska och spara.`);
 }
 
 function setFetchStatus(type,msg){
@@ -1181,22 +1107,19 @@ function renderApplicationsTab(){
     <div class="form-card">
       <div class="form-card-hd"><h2>Ny ansökan</h2></div>
       <div class="url-fetcher">
-        <div class="url-fetcher-label">Hämta info från jobbannons</div>
-        <div class="url-row">
-          <input id="url-input" class="url-input" type="url" placeholder="Klistra in URL…" onkeydown="if(event.key==='Enter'){event.preventDefault();fetchJobInfo()}">
-          <button id="fetch-btn" class="btn btn-sm" onclick="fetchJobInfo()">Hämta jobbinfo</button>
-        </div>
-        <button type="button" class="text-link" onclick="toggleManualFallback()">Ingen länk? Klistra in annonstexten istället</button>
+        <div class="url-fetcher-label">Klistra in jobbannonsen så extraherar Claude detaljerna</div>
+        <textarea id="manual-text" class="manual-textarea" placeholder="Klistra in hela jobbannonsen här…"></textarea>
+        <div class="fallback-actions"><button id="manual-extract-btn" class="btn btn-sm" onclick="extractFromManualText()">Extrahera med Claude</button></div>
         <div id="fetch-status" class="fetch-status"></div>
       </div>
       <form id="add-form">
-        <input type="hidden" name="job_url" id="form-job-url">
         <div class="form-grid">
           <div class="fg"><label>Företag</label><input name="company" placeholder="Acme AB" required autocomplete="off"></div>
           <div class="fg"><label>Roll</label><input name="role" placeholder="Frontend-utvecklare" required autocomplete="off"></div>
           <div class="fg"><label>Datum ansökt</label><input name="date_applied" type="date" required value="${today()}"></div>
           <div class="fg"><label>Status</label><select name="status">${STATUSES.map(s=>`<option value="${s}">${STATUS_LABELS[s]}</option>`).join('')}</select></div>
         </div>
+        <div class="fg" style="margin-bottom:16px"><label>Länk till annonsen (valfritt)</label><input name="job_url" type="url" placeholder="https://…" autocomplete="off"></div>
         <div class="form-divider">Kontaktinfo</div>
         <div class="form-grid-3">
           <div class="fg"><label>Kontaktperson</label><input name="contact_name" placeholder="Anna Andersson" autocomplete="off"></div>
@@ -1544,12 +1467,7 @@ function renderReadOnly(){
 // ── Attach listeners ──────────────────────────────────────────────────
 function attachTabListeners(){
   const form=document.getElementById('add-form');
-  if(form){
-    form.addEventListener('submit',addApplication);
-    const ui=document.getElementById('url-input');
-    const jf=document.getElementById('form-job-url');
-    if(ui&&jf) ui.addEventListener('input',()=>{ jf.value=ui.value.trim(); });
-  }
+  if(form) form.addEventListener('submit',addApplication);
 }
 
 // ── Init ──────────────────────────────────────────────────────────────

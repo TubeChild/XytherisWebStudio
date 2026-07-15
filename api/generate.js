@@ -220,7 +220,7 @@ Write the complete cover letter now.`;
   }
 
   try {
-    const model = 'claude-sonnet-4-20250514';
+    const model = 'claude-sonnet-5';
     const upstream = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
