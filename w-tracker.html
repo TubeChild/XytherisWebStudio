@@ -72,11 +72,11 @@
     .ro-banner { background: var(--accent-dim); border: 1px solid rgba(124,111,255,.25); border-radius: var(--r); padding: 10px 18px; margin-bottom: 32px; font-size: .8rem; color: #a89fff; text-align: center; }
 
     /* ── Stats ── */
-    .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 32px; }
+    .stats { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 32px; }
     .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 18px; }
     .stat-val { font-size: 1.9rem; font-weight: 600; letter-spacing: -.04em; line-height: 1; margin-bottom: 5px; }
     .stat-label { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .09em; }
-    .stat-val.c-a { color: #60a5fa; } .stat-val.c-i { color: #fbbf24; } .stat-val.c-o { color: #34d399; }
+    .stat-val.c-a { color: #60a5fa; } .stat-val.c-i { color: #fbbf24; } .stat-val.c-o { color: #34d399; } .stat-val.c-cb { color: #a78bfa; }
 
     /* ── Form card ── */
     .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 26px; margin-bottom: 32px; }
@@ -92,6 +92,8 @@
     .url-input::placeholder { color: var(--muted); }
     .fetch-status { margin-top: 9px; font-size: .75rem; color: var(--muted); min-height: 16px; display: flex; align-items: center; gap: 6px; }
     .fetch-status.error { color: #f87171; } .fetch-status.success { color: #34d399; }
+    .text-link { background: none; border: none; color: var(--accent); cursor: pointer; font-size: .74rem; font-family: inherit; text-decoration: underline; padding: 0; margin-top: 9px; display: inline-block; }
+    .text-link:hover { opacity: .8; }
     .manual-fallback { margin-top: 10px; display: none; }
     .fallback-msg { font-size: .76rem; color: #fbbf24; margin-bottom: 9px; line-height: 1.5; }
     .manual-textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 9px 12px; border-radius: var(--r); font-size: .82rem; font-family: inherit; outline: none; resize: vertical; min-height: 110px; transition: border-color .15s; display: block; }
@@ -140,6 +142,7 @@
     .badge { font-size: .64rem; padding: 3px 9px; border-radius: 20px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; min-width: 76px; text-align: center; white-space: nowrap; }
     .b-Applied   { background: rgba(59,130,246,.14); color: #60a5fa; }
     .b-Interview { background: rgba(245,158,11,.14);  color: #fbbf24; }
+    .b-Callback  { background: rgba(167,139,250,.14); color: #a78bfa; }
     .b-Rejected  { background: rgba(239,68,68,.14);   color: #f87171; }
     .b-Offer     { background: rgba(16,185,129,.14);  color: #34d399; }
     .status-select { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 5px 8px; border-radius: 6px; font-size: .74rem; cursor: pointer; outline: none; font-family: inherit; transition: border-color .15s; }
@@ -156,6 +159,12 @@
     /* ── App expand panel ── */
     .app-expand { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
     .expand-section-label { font-size: .63rem; color: var(--muted); text-transform: uppercase; letter-spacing: .09em; margin-bottom: 6px; }
+    .history-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
+    .history-item { display: flex; align-items: center; gap: 10px; font-size: .76rem; color: var(--muted); }
+    .history-date { white-space: nowrap; }
+    .history-add-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .history-date-inp { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 6px; font-size: .74rem; font-family: inherit; outline: none; transition: border-color .15s; }
+    .history-date-inp:focus { border-color: var(--accent); }
     .notes-area { width: 100%; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 8px 11px; border-radius: var(--r); font-size: .82rem; font-family: inherit; resize: vertical; min-height: 60px; outline: none; transition: border-color .15s; }
     .notes-area:focus { border-color: var(--accent); }
     .file-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; }
@@ -265,11 +274,13 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 const params     = new URLSearchParams(window.location.search);
 const isReadOnly = params.has('view');
 const sharedUID  = params.get('user') || '';
-const STATUSES   = ['Applied','Interview','Rejected','Offer'];
+const STATUSES   = ['Applied','Interview','Callback','Rejected','Offer'];
+const STATUS_LABELS = { Applied:'Applied', Interview:'Interview', Callback:'Uppföljning', Rejected:'Rejected', Offer:'Offer' };
 
 let currentUser  = null;
 let applications = [];
 let appFiles     = {};          // { appId: [file,...] }
+let appHistory   = {};          // { appId: [{status,changed_at},...] } ascending
 let expandedApps = new Set();   // app IDs with expand panel open
 let profile      = defaultProfile();
 let activeFilter = 'All';
@@ -509,7 +520,22 @@ async function load(){
   if(error){ toast('Kunne inte ladda data'); return; }
   applications=data||[];
   await loadAllFiles();
+  if(!isReadOnly) await loadAllHistory();
   await loadSavedDocs();
+}
+
+async function loadAllHistory(){
+  if(!applications.length){ appHistory={}; return; }
+  const ids=applications.map(a=>a.id);
+  const {data}=await db.from('status_history').select('*').in('application_id',ids).order('changed_at',{ascending:true});
+  appHistory={};
+  (data||[]).forEach(h=>{ if(!appHistory[h.application_id]) appHistory[h.application_id]=[]; appHistory[h.application_id].push(h); });
+}
+
+async function logStatusChange(applicationId, status, atDate){
+  if(!currentUser) return {error:null};
+  const changed_at = atDate ? new Date(atDate+'T00:00:00').toISOString() : new Date().toISOString();
+  return db.from('status_history').insert({ application_id: applicationId, user_id: currentUser.id, status, changed_at });
 }
 
 async function loadSavedDocs(){
@@ -554,9 +580,10 @@ async function addApplication(e){
   };
   if(!payload.company||!payload.role||!payload.date_applied) return;
   const btn=f.querySelector('button[type="submit"]'); btn.disabled=true; btn.textContent='Sparar…';
-  const {error}=await db.from('job_applications').insert(payload);
+  const {data:inserted,error}=await db.from('job_applications').insert(payload).select().single();
   btn.disabled=false; btn.textContent='Lägg till ansökan';
   if(error){ toast('Fel vid sparning'); return; }
+  if(inserted) await logStatusChange(inserted.id, payload.status, payload.date_applied);
   f.reset(); f.date_applied.value=today(); setFetchStatus('','');
   const ui=document.getElementById('url-input'); if(ui) ui.value='';
   toast('Ansökan sparad'); await load(); renderTabContent();
@@ -565,7 +592,25 @@ async function addApplication(e){
 async function updateStatus(id,status){
   const {error}=await db.from('job_applications').update({status}).eq('id',id);
   if(error){ toast('Uppdatering misslyckades'); return; }
-  applications=applications.map(a=>a.id===id?{...a,status}:a); renderTabContent();
+  applications=applications.map(a=>a.id===id?{...a,status}:a);
+  await logStatusChange(id, status);
+  if(!appHistory[id]) appHistory[id]=[];
+  appHistory[id].push({application_id:id, status, changed_at:new Date().toISOString()});
+  renderTabContent();
+}
+
+async function addHistoryEntry(appId){
+  const statusEl=document.getElementById('hist-status-'+appId);
+  const dateEl=document.getElementById('hist-date-'+appId);
+  const status=statusEl?.value, date=dateEl?.value;
+  if(!status||!date) return;
+  const {error}=await logStatusChange(appId, status, date);
+  if(error){ toast('Kunde inte spara historik: '+error.message); return; }
+  if(!appHistory[appId]) appHistory[appId]=[];
+  appHistory[appId].push({application_id:appId, status, changed_at:new Date(date+'T00:00:00').toISOString()});
+  appHistory[appId].sort((x,y)=>x.changed_at.localeCompare(y.changed_at));
+  toast('Händelse tillagd i historik');
+  renderTabContent();
 }
 
 async function saveNotes(id,notes){
@@ -658,7 +703,7 @@ async function fetchJobInfo(){
   if(!url.startsWith('http')){ setFetchStatus('error','URL måste börja med http/https.'); return; }
   const btn=document.getElementById('fetch-btn'); btn.disabled=true; hideFallback();
   const html=await fetchViaProxies(url);
-  if(!html){ btn.disabled=false; setFetchStatus('error','Alla proxies misslyckades.'); showFallback(); return; }
+  if(!html){ btn.disabled=false; setFetchStatus('error','Alla proxies misslyckades.'); showFallback('fetch-failed'); return; }
   setFetchStatus('loading','Extraherar detaljer med Claude…');
   let extracted;
   try{ extracted=await callClaudeExtract(extractText(html)); }
@@ -675,10 +720,10 @@ async function extractFromManualText(){
   let extracted;
   try{ extracted=await callClaudeExtract(raw.slice(0,7000)); }
   catch(err){ setFetchStatus('error','Claude-fel: '+err.message); if(btn) btn.disabled=false; return; }
-  if(btn) btn.disabled=false; hideFallback(); applyExtracted(extracted,url);
+  if(btn) btn.disabled=false; applyExtracted(extracted,url,true);
 }
 
-function applyExtracted(ex,url){
+function applyExtracted(ex,url,viaManual){
   const f=document.getElementById('add-form'); const filled=[];
   if(ex.company){ f.company.value=ex.company; f.company.classList.add('autofilled'); filled.push('företag'); }
   if(ex.role){ f.role.value=ex.role; f.role.classList.add('autofilled'); filled.push('roll'); }
@@ -686,19 +731,30 @@ function applyExtracted(ex,url){
   if(ex.contact_email) f.contact_email.value=ex.contact_email;
   if(ex.contact_phone) f.contact_phone.value=ex.contact_phone;
   if(url){ const jf=document.getElementById('form-job-url'); if(jf) jf.value=url; }
-  if(!filled.length){ setFetchStatus('error','Kunde inte extrahera — fyll i manuellt.'); showFallback(); }
-  else setFetchStatus('success',`Ifyllt: ${filled.join(', ')}. Granska och spara.`);
+  if(!filled.length){ setFetchStatus('error','Kunde inte extrahera — fyll i manuellt.'); showFallback(viaManual?'manual':'fetch-failed'); }
+  else { setFetchStatus('success',`Ifyllt: ${filled.join(', ')}. Granska och spara.`); if(viaManual) hideFallback(); }
 }
 
-function showFallback(){
+function toggleManualFallback(){
+  const el=document.getElementById('manual-fallback');
+  if(el&&el.style.display==='block') hideFallback();
+  else showFallback('manual');
+}
+
+function showFallback(reason){
+  const msg = reason==='fetch-failed'
+    ? 'Kunde inte hämta sidan automatiskt. Klistra in jobbannonsen som text istället.'
+    : 'Ingen länk till hands? Klistra in hela jobbannonsen nedan så extraherar Claude detaljerna.';
   let el=document.getElementById('manual-fallback');
   if(!el){
     const anchor=document.getElementById('fetch-status'); if(!anchor) return;
     el=document.createElement('div'); el.id='manual-fallback'; el.className='manual-fallback';
-    el.innerHTML=`<div class="fallback-msg">Kunde inte hämta sidan automatiskt. Klistra in jobbannonsen som text istället.</div>
+    el.innerHTML=`<div class="fallback-msg">${esc(msg)}</div>
       <textarea id="manual-text" class="manual-textarea" placeholder="Klistra in hela jobbannonsen här…"></textarea>
       <div class="fallback-actions"><button id="manual-extract-btn" class="btn btn-sm" onclick="extractFromManualText()">Extrahera med Claude</button></div>`;
     anchor.after(el);
+  } else {
+    const msgEl=el.querySelector('.fallback-msg'); if(msgEl) msgEl.textContent=msg;
   }
   el.style.display='block'; el.querySelector('textarea')?.focus();
 }
@@ -1011,7 +1067,20 @@ function copyShare(){
 
 // ── Filter / stats ───────────────────────────────────────────────────
 function filteredApps(){ return activeFilter==='All'?applications:applications.filter(a=>a.status===activeFilter); }
-function statsCount(){ return { total:applications.length, applied:applications.filter(a=>a.status==='Applied').length, interview:applications.filter(a=>a.status==='Interview').length, offer:applications.filter(a=>a.status==='Offer').length }; }
+function everReached(a,status){
+  const hist=appHistory[a.id];
+  if(hist&&hist.length) return hist.some(h=>h.status===status);
+  return a.status===status; // fallback for apps with no history rows yet
+}
+function statsCount(){
+  return {
+    total: applications.length,
+    applied: applications.filter(a=>a.status==='Applied').length,
+    interview: applications.filter(a=>everReached(a,'Interview')).length,
+    callback: applications.filter(a=>everReached(a,'Callback')).length,
+    offer: applications.filter(a=>everReached(a,'Offer')).length,
+  };
+}
 function setFilter(f){ activeFilter=f; renderTabContent(); }
 function switchTab(tab){ currentTab=tab; document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab)); renderTabContent(); }
 function confirmDelete(id){ if(confirm('Ta bort denna ansökan?')) deleteApp(id); }
@@ -1105,6 +1174,7 @@ function renderApplicationsTab(){
       <div class="stat"><div class="stat-val">${s.total}</div><div class="stat-label">Totalt</div></div>
       <div class="stat"><div class="stat-val c-a">${s.applied}</div><div class="stat-label">Skickade</div></div>
       <div class="stat"><div class="stat-val c-i">${s.interview}</div><div class="stat-label">Intervjuer</div></div>
+      <div class="stat"><div class="stat-val c-cb">${s.callback}</div><div class="stat-label">Uppföljningar</div></div>
       <div class="stat"><div class="stat-val c-o">${s.offer}</div><div class="stat-label">Erbjudanden</div></div>
     </div>
 
@@ -1116,6 +1186,7 @@ function renderApplicationsTab(){
           <input id="url-input" class="url-input" type="url" placeholder="Klistra in URL…" onkeydown="if(event.key==='Enter'){event.preventDefault();fetchJobInfo()}">
           <button id="fetch-btn" class="btn btn-sm" onclick="fetchJobInfo()">Hämta jobbinfo</button>
         </div>
+        <button type="button" class="text-link" onclick="toggleManualFallback()">Ingen länk? Klistra in annonstexten istället</button>
         <div id="fetch-status" class="fetch-status"></div>
       </div>
       <form id="add-form">
@@ -1124,7 +1195,7 @@ function renderApplicationsTab(){
           <div class="fg"><label>Företag</label><input name="company" placeholder="Acme AB" required autocomplete="off"></div>
           <div class="fg"><label>Roll</label><input name="role" placeholder="Frontend-utvecklare" required autocomplete="off"></div>
           <div class="fg"><label>Datum ansökt</label><input name="date_applied" type="date" required value="${today()}"></div>
-          <div class="fg"><label>Status</label><select name="status">${STATUSES.map(s=>`<option>${s}</option>`).join('')}</select></div>
+          <div class="fg"><label>Status</label><select name="status">${STATUSES.map(s=>`<option value="${s}">${STATUS_LABELS[s]}</option>`).join('')}</select></div>
         </div>
         <div class="form-divider">Kontaktinfo</div>
         <div class="form-grid-3">
@@ -1139,7 +1210,7 @@ function renderApplicationsTab(){
     </div>
 
     <div class="filter-bar">
-      ${['All',...STATUSES].map(f=>`<button class="filter-chip${activeFilter===f?' active':''}" onclick="setFilter('${f}')">${f==='All'?'Alla':f}</button>`).join('')}
+      ${['All',...STATUSES].map(f=>`<button class="filter-chip${activeFilter===f?' active':''}" onclick="setFilter('${f}')">${f==='All'?'Alla':STATUS_LABELS[f]}</button>`).join('')}
     </div>
     <div class="sh"><h2>Ansökningar</h2><span class="count">${list.length} visas</span></div>
     <div class="applications">
@@ -1153,6 +1224,12 @@ function renderApplicationsTab(){
         <button class="btn btn-ghost btn-sm" onclick="copyShare()">Kopiera</button>
       </div>
     </div>`;
+}
+
+function renderHistoryList(appId){
+  const hist=appHistory[appId];
+  if(!hist||!hist.length) return `<div style="font-size:.76rem;color:var(--muted)">Ingen historik ännu.</div>`;
+  return hist.map(h=>`<div class="history-item"><span class="badge b-${h.status}">${STATUS_LABELS[h.status]||h.status}</span><span class="history-date">${formatDate(h.changed_at.slice(0,10))}</span></div>`).join('');
 }
 
 function renderAppRow(a){
@@ -1173,7 +1250,7 @@ function renderAppRow(a){
       <div class="app-date">${formatDate(a.date_applied)}</div>
       <div class="app-actions">
         <select class="status-select" onchange="updateStatus('${a.id}',this.value)">
-          ${STATUSES.map(s=>`<option${a.status===s?' selected':''}>${s}</option>`).join('')}
+          ${STATUSES.map(s=>`<option value="${s}"${a.status===s?' selected':''}>${STATUS_LABELS[s]}</option>`).join('')}
         </select>
         <button class="expand-toggle" onclick="toggleExpand('${a.id}')">📎 ${files.length}${a.notes?' 📝':''} ${expanded?'▲':'▼'}</button>
         <button class="icon-btn del" onclick="confirmDelete('${a.id}')" title="Ta bort">✕</button>
@@ -1181,6 +1258,17 @@ function renderAppRow(a){
     </div>
     ${expanded?`
     <div class="app-expand">
+      <div>
+        <div class="expand-section-label">Historik</div>
+        <div class="history-list">${renderHistoryList(a.id)}</div>
+        <div class="history-add-row">
+          <select class="status-select" id="hist-status-${a.id}">
+            ${STATUSES.map(s=>`<option value="${s}">${STATUS_LABELS[s]}</option>`).join('')}
+          </select>
+          <input type="date" class="history-date-inp" id="hist-date-${a.id}" value="${today()}">
+          <button class="btn btn-ghost btn-xs" onclick="addHistoryEntry('${a.id}')">+ Lägg till händelse</button>
+        </div>
+      </div>
       <div>
         <div class="expand-section-label">Anteckningar</div>
         <textarea class="notes-area" placeholder="Inga anteckningar…" onblur="saveNotes('${a.id}',this.value)">${esc(a.notes||'')}</textarea>
@@ -1380,7 +1468,7 @@ function renderDocumentsTab(){
               <div class="doc-co">${esc(a.company)}</div>
               <div class="doc-role">${esc(a.role)}</div>
             </div>
-            <span class="badge b-${a.status}" style="flex-shrink:0">${a.status}</span>
+            <span class="badge b-${a.status}" style="flex-shrink:0">${STATUS_LABELS[a.status]||a.status}</span>
             ${chipHtml}
             <span class="doc-chevron${expanded?' open':''}">▼</span>
           </div>`;
@@ -1446,7 +1534,7 @@ function renderReadOnly(){
                 <div class="app-role">${esc(a.role)}</div>
               </div>
               <div class="app-date">${formatDate(a.date_applied)}</div>
-              <span class="badge b-${a.status}">${a.status}</span>
+              <span class="badge b-${a.status}">${STATUS_LABELS[a.status]||a.status}</span>
             </div>
           </div>`).join('')}
       </div>
